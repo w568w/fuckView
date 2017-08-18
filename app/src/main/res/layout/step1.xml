@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/step1_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ff0099cc"
+        android:gravity="center_vertical"
+        android:padding="6dp"
+        android:text="选择一个你要净化的应用\n(你应事先将其强制停止，否则无法正常标记)"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="12sp" />
+
+
+    <ListView
+        android:id="@+id/step1_listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:choiceMode="singleChoice" />
+</LinearLayout>

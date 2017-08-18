@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="super_mode"
+        android:summary="打开后可能导致误杀和卡顿，但对于广告有奇效"
+        android:title="超强模式" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="only_once"
+        android:summary="每条规则在屏蔽一次后，立刻失效，直到下一次打开应用。\n如果有误杀可尝试勾选此项。"
+        android:title="每条规则只屏蔽一次" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="force_root"
+        android:summary="无视辅助服务，悬浮窗强制使用root模式解析布局"
+        android:title="悬浮窗使用root" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="system_app"
+        android:summary="在应用列表中显示系统应用"
+        android:title="显示系统应用" />
+    <Preference
+        android:key="import"
+        android:summary="点我导入新规则"
+        android:title="导入规则" />
+    <PreferenceCategory android:title="关于">
+        <Preference
+            android:key="about"
+            android:summary="w568w"
+            android:title="作者" />
+        <Preference
+            android:key="pay"
+            android:summary="感谢 @纯白 对净眼的支持"
+            android:title="捐赠" />
+        <Preference
+            android:key="source"
+            android:summary="None"
+            android:title="开放源代码许可" />
+        <Preference
+            android:key="qq"
+            android:summary="寻找组织搞事情"
+            android:title="加入企鹅群" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

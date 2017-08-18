@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Statistic">
+    <option name="separateTabsFileTypes" value="java;xml;" />
+    <option name="excludeCompilerOutput" value="false" />
+    <option name="excludeIdea9ArtifactDirectory" value="false" />
+    <option name="excludeGitArtifactDirectory" value="false" />
+    <option name="excludeSubversionArtifactDirectory" value="false" />
+    <option name="excludeTargetDirectories" value="false" />
+  </component>
+</project>

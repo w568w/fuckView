@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/background_dark"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/dump_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="刷新解析" />
+
+        <Button
+            android:id="@+id/dump_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="切换位置" />
+
+        <Button
+            android:id="@+id/dump_block_launch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="标记当前页" />
+
+        <Button
+            android:id="@+id/dump_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关闭悬浮" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
