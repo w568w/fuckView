@@ -11,15 +11,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-
+        android:paddingRight="10dp"
+        android:paddingEnd="10dp"
         android:checked="false"
         android:clickable="false"
         android:focusable="false" />
 
     <TextView
+        android:drawablePadding="10dp"
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical" />
+        android:layout_gravity="center_vertical" />
 
 </LinearLayout>
