@@ -18,7 +18,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //FIR.init(this);
         con = this;
         Fabric.with(this, new Crashlytics());
     }

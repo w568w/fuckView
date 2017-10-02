@@ -13,12 +13,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.BoolRes;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,7 +24,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,12 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.net.CookieManager;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -65,10 +55,9 @@ import static ml.qingsu.fuckview.Hook.ViewBlocker.getViewPath;
 
 public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
     private static ArrayList<BlockModel> mBlockList = new ArrayList<>();
-    private static ArrayList<Object> arrayList = new ArrayList<>();
     private ArrayList<String> jsFiles = new ArrayList<>();
     //由于目标APP不一定有读写文件权限，所以想到了这么个奇巧淫技，自己维护个缓存区
-    private static String write_File_cache = "";
+    private static String writeFileCache = "";
     private static final String DIR_NAME = "fuckView/";
     private static final String JS_FILE_NAME = DIR_NAME + "js";
     private static final String SUPER_MODE_NAME = DIR_NAME + "super_mode";
@@ -89,7 +78,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
         //读文件会有多余的换行
         String pkg = Read_File(PACKAGE_NAME_FILENAME).replace("\n", "");
 
-
+        //读取设置
         try {
             super_mode = Boolean.valueOf(Read_File(SUPER_MODE_NAME).replace("\n", ""));
             only_once = Boolean.valueOf(Read_File(ONLY_ONCE_NAME).replace("\n", ""));
@@ -105,38 +94,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
                     "isModuleActive", XC_MethodReplacement.returnConstant(true));
             return;
         }
-//        if (loadPackageParam.packageName.equals("yyc.gxbj")) {
-//            XposedBridge.log("Bomb hook start!");
-//            XposedHelpers.findAndHookConstructor("cn.bmob.v3.BmobQuery", loadPackageParam.classLoader, new XC_MethodHook() {
-//                @Override
-//                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                    super.afterHookedMethod(param);
-//                    System.out.println("fuck --> a query");
-//                    Object bmobQuery = param.thisObject;
-//
-//                    Class<?> mCallback = Class.forName("cn.bmob.v3.listener.FindListener", false, loadPackageParam.classLoader);
-//                    Method findObjects = bmobQuery.getClass().getMethod("findObjects",
-//                            mCallback);
-//                    Object mObj = Proxy.newProxyInstance(loadPackageParam.classLoader,
-//                            new Class[]{mCallback}, new InvocationHandler() {
-//                                @Override
-//                                public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-//                                    List list = (List) objects[0];
-//                                    System.out.println("fuck --> query over");
-//                                    if (list == null) {
-//                                        System.out.println("fuck --> null!");
-//                                        return null;
-//                                    }
-//                                    for (Object obj : list)
-//                                        if (obj instanceof BmobObject)
-//                                            System.out.println("fuck -->" + ((BmobObject) obj).getObjectId());
-//                                    return null;
-//                                }
-//                            });
-//                    findObjects.invoke(bmobQuery, mObj);
-//                }
-//            });
-//        }
 
         XposedBridge.log("净眼:检测模块正常 -->" + pkg);
         if ((pkg != null && loadPackageParam.packageName.equals(pkg))) {
@@ -195,17 +152,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
                             //如果是ListView中的项目，手动CALL一次监听器
                             ViewModel model = getListView(view);
                             if (model != null && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                                //Google哪个傻逼写这个JB参数，非要我提供ID和位置，你TM自己不是有
-                                //getItemIdAtPosition嘛，你TM敢跟我说你没有getPositionForView？？
-                                //我敢肯定你们没审查代码
-                                // (╯‵□′)╯︵┻━┻！！！
-                                //我预祝写这个类的程序员下AV全是葫芦娃和喜羊羊
-
-                                //腾讯哪个傻逼，还真TM会装逼啊，自己写了个com.tencent.widget.AdapterView!!!
-                                //我TM还得用反射！不然就ClassCast异常！
-                                //想写累死我？
-                                //我问候您全家
-                                // fuck duck type!
                                 try {
                                     int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
                                     long id = (long) XposedHelpers.callMethod(model.adapterView, "getItemIdAtPosition", new Class[]{int.class}, position);
@@ -331,9 +277,16 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
         //------------------------------------标记部分结束，以下为拦截部分------------------------
         //------------------------------------华丽的分割线----------------------------------------
         //读取屏蔽列表
-        //if (!loadPackageParam.packageName.equals("com.google.android.gms"))
-        //   mBlockList = readBlockList(loadPackageParam.packageName);
-        mBlockList = readBlockList();
+
+        //坑：若要屏蔽的是一个“请使用Google Play服务”之类的对话框，标记时View.getContext().getPackageName()记录的是APK本身的包名，
+        //屏蔽时调用同一方法却会读到com.google.android.gms这一包名，导致对不上记录，不屏蔽，很迷。
+        //虽说可以HardCode，但是像这样使用XXX服务的APP不在少数...
+        //这种方案肯定不行， TODO 一下，以后慢慢想解决办法。
+//        if (!loadPackageParam.packageName.equals("com.google.android.gms"))
+//           mBlockList = readBlockList(loadPackageParam.packageName);
+        mBlockList = readBlockList(loadPackageParam.packageName);
+
+        //以下为Hook
         //对话框取消那个APP，其实核心就这一行代码...
         XposedBridge.log("净眼:hook -->setCancelable");
         XposedHelpers.findAndHookMethod(Dialog.class, "setCancelable", boolean.class, new booleanSetterHooker(true));
@@ -471,7 +424,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
             XposedBridge.log("净眼:Message --> RemoveView");
             final BlockModel model = DialogBlocker.getInstance().log(view);
             XposedBridge.log("净眼:Removed View -->" + model.id);
-
+            //防止自残
             if (!model.id.equals("") &&
                     !model.id.contains("长按以标记")
                     && !model.id.contains("强制停止应用即可")
@@ -522,7 +475,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
                         Toast.makeText(con, "强制停止应用即可", Toast.LENGTH_LONG).show();
                         Intent intent = con.getPackageManager().getLaunchIntentForPackage("ml.qingsu.fuckview");
                         //看！奇巧淫技！
-                        intent.putExtra("cache", write_File_cache);
+                        intent.putExtra("cache", writeFileCache);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         con.startActivity(intent);
                     }
@@ -604,7 +557,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
         infomation.setText("长按以标记");
         //增加红框
         addViewShape(view);
-        //Single Dog,single dog,single all the day~~
         OnlySingleToast.showToast(context, infomation, Toast.LENGTH_SHORT);
         //显示通知栏
         //设置Intent
@@ -645,7 +597,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
     }
 
 
-    //只显示最后一个Toast，避免辣鸡的依次显示
+    //只显示最后一个Toast，避免依次显示
     private static class OnlySingleToast {
         private static Toast lastToast = null;
 
@@ -802,7 +754,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
         try {
             if (filename.equals(LIST_FILENAME)) {
                 //直接写进cache
-                write_File_cache = data;
+                writeFileCache = data;
                 return;
             }
             File file = new File(File_Get_SD_Path() + "/" + filename);
@@ -861,7 +813,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
     private static String Read_File(String filename) {
         if (filename.equals(LIST_FILENAME)) {
             //直接把cache还给它
-            return write_File_cache;
+            return writeFileCache;
         }
 
         File f = new File(File_Get_SD_Path() + "/" + filename);
@@ -991,16 +943,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
             return path;
         }
 
-        private static int getChildIndex(ViewGroup viewGroup, View view) {
-            for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                View child = viewGroup.getChildAt(i);
-                if (child.equals(view)) {
-                    return i;
-                }
-            }
-            return 0;
-        }
-
         static String getViewPosition(View view) {
             int[] loc = new int[2];
             view.getLocationInWindow(loc);
@@ -1041,7 +983,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
 
         private static Pair<Boolean, BlockModel> isBlockView(View view) {
 
-
+            //测试代码，为某个功能做铺垫
 //            ViewParent parent = view.getParent();
 //            if (parent != null && (parent instanceof AdapterView || parent instanceof RecyclerView)) {
 //                return new Pair<>(getAllText(view).contains("广告"), null);
@@ -1049,10 +991,11 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
             final String className = view.getClass().getSimpleName();
             final int id = view.getId();
             for (BlockModel model : mBlockList) {
-                final String pkg = view.getContext().getPackageName();
+//                final String pkg = view.getContext().getPackageName();
+//
+//                if (!model.packageName.equals(pkg))
+//                    continue;
 
-                if (!model.packageName.equals(pkg))
-                    continue;
                 //className都不对，免谈了，直接跳过
                 if (!model.className.equals("*") && !model.className.equals(className))
                     continue;
@@ -1069,7 +1012,7 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
                         if ((!model.text.equals("")) && (model.text.equals(getText(view))))
                             return new Pair<>(model.enable, model);
                 }
-                //ID也不能用？上文本大法
+                //ID也不能用？判断文本
                 else if ((!model.text.equals("")) && (model.text.equals(getText(view)))) {
                     return new Pair<>(model.enable, model);
                 }
@@ -1094,13 +1037,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
             if (shouldVisibility)
                 v.setVisibility(View.GONE);
             v.setWillNotDraw(true);
-//            Context context = v.getContext();
-//            ViewParent viewParent = v.getParent();
-//            if (viewParent != null && viewParent instanceof ViewGroup && !(viewParent instanceof AdapterView)) {
-//                int index = getChildIndex((ViewGroup) viewParent, v);
-//                ((ViewGroup) viewParent).removeViewAt(index);
-//                ((ViewGroup) viewParent).addView(new View(context), index);
-//            }
         }
 
     }
@@ -1186,89 +1122,6 @@ public class Hook implements de.robv.android.xposed.IXposedHookLoadPackage {
         public void block(Object o) {
 
         }
-    }
-
-//    private static class JSBlocker extends Blocker {
-//        private static JSBlocker instance;
-//
-//        public static JSBlocker getInstance() {
-//            if (instance == null)
-//                instance = new JSBlocker();
-//            return instance;
-//        }
-//
-//        @NonNull
-//        @Override
-//        public BlockModel log(Object o) {
-//            return null;
-//        }
-//
-//        @Override
-//        public boolean isBlocked(Object o) {
-//
-//            return false;
-//        }
-//
-//        @Override
-//        public void block(Object o) {
-//
-//        }
-//    }
-
-    private static class JavaScriptRunner {
-
-        public static boolean runJS(String js, View view) {
-            org.mozilla.javascript.Context rhino = org.mozilla.javascript.Context.enter();
-            rhino.setOptimizationLevel(-1);
-            try {
-                Scriptable scope = rhino.initStandardObjects();
-                Function function = (Function) scope.get("onProcessView", scope);
-                Object result = function.call(rhino, scope, scope, new Object[]{view});
-                return (Boolean) org.mozilla.javascript.Context.jsToJava(result, Boolean.class);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            } finally {
-                org.mozilla.javascript.Context.exit();
-            }
-            return false;
-        }
-
-        private static String getPackageName(String js) {
-            org.mozilla.javascript.Context rhino = org.mozilla.javascript.Context.enter();
-            rhino.setOptimizationLevel(-1);
-            try {
-                Scriptable scope = rhino.initStandardObjects();
-                Function function = (Function) scope.get("package", scope);
-                Object result = function.call(rhino, scope, scope, new Object[]{});
-                return (String) org.mozilla.javascript.Context.jsToJava(result, String.class);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            } finally {
-                org.mozilla.javascript.Context.exit();
-            }
-            return "";
-        }
-
-        public static ArrayList<String> readJS(String pkg) {
-            ArrayList<String> arrayList = new ArrayList<>();
-            File file = new File(JS_FILE_NAME);
-            if (!file.exists() || !file.isDirectory()) {
-                return arrayList;
-            }
-            File[] files = file.listFiles();
-            int len = files.length;
-            for (int i = 0; i < len; i++) {
-                file = files[i];
-                if (file.isFile() && file.canRead()) {
-                    String js = Read_File(JS_FILE_NAME + "/" + file.getName());
-                    if (getPackageName(js).equals(pkg)) {
-                        arrayList.add(js);
-                    }
-                }
-            }
-            return arrayList;
-        }
-
     }
 
 }
