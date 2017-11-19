@@ -15,12 +15,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -36,7 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
-import ml.qingsu.fuckview.wizard.TutorialWizard;
+import ml.qingsu.fuckview.wizard.SelectAppWizard;
 
 /**
  * By w568w on 2017-7-6.
@@ -94,7 +96,7 @@ public class MainFragment extends Fragment implements Searchable {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TutorialWizard tw = new TutorialWizard();
+                SelectAppWizard tw = new SelectAppWizard();
                 Bundle bundle = new Bundle();
                 if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("system_app", false))
                     bundle.putBoolean("sys", true);
@@ -106,7 +108,6 @@ public class MainFragment extends Fragment implements Searchable {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //是否是强制屏蔽
                 MainActivity.BlockModel model = models.get(i);
                 Bundle bundle = new Bundle();
                 bundle.putString("pkg", model.packageName);
@@ -116,6 +117,36 @@ public class MainFragment extends Fragment implements Searchable {
                 infoFragment.setArguments(bundle);
                 if (context instanceof MainActivity)
                     ((MainActivity) context).setFragment(infoFragment);
+            }
+        });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            boolean scrollFlag = false;//标记是否滑动
+            boolean isFirst = true;//标记第一次进入，因为第一次进来lastVisibleItemPosition默认为0，
+            // 此时如果listview的第一个显示的条目不是第一个（下表为0），则往下滑也会出现firstVisibleItem>lastVisibleItemPosition的情况
+            //所以第一次进入时不做操作，第二次进来已经给lastVisibleItemPosition赋值，就可以判断了
+            int  lastVisibleItemPosition;//标记上次的显示位置
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                scrollFlag = scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING;
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (!isFirst) {
+
+                    if (firstVisibleItem < lastVisibleItemPosition) {
+                        button.show();
+                        //执行向上滑动时要做的逻辑
+                    }
+                    else if(firstVisibleItem > lastVisibleItemPosition){
+                        button.hide();
+                    }
+                    lastVisibleItemPosition = firstVisibleItem;//记录当前条目
+
+                }
+                isFirst = false;
+
             }
         });
         return layout;
@@ -152,7 +183,7 @@ public class MainFragment extends Fragment implements Searchable {
         } else {
             menu.add(0, 3, Menu.NONE, "分享规则");
         }
-        menu.add(0, 6, Menu.NONE, model.enable?"禁用此项":"启用此项");
+        menu.add(0, 6, Menu.NONE, model.enable ? "禁用此项" : "启用此项");
     }
 
     public void setSearchText(String text) {
@@ -214,7 +245,7 @@ public class MainFragment extends Fragment implements Searchable {
                 adapter.notifyDataSetChanged();
                 break;
             case 6:
-                model.enable=!model.enable;
+                model.enable = !model.enable;
                 models.set(menuInfo.position, model);
                 adapter.notifyDataSetChanged();
                 saveAll();
@@ -296,7 +327,7 @@ public class MainFragment extends Fragment implements Searchable {
                 type.setText(bm.className);
             else
                 type.setText(String.format(Locale.CHINA, "%s ---> %s", bm.className, bm.text));
-            if(!bm.enable)
+            if (!bm.enable)
                 view.setBackgroundColor(Color.GRAY);
             if (!searchText.equals("") && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
                 view = new View(context);

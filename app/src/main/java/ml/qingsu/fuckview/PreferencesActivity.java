@@ -1,8 +1,12 @@
 package ml.qingsu.fuckview;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -10,8 +14,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
+import static ml.qingsu.fuckview.MainActivity.STANDARD_MODE_NAME;
 import static ml.qingsu.fuckview.MainActivity.SUPER_MODE_NAME;
 import static ml.qingsu.fuckview.MainActivity.ONLY_ONCE_NAME;
 
@@ -34,6 +41,13 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 MainActivity.Write_File(newValue.toString(), ONLY_ONCE_NAME);
+                return true;
+            }
+        });
+        findPreference("standard_mode").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                MainActivity.Write_File(newValue.toString(), STANDARD_MODE_NAME);
                 return true;
             }
         });
@@ -95,18 +109,100 @@ public class PreferencesActivity extends PreferenceActivity {
                 return false;
             }
         });
-        findPreference("qq").
+        findPreference("qq").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://jq.qq.com/?_wv=1027&k=4EepPOs")));
+                } catch (Throwable ignored) {
 
-                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                }
+                return false;
+            }
+        });
+        findPreference("log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new Thread(new Runnable() {
                     @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        try {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://jq.qq.com/?_wv=1027&k=4EepPOs")));
-                        } catch (Throwable ignored) {
+                    public void run() {
 
-                        }
-                        return false;
                     }
                 });
+                shareText(String.format(Locale.CHINA,"Logcat:\n\n%s\n\n" +
+                        "=================\n\n" +
+                        "XposedLog:\n\n%s\n\n" +
+                        "=================\n\n" +
+                        "Phone:\n\n%s\n\n",getLogcatInfo(),getXposedLogInfo(),getPhoneInfo()));
+                return false;
+            }
+        });
+    }
+    private String getLogcatInfo(){
+            return ShellUtils.execCommand("logcat -d -v time",false,true).successMsg;
+    }
+    private String getXposedLogInfo(){
+        return ShellUtils.execCommand("cat /data/data/de.robv.android.xposed.installer/log/error.log",false,true).successMsg;
+    }
+    private String getPhoneInfo(){
+        return String.format(Locale.CHINA,"版本:%s(%s)\n" +
+                        "Android版本:%s\n" +
+                        "指纹:%s\n",
+                getVersionName(this),getVersionCode(this),
+                System.getProperty("ro.build.version.release"),
+                Build.FINGERPRINT);
+    }
+    /**
+     * 返回版本名字
+     * 对应build.gradle中的versionName
+     *
+     * @param context
+     * @return
+     */
+    public static String getVersionName(Context context) {
+        String versionName = "";
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            versionName = packInfo.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return versionName;
+    }
+
+    /**
+     * 返回版本号
+     * 对应build.gradle中的versionCode
+     *
+     * @param context
+     * @return
+     */
+    public static String getVersionCode(Context context) {
+        String versionCode = "" ;
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            versionCode = String.valueOf(packInfo.versionCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return versionCode;
+    }
+
+    private void shareText(String text){
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+        sendIntent.setType("text/plain");
+        try {
+            Intent chooserIntent = Intent.createChooser(sendIntent, "选择分享途径");
+            if (chooserIntent == null) {
+                return;
+            }
+            startActivity(chooserIntent);
+        } catch (Exception e) {
+            startActivity(sendIntent);
+        }
     }
 }

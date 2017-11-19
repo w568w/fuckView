@@ -1,16 +1,16 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+
 android {
     compileSdkVersion 23
     buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "ml.qingsu.fuckview"
-        minSdkVersion 9
+        minSdkVersion 10
         targetSdkVersion 23
         versionCode 14
         versionName "0.8.3.1 experimental"
 
-        manifestPlaceholders = [fabricApiKey: project.fabricApiKey]
+        //manifestPlaceholders = [fabricApiKey: project.fabricApiKey]
     }
     buildTypes {
         release {
@@ -24,20 +24,23 @@ android {
 
 }
 
+repositories {
+    jcenter();
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     provided 'de.robv.android.xposed:api:53'
     compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.android.support:design:23.+'
-
+    compile 'com.tencent.bugly:crashreport:latest.release'
     //BugHD已停止运营
     //compile 'im.fir:fir-sdk:latest.integration@aar'
 
-    compile files('libs/rhino-1.7.7.1.jar')
+   // compile files('libs/rhino-1.7.7.1.jar')
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
-        transitive = true;
-    }
+//    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+//        transitive = true;
+//    }
 
 }

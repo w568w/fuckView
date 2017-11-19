@@ -14,7 +14,7 @@ import ml.qingsu.fuckview.wizard_library.WizardStep;
 /**
  * Created by w568w on 17-6-18.
  */
-public class TutorialWizard extends BasicWizard implements Searchable {
+public class SelectAppWizard extends BasicWizard implements Searchable {
     Step1 step1;
 
     @Override
@@ -27,7 +27,7 @@ public class TutorialWizard extends BasicWizard implements Searchable {
         return new Settings("上一步", "下一步", "开始标记", new WizardStep[]{step1});
     }
 
-    public TutorialWizard() {
+    public SelectAppWizard() {
         super();
     }
 
@@ -60,11 +60,12 @@ public class TutorialWizard extends BasicWizard implements Searchable {
         PackageManager pm = MyApplication.con.getPackageManager();
         try {
             MyApplication.con.startActivity(pm.getLaunchIntentForPackage(Step1.selected.packageName));
-            Toast.makeText(MyApplication.con, "长按以标记View", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.con, "点击以标记View", Toast.LENGTH_SHORT).show();
             new DumpViewerPopupView(mCon, Step1.selected.packageName).show();
             mCon.finish();
         } catch (Exception e) {
             Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 

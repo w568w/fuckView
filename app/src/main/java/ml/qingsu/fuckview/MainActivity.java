@@ -17,6 +17,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
@@ -33,7 +34,7 @@ import java.util.Locale;
 
 import ml.qingsu.fuckview.about.Faq;
 import ml.qingsu.fuckview.helper.Helper;
-import ml.qingsu.fuckview.wizard.TutorialWizard;
+import ml.qingsu.fuckview.wizard.SelectAppWizard;
 
 public class MainActivity extends AppCompatActivity {
     public boolean shouldShowFAQ = false;
@@ -42,9 +43,12 @@ public class MainActivity extends AppCompatActivity {
     public static final String LIST_FILE_NAME = "block_list";
     public static final String SUPER_MODE_FILE_NAME = "super_mode";
     public static final String ONLY_ONCE_FILE_NAME = "only_once";
+
     public static final String LIST_NAME = DIR_NAME + LIST_FILE_NAME;
     public static final String SUPER_MODE_NAME = DIR_NAME + SUPER_MODE_FILE_NAME;
     public static final String ONLY_ONCE_NAME = DIR_NAME + ONLY_ONCE_FILE_NAME;
+    public static final String STANDARD_MODE_NAME = DIR_NAME + "standard_mode";
+
     public static final String PACKAGE_NAME_NAME = DIR_NAME + "package_name";
 
     public static final String LAUNCHER_VIRTUAL_CLASSNAME = "launcher";
@@ -59,13 +63,11 @@ public class MainActivity extends AppCompatActivity {
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         SharedPreferences sharedPreferences = getSharedPreferences("info", MODE_PRIVATE);
         boolean firstRun = sharedPreferences.getBoolean("first_run", true);
-        //给root
-        //ShellUtils.execCommand("", true);
 
         if (firstRun) {
             setFragmentWithoutBack(new Helper());
         } else if (Read_File(LIST_NAME).equals("")) {
-            setFragmentWithoutBack(new TutorialWizard());
+            setFragmentWithoutBack(new SelectAppWizard());
             if (!isModuleActive()) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("模块未启用/更新")
@@ -85,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Write_File("", PACKAGE_NAME_NAME);
-        //此处详见hook.java
+
+        //此处详见Hook.java
         //是否从通知栏里点过来
         boolean isDialog = getIntent().getBooleanExtra("Dialog", false);
         String cache = getIntent().getStringExtra("cache");
@@ -264,9 +267,17 @@ public class MainActivity extends AppCompatActivity {
 
     //你可以在hook.java中看到一毛一样的以下代码
     //为啥要写两遍呢？
-    //因为hook是脱离程序运行的，此时如果用MainActivity.XX()会扔出NPE
+    //因为hook是脱离程序运行的，此时如果用MainActivity.XX()，由于应用尚未加载，会扔出NPE
     //
     //MainActivity中调用hook.XX()也是相同道理(这句话未经验证，只是猜测)
+
+    //2017-11-19:上面这句话已得到验证。原因如下：
+    //在build.gradle中，Xposed的API通过Provided模式而不是Compile模式载入应用中，
+    // 这意味着打包出来的APK中不会含有de.robv.android.xposed.IXposedHookLoadPackage这些类和接口，
+    // 它们由Xposed在开机时手动装载。
+    // 但是，它们并不是Android类库的一部分，
+    // 因此，如果调用Hook类中的方法或字段，系统会尝试装载Hook.class，但是发现找不到IXposedHookLoadPackage这个接口。
+    // 所以会妥妥地报ClassNotFound：IXposedHookLoadPackage，并且继而爆出ClassNotFound：Hook，使应用异常。
     public static ArrayList<BlockModel> read() {
         ArrayList<BlockModel> list = new ArrayList<>();
         ArrayList<String> lines = readFileByLine(LIST_NAME);

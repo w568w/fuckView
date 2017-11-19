@@ -16,6 +16,12 @@
         android:summary="无视辅助服务，悬浮窗强制使用root模式解析布局"
         android:title="悬浮窗使用root" />
     <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="standard_mode"
+        android:summaryOn="当前为标准标记模式，适用于大多数情况"
+        android:summaryOff="当前为兼容标记模式，适用于无法标记某个控件的场合，一般情况下请保持勾选"
+        android:title="标记模式" />
+    <CheckBoxPreference
         android:defaultValue="false"
         android:key="system_app"
         android:summary="在应用列表中显示系统应用"
@@ -31,7 +37,7 @@
             android:title="作者" />
         <Preference
             android:key="pay"
-            android:summary="感谢 @纯白 对净眼的支持"
+            android:summary="感谢 @纯白 @Rio 对净眼的支持"
             android:title="捐赠" />
         <Preference
             android:key="source"
@@ -42,6 +48,13 @@
             android:summary="寻找组织搞事情"
             android:title="加入企鹅群" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="调试">
+    <Preference
+        android:key="log"
+        android:summary="生成报告Bug时所必需的日志"
+        android:title="生成日志" />
+</PreferenceCategory>
+
 
 
 </PreferenceScreen>

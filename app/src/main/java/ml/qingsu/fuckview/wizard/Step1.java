@@ -63,7 +63,6 @@ public class Step1 extends WizardStep implements Searchable {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, 1, Menu.NONE, "转到应用信息页面");
-        menu.add(0, 2, Menu.NONE, "屏蔽启动页");
     }
 
     @Override
@@ -81,16 +80,6 @@ public class Step1 extends WizardStep implements Searchable {
                     Toast.makeText(mCon, "抱歉,您的设备不支持此选项", Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case 2:
-                try {
-                    PackageManager pm=con.getPackageManager();
-                    Intent intent= pm.getLaunchIntentForPackage(info.packageName);
-                    new MainActivity.BlockModel(info.packageName,intent.getComponent().getClassName(),"",MainActivity.LAUNCHER_VIRTUAL_CLASSNAME).save();
-                    Toast.makeText(mCon, "标记已完成，请不要重复标记。", Toast.LENGTH_SHORT).show();
-
-                } catch (Exception e) {
-
-                }
         }
         return super.onContextItemSelected(item);
     }

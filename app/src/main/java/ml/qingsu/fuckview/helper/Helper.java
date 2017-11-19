@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ml.qingsu.fuckview.MainActivity;
-import ml.qingsu.fuckview.wizard.TutorialWizard;
+import ml.qingsu.fuckview.wizard.SelectAppWizard;
 import ml.qingsu.fuckview.wizard_library.BasicWizard;
 import ml.qingsu.fuckview.wizard_library.WizardStep;
 
@@ -70,7 +70,7 @@ public class Helper extends BasicWizard {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("info", MODE_PRIVATE);
         sharedPreferences.edit().putBoolean("first_run", false).apply();
         if (getActivity() instanceof MainActivity)
-            ((MainActivity) getActivity()).setFragmentWithoutBack(new TutorialWizard());
+            ((MainActivity) getActivity()).setFragmentWithoutBack(new SelectAppWizard());
         Toast.makeText(mCon, "有问题请按右上角问号!\n有问题请按右上角问号!\n有问题请按右上角问号!\n\n重要的事情说三遍", Toast.LENGTH_LONG).show();
     }
 }

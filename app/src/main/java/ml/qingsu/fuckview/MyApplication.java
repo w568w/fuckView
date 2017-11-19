@@ -3,9 +3,7 @@ package ml.qingsu.fuckview;
 import android.app.Application;
 import android.content.Context;
 
-import com.crashlytics.android.Crashlytics;
-
-import io.fabric.sdk.android.Fabric;
+import com.tencent.bugly.crashreport.CrashReport;
 
 
 /**
@@ -19,6 +17,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         con = this;
-        Fabric.with(this, new Crashlytics());
+        CrashReport.initCrashReport(getApplicationContext(), "cfccfa2c50", false);
+        //Fabric.with(this, new Crashlytics());
     }
 }

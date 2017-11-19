@@ -123,3 +123,6 @@
 -keepclasseswithmembers class android.support.v7.widget.SearchView {
     <init>(...);
 }
+
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}
