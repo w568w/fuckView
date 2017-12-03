@@ -48,7 +48,7 @@ public class ViewDumper {
 
 
         ShellUtils.execCommand("uiautomator dump /mnt/sdcard/dump.xml", true, false);
-        String xml = MainActivity.Read_File("dump.xml").replace("\n", "");
+        String xml = MainActivity.Read_Preferences("dump.xml").replace("\n", "");
         ArrayList<ViewItem> itemList = new ArrayList<>();
         ViewItem temp;
         XmlPullParser parser = Xml.newPullParser();

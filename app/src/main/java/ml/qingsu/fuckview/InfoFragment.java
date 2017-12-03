@@ -35,7 +35,6 @@ public class InfoFragment extends Fragment {
         String ids = getArguments().getString("id");
         String classNames = getArguments().getString("className");
 
-
         appName.setText(MainFragment.getAppTitle(pm, pkg));
         packageName.setText(pkg);
         className.setText(classNames);

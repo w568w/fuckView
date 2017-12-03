@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
@@ -29,7 +30,6 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -38,6 +38,7 @@ import java.util.Locale;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -55,13 +56,11 @@ public class Hook implements IXposedHookLoadPackage {
     private ArrayList<String> jsFiles = new ArrayList<>();
     //由于目标APP不一定有读写文件权限，所以想到了这么个奇巧淫技，自己维护个缓存区
     private static String writeFileCache = "";
-    private static final String DIR_NAME = "fuckView/";
-    private static final String JS_FILE_NAME = DIR_NAME + "js";
-    private static final String SUPER_MODE_NAME = DIR_NAME + "super_mode";
-    private static final String ONLY_ONCE_NAME = DIR_NAME + "only_once";
-    private static final String STANDARD_MODE_NAME = DIR_NAME + "standard_mode";
-    private static final String PACKAGE_NAME_FILENAME = DIR_NAME + "package_name";
-    private static final String LIST_FILENAME = DIR_NAME + "block_list";
+    private static final String SUPER_MODE_NAME =  "super_mode";
+    private static final String ONLY_ONCE_NAME =  "only_once";
+    private static final String STANDARD_MODE_NAME =  "standard_mode";
+    private static final String PACKAGE_NAME_NAME =  "package_name";
+    private static final String LIST_FILENAME =  "block_list";
     public static final String DIALOG_VIRTUAL_CLASSNAME = "Dialog";
 
     private static final String ALL_SPLIT = "~~";
@@ -71,16 +70,21 @@ public class Hook implements IXposedHookLoadPackage {
     private static boolean only_once;
     private static boolean standard_mode;
 
+    private static XSharedPreferences xSP=new XSharedPreferences("ml.qingsu.fuckview","data");
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        //读文件会有多余的换行
-        String pkg = Read_File(PACKAGE_NAME_FILENAME).replace("\n", "");
+        XposedBridge.log("Read File -->"+xSP.getFile().getAbsolutePath());
+
+
+        xSP.reload();
+        xSP.makeWorldReadable();
+        String pkg = xSP.getString(PACKAGE_NAME_NAME, "");
 
         //读取设置
         try {
-            super_mode = Boolean.valueOf(Read_File(SUPER_MODE_NAME).replace("\n", ""));
-            only_once = Boolean.valueOf(Read_File(ONLY_ONCE_NAME).replace("\n", ""));
-            standard_mode = Boolean.valueOf(Read_File(STANDARD_MODE_NAME).replace("\n", ""));
+            super_mode = xSP.getBoolean(SUPER_MODE_NAME,false);
+            only_once = xSP.getBoolean(ONLY_ONCE_NAME,false);
+            standard_mode = xSP.getBoolean(STANDARD_MODE_NAME,true);
         } catch (Exception e) {
             e.printStackTrace();
             super_mode = false;
@@ -113,16 +117,13 @@ public class Hook implements IXposedHookLoadPackage {
 //                            //如果是ListView中的项目，手动CALL一次监听器
 //                            ViewModel model = getListView(view);
 //                            if (model != null) {
-//                                //Google哪个傻逼写这个JB参数，非要我提供ID和位置，你TM自己不是有
+//                                //Google哪个人写这个参数，非要我提供ID和位置，你TM自己不是有
 //                                //getItemIdAtPosition嘛，你TM敢跟我说你没有getPositionForView？？
 //                                //我敢肯定你们没审查代码
 //                                // (╯‵□′)╯︵┻━┻！！！
-//                                //我预祝写这个类的程序员下AV全是葫芦娃和喜羊羊
 //
-//                                //腾讯哪个傻逼，还真TM会装逼啊，自己写了个com.tencent.widget.AdapterView!!!
+//                                //腾讯自己写了个com.tencent.widget.AdapterView!!!
 //                                //我TM还得用反射！不然就ClassCast异常！
-//                                //想写累死我？
-//                                //我问候您全家
 //                                // fuck duck type!
 //                                try {
 //                                    int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
@@ -680,7 +681,7 @@ public class Hook implements IXposedHookLoadPackage {
 
     private static ArrayList<BlockModel> readBlockList(String pkgFilter) {
         ArrayList<BlockModel> list = new ArrayList<>();
-        ArrayList<String> lines = readFileByLine(LIST_FILENAME);
+        ArrayList<String> lines = readPreferenceByLine(LIST_FILENAME);
         for (String line : lines) {
             BlockModel model = BlockModel.fromString(line);
             if (model != null && model.packageName.equals(pkgFilter))
@@ -691,7 +692,7 @@ public class Hook implements IXposedHookLoadPackage {
 
     private static ArrayList<BlockModel> readBlockList() {
         ArrayList<BlockModel> list = new ArrayList<>();
-        ArrayList<String> lines = readFileByLine(LIST_FILENAME);
+        ArrayList<String> lines = readPreferenceByLine(LIST_FILENAME);
         for (String line : lines) {
             BlockModel model = BlockModel.fromString(line);
             if (model != null)
@@ -739,7 +740,7 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         private void save() {
-            Write_File(Read_File(LIST_FILENAME) + "\n" + toString(), LIST_FILENAME);
+            Write_Preference(Read_Preference(LIST_FILENAME) + "\n" + toString(), LIST_FILENAME);
         }
 
         @Override
@@ -748,115 +749,30 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-    private static void Write_File(String data, String filename) {
-        try {
-            if (filename.equals(LIST_FILENAME)) {
-                //直接写进cache
-                writeFileCache = data;
-                return;
-            }
-            File file = new File(File_Get_SD_Path() + "/" + filename);
-            if (file.exists())
-                file.delete();
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileOutputStream fops = new FileOutputStream(file);
-            fops.write(data.getBytes());
-            fops.flush();
-            fops.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private static void Write_Preference(String data, String filename) {
+        xSP.edit().putString(filename,data).apply();
     }
 
-    public static String File_Get_SD_Path() {
-        String[] partpaths = {
-                "/emulated/0",
-                "/extSdCard",
-                "/sdcard0",
-                "/sdcard1",
-                "/sdcard2",
-                "/sdcard3",
-                "/sdcard4",
-                "/emulated/0",
-                "/external_sd",
-                "/extsdcard",
-                "/sdcard",
-                "/sdcard/sdcard",
 
-        };
-        File file = new File("/sdcard/");
-        if (file.exists()) {
-            return file.getAbsolutePath();
-        }
-        for (String partpath : partpaths) {
-            file = new File(partpath + "/");
-            if (file.exists() && file.canWrite()) {
-                return file.getAbsolutePath();
-            }
-            file = new File("/storage" + partpath + "/");
-            if (file.exists() && file.canWrite()) {
-                return file.getAbsolutePath();
-            }
-            file = new File("/mnt" + partpath + "/");
-
-            if (file.exists() && file.canWrite()) {
-                return file.getAbsolutePath();
-            }
-        }
-        return null;
-    }
-
-    private static String Read_File(String filename) {
+    private static String Read_Preference(String filename) {
         if (filename.equals(LIST_FILENAME)) {
-            //直接把cache还给它
+            //直接返回cache
             return writeFileCache;
         }
-
-        File f = new File(File_Get_SD_Path() + "/" + filename);
-        if (!f.exists())
-            return "";
-        String result = "";
-        try {
-            FileInputStream is = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader bufReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufReader.readLine()) != null)
-                result += ("\n" + line);
-            bufReader.close();
-            isr.close();
-            is.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+        return xSP.getString(filename,"");
     }
 
     //正常的readfile,不做任何缓存代理
-    private static ArrayList<String> readFileByLine(String filename) {
-        File f = new File(File_Get_SD_Path() + "/" + filename);
-        ArrayList<String> result = new ArrayList<>();
-        if (!f.exists())
-            return result;
-        try {
-            FileInputStream is = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader bufReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufReader.readLine()) != null)
-                result.add(line);
-            bufReader.close();
-            isr.close();
-            is.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static ArrayList<String> readPreferenceByLine(String filename) {
+        String data = xSP.getString(filename,"");
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (String line : data.split("\n")) {
+            if (!line.equals("")) arrayList.add(line);
         }
-        return result;
+        return arrayList;
     }
+
+
 
     static abstract class Blocker {
 
@@ -912,7 +828,7 @@ public class Hook implements IXposedHookLoadPackage {
 
         @Override
         protected Pair<Boolean, Integer> isBlock(Object o) {
-            XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
+            //XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
             return isBlockView((View) o);
         }
 

@@ -1,12 +1,14 @@
 package ml.qingsu.fuckview;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +19,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -39,21 +39,22 @@ import ml.qingsu.fuckview.wizard.SelectAppWizard;
 public class MainActivity extends AppCompatActivity {
     public boolean shouldShowFAQ = false;
 
-    public static final String DIR_NAME = "fuckView/";
+
     public static final String LIST_FILE_NAME = "block_list";
     public static final String SUPER_MODE_FILE_NAME = "super_mode";
     public static final String ONLY_ONCE_FILE_NAME = "only_once";
 
-    public static final String LIST_NAME = DIR_NAME + LIST_FILE_NAME;
-    public static final String SUPER_MODE_NAME = DIR_NAME + SUPER_MODE_FILE_NAME;
-    public static final String ONLY_ONCE_NAME = DIR_NAME + ONLY_ONCE_FILE_NAME;
-    public static final String STANDARD_MODE_NAME = DIR_NAME + "standard_mode";
+    public static final String LIST_NAME = LIST_FILE_NAME;
+    public static final String SUPER_MODE_NAME = SUPER_MODE_FILE_NAME;
+    public static final String ONLY_ONCE_NAME = ONLY_ONCE_FILE_NAME;
+    public static final String STANDARD_MODE_NAME = "standard_mode";
 
-    public static final String PACKAGE_NAME_NAME = DIR_NAME + "package_name";
+    public static final String PACKAGE_NAME_NAME = "package_name";
 
     public static final String LAUNCHER_VIRTUAL_CLASSNAME = "launcher";
     private static final int REQUEST_PERMISSION = 0x123;
     private static final String ALL_SPLIT = "~~";
+    private static SharedPreferences mSharedPreferences;
     public Fragment currentFragment;
 
     @Override
@@ -61,12 +62,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        mSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
         SharedPreferences sharedPreferences = getSharedPreferences("info", MODE_PRIVATE);
         boolean firstRun = sharedPreferences.getBoolean("first_run", true);
 
         if (firstRun) {
             setFragmentWithoutBack(new Helper());
-        } else if (Read_File(LIST_NAME).equals("")) {
+        } else if (Read_Preferences(LIST_NAME).equals("")) {
             setFragmentWithoutBack(new SelectAppWizard());
             if (!isModuleActive()) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Write_File("", PACKAGE_NAME_NAME);
+        Write_Preferences("", PACKAGE_NAME_NAME);
 
         //此处详见Hook.java
         //是否从通知栏里点过来
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             blockInfo.id = ids[0];
                             //换行不能忘！
-                            Append_File("\n" + blockInfo, LIST_NAME);
+                            Append_Preferences("\n" + blockInfo, LIST_NAME);
                             setFragmentWithoutBack(new MainFragment());
                         }
                     })
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             blockInfo.id = ids[1];
-                            Append_File("\n" + blockInfo, LIST_NAME);
+                            Append_Preferences("\n" + blockInfo, LIST_NAME);
                             setFragmentWithoutBack(new MainFragment());
                         }
                     })
@@ -124,13 +126,13 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             blockInfo.id = ids[2];
-                            Append_File("\n" + blockInfo, LIST_NAME);
+                            Append_Preferences("\n" + blockInfo, LIST_NAME);
                             setFragmentWithoutBack(new MainFragment());
                         }
                     })
                     .show();
         } else {
-            Append_File(cache, LIST_NAME);
+            Append_Preferences(cache, LIST_NAME);
         }
 
     }
@@ -140,57 +142,59 @@ public class MainActivity extends AppCompatActivity {
                 ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
         } else {
-            findViewById(R.id.fl).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            //處理老文件
+            getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    findViewById(R.id.fl).getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    checkFile();
+                    getWindow().getDecorView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    process_file();
                 }
             });
         }
     }
+    //Useless?
 
-    private void checkFile() {
-        final String sdPath = File_Get_SD_Path() + "/";
-        File dir = new File(sdPath + DIR_NAME);
-        if (!dir.exists()) {
-            if (!dir.mkdirs() && !dir.mkdir()) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("错误")
-                        .setMessage("创建文件夹失败!\n请检查您是否限制了净眼创建文件夹的权限。\n\n提示:您也可以手动在SD卡中创建fuckView(注意大小写)文件夹并重试。")
-                        .setPositiveButton("退出", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                finish();
-                            }
-                        })
-                        .show();
-            }
-        }
-        final File oldFile = new File(sdPath + LIST_FILE_NAME);
-        if (oldFile.exists()) {
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("检测到旧文件")
-                    .setMessage("检测到你曾经使用过0.7.1及之前版本的 净眼，是否要更新规则位置?")
-                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Append_File(Read_File(LIST_FILE_NAME), LIST_NAME);
-                            oldFile.delete();
-                            File oldFile = new File(sdPath + SUPER_MODE_FILE_NAME);
-                            if (oldFile.exists()) oldFile.delete();
-                            Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setNegativeButton("否", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Toast.makeText(MainActivity.this, "注意!\n净眼将暂时无法正常标记和屏蔽，要更新规则，请重新打开净眼。", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .show();
-        }
-    }
+//    private void checkFile() {
+//        final String sdPath = File_Get_SD_Path() + "/";
+//        File dir = new File(sdPath + DIR_NAME);
+//        if (!dir.exists()) {
+//            if (!dir.mkdirs() && !dir.mkdir()) {
+//                new AlertDialog.Builder(MainActivity.this)
+//                        .setTitle("错误")
+//                        .setMessage("创建文件夹失败!\n请检查您是否限制了净眼创建文件夹的权限。\n\n提示:您也可以手动在SD卡中创建fuckView(注意大小写)文件夹并重试。")
+//                        .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                finish();
+//                            }
+//                        })
+//                        .show();
+//            }
+//        }
+//        final File oldFile = new File(sdPath + LIST_FILE_NAME);
+//        if (oldFile.exists()) {
+//            new AlertDialog.Builder(MainActivity.this)
+//                    .setTitle("检测到旧文件")
+//                    .setMessage("检测到你曾经使用过0.7.1及之前版本的 净眼，是否要更新规则位置?")
+//                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            Append_Preferences(Read_Preferences(LIST_FILE_NAME), LIST_NAME);
+//                            oldFile.delete();
+//                            File oldFile = new File(sdPath + SUPER_MODE_FILE_NAME);
+//                            if (oldFile.exists()) oldFile.delete();
+//                            Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .setNegativeButton("否", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            Toast.makeText(MainActivity.this, "注意!\n净眼将暂时无法正常标记和屏蔽，要更新规则，请重新打开净眼。", Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .show();
+//        }
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -201,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 && grantResults[0] != PackageManager.PERMISSION_GRANTED)
             checkAndCallPermission(permissions[0]);
         else
-            checkFile();
+            process_file();
     }
 
     public void setFragmentWithoutBack(Fragment fragment) {
@@ -280,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
     // 所以会妥妥地报ClassNotFound：IXposedHookLoadPackage，并且继而爆出ClassNotFound：Hook，使应用异常。
     public static ArrayList<BlockModel> read() {
         ArrayList<BlockModel> list = new ArrayList<>();
-        ArrayList<String> lines = readFileByLine(LIST_NAME);
+        ArrayList<String> lines = readPreferenceByLine(LIST_NAME);
         for (String str : lines) {
             BlockModel model = BlockModel.fromString(str);
             if (model != null)
@@ -301,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
             this.id = id;
             this.text = text;
             this.className = className;
-            enable=true;
+            enable = true;
         }
 
         private BlockModel(String packageName, String id, String text, String className, boolean enable) {
@@ -324,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void save() {
-            Append_File("\n" + toString(), LIST_NAME);
+            Append_Preferences("\n" + toString(), LIST_NAME);
         }
 
         @Override
@@ -333,31 +337,58 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void Append_File(String data, String filename) {
-        Write_File(Read_File(filename) + data, filename);
+    private void process_file() {
+        final File oldFile = new File(File_Get_SD_Path() + "/fuckview/" + LIST_FILE_NAME);
+        if (oldFile.exists()) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
+                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Append_Preferences("\n" + Read_File("fuckview/" + LIST_FILE_NAME), LIST_NAME);
+                            oldFile.delete();
+                            Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Toast.makeText(MainActivity.this, "注意!\n净眼将暂时无法正常标记和屏蔽，要更新规则，请重新打开净眼。", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .show();
+        }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void Write_File(String data, String filename) {
+    public static void Append_Preferences(String data, String filename) {
+        Write_Preferences(Read_Preferences(filename) + data, filename);
+    }
+
+    private static String Read_File(String filename) {
         final String sdPath = File_Get_SD_Path() + "/";
-        File f = new File(String.format("%s%s", sdPath, filename));
-        if (f.exists())
-            f.delete();
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
+        File f = new File(sdPath + filename);
+        if (!f.exists())
+            return "";
+        String result = "";
         try {
-            FileOutputStream fops = new FileOutputStream(f);
-            fops.write(data.getBytes());
-            fops.flush();
-            fops.close();
-        } catch (Exception e) {
+            FileInputStream is = new FileInputStream(f);
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader bufReader = new BufferedReader(isr);
+            String line;
+            while ((line = bufReader.readLine()) != null)
+                result += ("\n" + line);
+            bufReader.close();
+            isr.close();
+            is.close();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
+    }
+
+    public static void Write_Preferences(String data, String filename) {
+        mSharedPreferences.edit().putString(filename, data).apply();
     }
 
     //暴力美学
@@ -401,50 +432,17 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String Read_File(String filename) {
-        final String sdPath = File_Get_SD_Path() + "/";
-        File f = new File(sdPath + filename);
-        if (!f.exists())
-            return "";
-        String result = "";
-        try {
-            FileInputStream is = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader bufReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufReader.readLine()) != null)
-                result += ("\n" + line);
-            bufReader.close();
-            isr.close();
-            is.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+    public static String Read_Preferences(String filename) {
+        return mSharedPreferences.getString(filename, "");
     }
 
-    public static ArrayList<String> readFileByLine(String filename) {
-        final String sdPath = File_Get_SD_Path() + "/";
-        File f = new File(sdPath + filename);
-        ArrayList<String> result = new ArrayList<>();
-        if (!f.exists())
-            return result;
-        try {
-            FileInputStream is = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader bufReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufReader.readLine()) != null)
-                result.add(line);
-            bufReader.close();
-            isr.close();
-            is.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static ArrayList<String> readPreferenceByLine(String filename) {
+        String data = Read_Preferences(filename);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (String line : data.split("\n")) {
+            if (!line.equals("")) arrayList.add(line);
         }
-        return result;
+        return arrayList;
     }
 
     private static boolean isModuleActive() {

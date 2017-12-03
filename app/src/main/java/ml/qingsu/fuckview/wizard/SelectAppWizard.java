@@ -1,9 +1,17 @@
 package ml.qingsu.fuckview.wizard;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.content.SharedPreferencesCompat;
 import android.widget.Toast;
 
+import com.tencent.bugly.crashreport.CrashReport;
+
+import de.robv.android.xposed.XposedBridge;
 import ml.qingsu.fuckview.DumpViewerPopupView;
 import ml.qingsu.fuckview.MainActivity;
 import ml.qingsu.fuckview.MyApplication;
@@ -46,11 +54,14 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
         }
     }
 
+    @SuppressLint({"ApplySharedPref", "WorldReadableFiles"})
     @Override
     public void onWizardComplete() {
         super.onWizardComplete();
         if (Step1.selected == null) return;
-        MainActivity.Write_File(Step1.selected.packageName, MainActivity.PACKAGE_NAME_NAME);
+        getActivity().getSharedPreferences("data", Context.MODE_WORLD_READABLE)
+                .edit().putString(MainActivity.PACKAGE_NAME_NAME, Step1.selected.packageName).commit();
+        //等待數據寫入完成
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -65,7 +76,7 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
             mCon.finish();
         } catch (Exception e) {
             Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            CrashReport.postCatchedException(e);
         }
     }
 

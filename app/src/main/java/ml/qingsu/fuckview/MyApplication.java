@@ -18,6 +18,5 @@ public class MyApplication extends Application {
         super.onCreate();
         con = this;
         CrashReport.initCrashReport(getApplicationContext(), "cfccfa2c50", false);
-        //Fabric.with(this, new Crashlytics());
     }
 }

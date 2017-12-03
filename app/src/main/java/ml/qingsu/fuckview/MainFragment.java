@@ -15,7 +15,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -266,7 +265,7 @@ public class MainFragment extends Fragment implements Searchable {
     }
 
     private void saveAll() {
-        MainActivity.Write_File("", MainActivity.LIST_NAME);
+        MainActivity.Write_Preferences("", MainActivity.LIST_NAME);
         for (MainActivity.BlockModel bm : models)
             bm.save();
     }
@@ -320,15 +319,19 @@ public class MainFragment extends Fragment implements Searchable {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));
             } catch (Exception e) {
+                //未找到该应用
                 icon.setImageResource(R.drawable.ic_launcher);
                 title.setText(bm.packageName);
             }
+            //是否是经典模式
             if (bm.text.equals(""))
                 type.setText(bm.className);
             else
                 type.setText(String.format(Locale.CHINA, "%s ---> %s", bm.className, bm.text));
             if (!bm.enable)
                 view.setBackgroundColor(Color.GRAY);
+//            else
+//                view.setBackgroundColor(Color.BLACK);
             if (!searchText.equals("") && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
                 view = new View(context);
                 view.setVisibility(View.GONE);

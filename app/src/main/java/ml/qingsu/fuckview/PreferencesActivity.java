@@ -14,9 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import static ml.qingsu.fuckview.MainActivity.STANDARD_MODE_NAME;
 import static ml.qingsu.fuckview.MainActivity.SUPER_MODE_NAME;
@@ -33,21 +31,21 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
 
-                MainActivity.Write_File(o.toString(), SUPER_MODE_NAME);
+                MainActivity.Write_Preferences(o.toString(), SUPER_MODE_NAME);
                 return true;
             }
         });
         findPreference("only_once").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                MainActivity.Write_File(newValue.toString(), ONLY_ONCE_NAME);
+                MainActivity.Write_Preferences(newValue.toString(), ONLY_ONCE_NAME);
                 return true;
             }
         });
         findPreference("standard_mode").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                MainActivity.Write_File(newValue.toString(), STANDARD_MODE_NAME);
+                MainActivity.Write_Preferences(newValue.toString(), STANDARD_MODE_NAME);
                 return true;
             }
         });
@@ -62,7 +60,7 @@ public class PreferencesActivity extends PreferenceActivity {
                         .setPositiveButton("导入", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                MainActivity.Append_File("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
+                                MainActivity.Append_Preferences("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
                             }
                         })
                         .setNegativeButton("取消", null)
@@ -126,14 +124,19 @@ public class PreferencesActivity extends PreferenceActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                        final String bug=String.format(Locale.CHINA,"Logcat:\n\n%s\n\n" +
+                                "=================\n\n" +
+                                "XposedLog:\n\n%s\n\n" +
+                                "=================\n\n" +
+                                "Phone:\n\n%s\n\n",getLogcatInfo(),getXposedLogInfo(),getPhoneInfo());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                shareText(bug);
+                            }
+                        });
                     }
-                });
-                shareText(String.format(Locale.CHINA,"Logcat:\n\n%s\n\n" +
-                        "=================\n\n" +
-                        "XposedLog:\n\n%s\n\n" +
-                        "=================\n\n" +
-                        "Phone:\n\n%s\n\n",getLogcatInfo(),getXposedLogInfo(),getPhoneInfo()));
+                }).start();
                 return false;
             }
         });
@@ -194,7 +197,7 @@ public class PreferencesActivity extends PreferenceActivity {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);
-        sendIntent.setType("text/plain");
+        sendIntent.setType("*/*");
         try {
             Intent chooserIntent = Intent.createChooser(sendIntent, "选择分享途径");
             if (chooserIntent == null) {
