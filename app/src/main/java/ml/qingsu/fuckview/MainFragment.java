@@ -85,6 +85,9 @@ public class MainFragment extends Fragment implements Searchable {
             public int compare(MainActivity.BlockModel blockModel, MainActivity.BlockModel t1) {
                 String s1 = getAppTitle(pm, blockModel.packageName);
                 String s2 = getAppTitle(pm, t1.packageName);
+                //JDK7: RFE: 6804124
+                //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
+                if(s1.equals(s2))return 0;
                 return Collator.getInstance(Locale.CHINA).compare(s1, s2);
             }
         });

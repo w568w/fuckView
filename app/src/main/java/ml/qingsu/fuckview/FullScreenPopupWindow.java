@@ -70,7 +70,8 @@ class FullScreenPopupWindow extends GlobalPopupWindow {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getTitle().equals("就它了")) {
-                                Point p = ((ViewDumper.ViewItem) view.getTag()).bounds;
+                                ViewDumper.ViewItem item1 = (ViewDumper.ViewItem) view.getTag();
+                                Point p = item1.bounds;
                                 MainActivity.Append_Preferences("\n" + new MainActivity.BlockModel(pkg, p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
                                 Toast.makeText(getActivity(), "已保存标记", Toast.LENGTH_SHORT).show();
 

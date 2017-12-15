@@ -20,12 +20,10 @@ import ml.qingsu.fuckview.ShellUtils;
 
 /**
  * Created by w568w on 2017-7-12.
- * No GPL ,MIT,Apache or any other fucking licence.
- * Just do anything fucking you'd like to.
  */
 
 public class ViewDumper {
-    private static final int NO_PARENT = -1;
+    public static final int NO_PARENT = -1;
 
     public static final class ViewItem {
         public String simpleClassName;
@@ -48,7 +46,7 @@ public class ViewDumper {
 
 
         ShellUtils.execCommand("uiautomator dump /mnt/sdcard/dump.xml", true, false);
-        String xml = MainActivity.Read_Preferences("dump.xml").replace("\n", "");
+        String xml = MainActivity.Read_File("dump.xml").replace("\n", "");
         ArrayList<ViewItem> itemList = new ArrayList<>();
         ViewItem temp;
         XmlPullParser parser = Xml.newPullParser();

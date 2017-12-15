@@ -21,11 +21,6 @@
             android:layout_height="wrap_content"
             android:text="切换位置" />
 
-        <Button
-            android:id="@+id/dump_block_launch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="标记当前页" />
 
         <Button
             android:id="@+id/dump_close"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="屏蔽">
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="super_mode"
@@ -10,26 +11,36 @@
         android:key="only_once"
         android:summary="每条规则在屏蔽一次后，立刻失效，直到下一次打开应用。\n如果有误杀可尝试勾选此项。"
         android:title="每条规则只屏蔽一次" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="force_root"
-        android:summary="无视辅助服务，悬浮窗强制使用root模式解析布局"
-        android:title="悬浮窗使用root" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="standard_mode"
-        android:summaryOn="当前为标准标记模式，适用于大多数情况"
-        android:summaryOff="当前为兼容标记模式，适用于无法标记某个控件的场合，一般情况下请保持勾选"
-        android:title="标记模式" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="system_app"
-        android:summary="在应用列表中显示系统应用"
-        android:title="显示系统应用" />
     <Preference
         android:key="import"
         android:summary="点我导入新规则"
         android:title="导入规则" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="标记">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="force_root"
+            android:summary="无视辅助服务，悬浮窗强制使用root模式解析布局"
+            android:title="悬浮窗使用root" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="no_list"
+            android:summaryOn="当前为布局标记模式"
+            android:summaryOff="当前为列表标记模式"
+            android:title="悬浮窗标记模式" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="standard_mode"
+            android:summaryOn="当前为标准标记模式，适用于大多数情况"
+            android:summaryOff="当前为兼容标记模式，适用于无法标记某个控件的场合，一般情况下请保持勾选"
+            android:title="标记模式" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="system_app"
+            android:summary="在应用列表中显示系统应用"
+            android:title="显示系统应用" />
+
+    </PreferenceCategory>
     <PreferenceCategory android:title="关于">
         <Preference
             android:key="about"
@@ -48,7 +59,11 @@
             android:summary="寻找组织搞事情"
             android:title="加入企鹅群" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="调试">
+    <PreferenceCategory android:title="其他">
+        <!--<Preference-->
+            <!--android:key="guide"-->
+            <!--android:summary="重读第一次启动时的教程"-->
+            <!--android:title="教程" />-->
     <Preference
         android:key="log"
         android:summary="生成报告Bug时所必需的日志"

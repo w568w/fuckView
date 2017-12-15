@@ -118,17 +118,24 @@ public class PreferencesActivity extends PreferenceActivity {
                 return false;
             }
         });
+//        findPreference("guide").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//
+//                return false;
+//            }
+//        });
         findPreference("log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final String bug=String.format(Locale.CHINA,"Logcat:\n\n%s\n\n" +
+                        final String bug = String.format(Locale.CHINA, "Logcat:\n\n%s\n\n" +
                                 "=================\n\n" +
                                 "XposedLog:\n\n%s\n\n" +
                                 "=================\n\n" +
-                                "Phone:\n\n%s\n\n",getLogcatInfo(),getXposedLogInfo(),getPhoneInfo());
+                                "Phone:\n\n%s\n\n", getLogcatInfo(), getXposedLogInfo(), getPhoneInfo());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -141,20 +148,24 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
     }
-    private String getLogcatInfo(){
-            return ShellUtils.execCommand("logcat -d -v time",false,true).successMsg;
+
+    private String getLogcatInfo() {
+        return ShellUtils.execCommand("logcat -d -v time", false, true).successMsg;
     }
-    private String getXposedLogInfo(){
-        return ShellUtils.execCommand("cat /data/data/de.robv.android.xposed.installer/log/error.log",false,true).successMsg;
+
+    private String getXposedLogInfo() {
+        return ShellUtils.execCommand("cat /data/data/de.robv.android.xposed.installer/log/error.log", false, true).successMsg;
     }
-    private String getPhoneInfo(){
-        return String.format(Locale.CHINA,"版本:%s(%s)\n" +
+
+    private String getPhoneInfo() {
+        return String.format(Locale.CHINA, "版本:%s(%s)\n" +
                         "Android版本:%s\n" +
                         "指纹:%s\n",
-                getVersionName(this),getVersionCode(this),
+                getVersionName(this), getVersionCode(this),
                 System.getProperty("ro.build.version.release"),
                 Build.FINGERPRINT);
     }
+
     /**
      * 返回版本名字
      * 对应build.gradle中的versionName
@@ -182,7 +193,7 @@ public class PreferencesActivity extends PreferenceActivity {
      * @return
      */
     public static String getVersionCode(Context context) {
-        String versionCode = "" ;
+        String versionCode = "";
         try {
             PackageManager packageManager = context.getPackageManager();
             PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
@@ -193,7 +204,7 @@ public class PreferencesActivity extends PreferenceActivity {
         return versionCode;
     }
 
-    private void shareText(String text){
+    private void shareText(String text) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);

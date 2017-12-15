@@ -1,12 +1,14 @@
 package ml.qingsu.fuckview.wizard;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.SharedPreferencesCompat;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.tencent.bugly.crashreport.CrashReport;
@@ -74,7 +76,13 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
             Toast.makeText(MyApplication.con, "点击以标记View", Toast.LENGTH_SHORT).show();
             new DumpViewerPopupView(mCon, Step1.selected.packageName).show();
             mCon.finish();
-        } catch (Exception e) {
+        } catch (WindowManager.BadTokenException e){
+            Toast.makeText(MyApplication.con, "无法启动悬浮窗，请给予净眼悬浮窗权限！", Toast.LENGTH_SHORT).show();
+        }
+        catch (ActivityNotFoundException e) {
+            Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
+        }
+        catch (Exception e){
             Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
             CrashReport.postCatchedException(e);
         }

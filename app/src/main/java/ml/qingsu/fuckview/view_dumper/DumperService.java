@@ -9,15 +9,11 @@ import android.view.accessibility.AccessibilityNodeInfo;
  */
 public class DumperService extends AccessibilityService {
     private static DumperService instance;
-    private static String activityName=null;
 
     public static DumperService getInstance() {
         return instance;
     }
 
-    public String getActivityName() {
-        return activityName;
-    }
 
     @Override
     protected void onServiceConnected() {
@@ -30,23 +26,14 @@ public class DumperService extends AccessibilityService {
         try {
             return super.getRootInActiveWindow();
         } catch (Throwable ignored) {
+            return null;
         }
-        return null;
+
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
         //NOTHING
-        int type = accessibilityEvent.getEventType();
-        switch (type) {
-            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-
-                String pkg = accessibilityEvent.getPackageName() == null ? "" : accessibilityEvent.getPackageName().toString();
-                if(!pkg.equals("ml.qingsu.fuckview"))
-                    activityName = accessibilityEvent.getClassName().toString();
-                break;
-        }
-
     }
 
     @Override

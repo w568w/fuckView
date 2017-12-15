@@ -52,8 +52,7 @@ import static ml.qingsu.fuckview.Hook.ViewBlocker.getViewPath;
  */
 
 public class Hook implements IXposedHookLoadPackage {
-    private static ArrayList<BlockModel> mBlockList = new ArrayList<>();
-    private ArrayList<String> jsFiles = new ArrayList<>();
+
     //由于目标APP不一定有读写文件权限，所以想到了这么个奇巧淫技，自己维护个缓存区
     private static String writeFileCache = "";
     private static final String SUPER_MODE_NAME =  "super_mode";
@@ -75,7 +74,7 @@ public class Hook implements IXposedHookLoadPackage {
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         XposedBridge.log("Read File -->"+xSP.getFile().getAbsolutePath());
 
-
+        final ArrayList<BlockModel> mBlockList;
         xSP.reload();
         xSP.makeWorldReadable();
         String pkg = xSP.getString(PACKAGE_NAME_NAME, "");
@@ -322,7 +321,7 @@ public class Hook implements IXposedHookLoadPackage {
         //对话框取消那个APP，其实核心就这一行代码...
         XposedBridge.log("净眼:hook -->setCancelable");
         XposedHelpers.findAndHookMethod(Dialog.class, "setCancelable", boolean.class, new booleanSetterHooker(true));
-        if (isBlockPackage(loadPackageParam.packageName) && !loadPackageParam.packageName.equals(pkg)) {
+        if (isBlockPackage(mBlockList,loadPackageParam.packageName) && !loadPackageParam.packageName.equals(pkg)) {
             XposedBridge.log("净眼:hook -->setVisibility");
             XposedHelpers.findAndHookMethod(View.class, "setVisibility", int.class, new XC_MethodHook() {
                 @Override
@@ -332,7 +331,7 @@ public class Hook implements IXposedHookLoadPackage {
                     if ((int) param.args[0] == View.GONE) {
                         return;
                     }
-                    if (ViewBlocker.getInstance().isBlocked(v)) {
+                    if (ViewBlocker.getInstance().isBlocked(mBlockList,v)) {
                         param.args[0] = View.GONE;
                         ViewBlocker.getInstance().block(v);
                     }
@@ -344,7 +343,7 @@ public class Hook implements IXposedHookLoadPackage {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
                     TextView v = (TextView) param.thisObject;
-                    if (ViewBlocker.getInstance().isBlocked(v))
+                    if (ViewBlocker.getInstance().isBlocked(mBlockList,v))
                         ViewBlocker.getInstance().block(v);
                 }
             });
@@ -355,7 +354,7 @@ public class Hook implements IXposedHookLoadPackage {
                     if (layoutParams != null) {
                         if (layoutParams.height == 0 && layoutParams.width == 0)
                             return;
-                        if (ViewBlocker.getInstance().isBlocked(param.thisObject))
+                        if (ViewBlocker.getInstance().isBlocked(mBlockList,param.thisObject))
                             ViewBlocker.getInstance().block(param.thisObject);
                     }
                 }
@@ -372,13 +371,13 @@ public class Hook implements IXposedHookLoadPackage {
                         public void onGlobalLayout() {
 
                             if (finalSuper_mode) {
-                                if (ViewBlocker.getInstance().isBlocked(v)) {
+                                if (ViewBlocker.getInstance().isBlocked(mBlockList,v)) {
                                     v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                                     ViewBlocker.getInstance().block(v);
                                 }
                             } else {
                                 v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                                if (ViewBlocker.getInstance().isBlocked(v)) {
+                                if (ViewBlocker.getInstance().isBlocked(mBlockList,v)) {
                                     ViewBlocker.getInstance().block(v);
                                 }
                             }
@@ -401,7 +400,7 @@ public class Hook implements IXposedHookLoadPackage {
                             View view = (View) param.args[0];
                             WindowManager windowManager = (WindowManager) param.thisObject;
                             if (view == null) return;
-                            if (DialogBlocker.getInstance().isBlocked(view))
+                            if (DialogBlocker.getInstance().isBlocked(mBlockList,view))
                                 windowManager.removeViewImmediate(view);
                         }
                     });
@@ -448,11 +447,11 @@ public class Hook implements IXposedHookLoadPackage {
     //--------------------------------------------------------------
     //--------------------------------------------------------------
     //Block包判断
-    private boolean isBlockPackage(String pkg) {
+    private boolean isBlockPackage(ArrayList<BlockModel> arrayList,String pkg) {
 //        jsFiles = JavaScriptRunner.readJS(pkg);
 //        if (jsFiles.size() > 0)
 //            return true;
-        for (BlockModel model : mBlockList) {
+        for (BlockModel model : arrayList) {
             if (model.packageName.equals(pkg))
                 return true;
         }
@@ -690,16 +689,6 @@ public class Hook implements IXposedHookLoadPackage {
         return list;
     }
 
-    private static ArrayList<BlockModel> readBlockList() {
-        ArrayList<BlockModel> list = new ArrayList<>();
-        ArrayList<String> lines = readPreferenceByLine(LIST_FILENAME);
-        for (String line : lines) {
-            BlockModel model = BlockModel.fromString(line);
-            if (model != null)
-                list.add(model);
-        }
-        return list;
-    }
 
     private static class BlockModel {
         private String packageName;
@@ -780,14 +769,14 @@ public class Hook implements IXposedHookLoadPackage {
         @NonNull
         public abstract BlockModel log(Object o);
 
-        protected abstract Pair<Boolean, Integer> isBlock(Object o);
+        protected abstract Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList,Object o);
 
         public abstract void block(Object o);
 
-        final boolean isBlocked(Object o) {
-            Pair<Boolean, Integer> pair = isBlock(o);
+        final boolean isBlocked(ArrayList<BlockModel> arrayList,Object o) {
+            Pair<Boolean, Integer> pair = isBlock(arrayList,o);
             if (only_once && pair.second >= 0) {
-                mBlockList.remove((int) pair.second);
+                arrayList.remove((int) pair.second);
             }
             return pair.first;
         }
@@ -827,9 +816,10 @@ public class Hook implements IXposedHookLoadPackage {
 
 
         @Override
-        protected Pair<Boolean, Integer> isBlock(Object o) {
-            //XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
-            return isBlockView((View) o);
+        protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList,Object o) {
+//            XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
+//            XposedBridge.log("list  --> "+arrayList);
+            return isBlockView(arrayList,(View) o);
         }
 
         @Override
@@ -898,7 +888,7 @@ public class Hook implements IXposedHookLoadPackage {
             return allText;
         }
 
-        private static Pair<Boolean, Integer> isBlockView(View view) {
+        private Pair<Boolean, Integer> isBlockView(ArrayList<BlockModel> mBlockList,View view) {
 
             //测试代码，为某个功能做铺垫
 //            ViewParent parent = view.getParent();
@@ -975,9 +965,9 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         @Override
-        protected Pair<Boolean, Integer> isBlock(Object o) {
+        protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList,Object o) {
             XposedBridge.log("add View-->" + getAllText((View) o));
-            return isBlockDialog((View) o);
+            return isBlockDialog(arrayList,(View) o);
         }
 
         @Override
@@ -985,7 +975,7 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         //Block对话框判断
-        private static Pair<Boolean, Integer> isBlockDialog(View view) {
+        private Pair<Boolean, Integer> isBlockDialog(ArrayList<BlockModel> mBlockList,View view) {
             final String pkg = view.getContext().getPackageName();
             final int len = mBlockList.size();
             for (int i = 0; i < len; i++) {

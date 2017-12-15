@@ -1,6 +1,7 @@
 package ml.qingsu.fuckview;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import ml.qingsu.fuckview.about.Faq;
+import ml.qingsu.fuckview.first_run_library.FirstRun;
 import ml.qingsu.fuckview.helper.Helper;
 import ml.qingsu.fuckview.wizard.SelectAppWizard;
 
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String PACKAGE_NAME_NAME = "package_name";
 
-    public static final String LAUNCHER_VIRTUAL_CLASSNAME = "launcher";
     private static final int REQUEST_PERMISSION = 0x123;
     private static final String ALL_SPLIT = "~~";
     private static SharedPreferences mSharedPreferences;
@@ -63,10 +64,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         mSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
-        SharedPreferences sharedPreferences = getSharedPreferences("info", MODE_PRIVATE);
-        boolean firstRun = sharedPreferences.getBoolean("first_run", true);
 
-        if (firstRun) {
+        if (FirstRun.isFirstRun(this,"app")) {
             setFragmentWithoutBack(new Helper());
         } else if (Read_Preferences(LIST_NAME).equals("")) {
             setFragmentWithoutBack(new SelectAppWizard());
@@ -140,7 +139,12 @@ public class MainActivity extends AppCompatActivity {
     private void checkAndCallPermission(String permission) {
         if (Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
+            try {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
+            }catch (ActivityNotFoundException e){
+                e.printStackTrace();
+                Toast.makeText(this, "emmm... 似乎你的手机上没有授权管理，请手动给予净眼文件读写权限！", Toast.LENGTH_SHORT).show();
+            }
         } else {
             //處理老文件
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -364,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
         Write_Preferences(Read_Preferences(filename) + data, filename);
     }
 
-    private static String Read_File(String filename) {
+    public static String Read_File(String filename) {
         final String sdPath = File_Get_SD_Path() + "/";
         File f = new File(sdPath + filename);
         if (!f.exists())

@@ -19,7 +19,7 @@ allprojects {
         jcenter()
         //maven { url 'https://maven.fabric.io/public' }
         //maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
-
+        maven { url 'https://jitpack.io' }
     }
 }
 
