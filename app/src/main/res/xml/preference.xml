@@ -25,14 +25,14 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="no_list"
-            android:summaryOn="当前为布局标记模式"
             android:summaryOff="当前为列表标记模式"
+            android:summaryOn="当前为布局标记模式"
             android:title="悬浮窗标记模式" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="standard_mode"
-            android:summaryOn="当前为标准标记模式，适用于大多数情况"
             android:summaryOff="当前为兼容标记模式，适用于无法标记某个控件的场合，一般情况下请保持勾选"
+            android:summaryOn="当前为标准标记模式，适用于大多数情况"
             android:title="标记模式" />
         <CheckBoxPreference
             android:defaultValue="false"
@@ -68,7 +68,7 @@
         android:key="log"
         android:summary="生成报告Bug时所必需的日志"
         android:title="生成日志" />
-</PreferenceCategory>
+    </PreferenceCategory>
 
 
 

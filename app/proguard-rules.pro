@@ -23,11 +23,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--keep public class ml.qingsu.fuckview.Hook
--keep public class ml.qingsu.fuckview.MainActivity{
+-keep public class ml.qingsu.fuckview.hook.Hook
+-keep public class ml.qingsu.fuckview.ui.activities.MainActivity{
     private static boolean isModuleActive();
 }
--keep public class ml.qingsu.fuckview.PreferencesActivity
+-keep public class ml.qingsu.fuckview.ui.activities.PreferencesActivity
 -keep class android.support.**
 -keepclassmembers class android.support.**
 

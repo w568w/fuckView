@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fuck view</string>
     <string name="des">Block your unliked view!</string>
@@ -7,7 +8,7 @@
     <string name="OK">OK</string>
     <string name="captured">Captured</string>
     <string name="notification_title">fuckView(Click here to block)</string>
-    <string name="no_file_ro_permission">emmm… Maybe there\'re not any permission management app,please manually give fuckView file read/write permission!</string>
+    <string name="no_file_ro_permission">emmm... Maybe there\'re not any permission management app,please manually give fuckView file read/write permission!</string>
     <string name="delete_selections">Delete Selections</string>
     <string name="share_selections">Share Selections</string>
     <string name="confirm">Confirm?</string>

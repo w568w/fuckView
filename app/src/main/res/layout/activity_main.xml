@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/fl"
-    tools:context="ml.qingsu.fuckview.MainActivity">
+    tools:context="ml.qingsu.fuckview.ui.activities.MainActivity">
 
 </FrameLayout>

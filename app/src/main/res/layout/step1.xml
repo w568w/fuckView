@@ -11,7 +11,7 @@
         android:background="#ff0099cc"
         android:gravity="center_vertical"
         android:padding="6dp"
-        android:text="选择一个你要净化的应用\n(你应事先将其强制停止，否则无法正常标记)"
+        android:text="@string/select_app_tip"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="12sp" />
 

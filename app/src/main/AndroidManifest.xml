@@ -24,22 +24,22 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="净眼模块，干♂你想干！" />
+            android:value="@string/module_des" />
         <meta-data
             android:name="xposedminversion"
             android:value="53" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreferencesActivity" />
+        <activity android:name=".ui.activities.PreferencesActivity" />
 
         <service
-            android:name=".view_dumper.DumperService"
+            android:name=".utils.view_dumper.DumperService"
             android:enabled="true"
             android:exported="true"
             android:label="@string/app_name"
