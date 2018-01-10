@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingTop="5dp">
+    android:padding="16dp"
+    android:weightSum="1">
+
 
     <RadioButton
         android:id="@+id/radioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:paddingRight="10dp"
-        android:paddingEnd="10dp"
+        android:layout_gravity="center_vertical"
         android:checked="false"
         android:clickable="false"
-        android:focusable="false" />
+        android:focusable="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
-        android:drawablePadding="10dp"
+
         android:id="@+id/textView"
+        android:textSize="16sp"
+        android:drawableLeft="@drawable/icon"
+        android:text="A cat is fine too."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical" />
-
-</LinearLayout>
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/radioButton"
+        android:layout_toEndOf="@id/radioButton" />
+</RelativeLayout>

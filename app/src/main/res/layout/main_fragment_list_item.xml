@@ -27,14 +27,12 @@
                 android:id="@+id/app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#fff"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/class_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#ddd"
                 android:textSize="14sp" />
         </LinearLayout>
 

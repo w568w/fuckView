@@ -63,8 +63,13 @@ abstract class GlobalPopupWindow {
         mWindowManager.addView(view, params);
         onShow();
     }
-    protected void onHide(){}
-    protected void onShow(){}
+
+    protected void onHide() {
+    }
+
+    protected void onShow() {
+    }
+
     public final void hide() {
         if (!isShown) return;
         isShown = false;

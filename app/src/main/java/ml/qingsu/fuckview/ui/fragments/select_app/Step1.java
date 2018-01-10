@@ -1,5 +1,6 @@
 package ml.qingsu.fuckview.ui.fragments.select_app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -51,7 +52,7 @@ public class Step1 extends WizardStep implements Searchable {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.step1, null);
+        LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.select_app, null);
         tv = (TextView) ll.findViewById(R.id.step1_textView);
         lv = (ListView) ll.findViewById(R.id.step1_listView);
         ll.setPadding(5, 5, 5, 5);
@@ -62,7 +63,7 @@ public class Step1 extends WizardStep implements Searchable {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, 1, Menu.NONE, "转到应用信息页面");
+        menu.add(0, 1, Menu.NONE, R.string.goto_app_detail);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class Step1 extends WizardStep implements Searchable {
                     startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(mCon, "抱歉,您的设备不支持此选项", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mCon, R.string.unsupport_of_package, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -114,7 +115,7 @@ public class Step1 extends WizardStep implements Searchable {
                         mCon.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(act, "未获得读取应用权限", Toast.LENGTH_LONG).show();
+                                Toast.makeText(act, getString(R.string.no_app_list_permission), Toast.LENGTH_LONG).show();
                             }
                         });
                         return;
@@ -165,7 +166,7 @@ public class Step1 extends WizardStep implements Searchable {
                                     if (selected.packageName.equals(lv.getContext().getPackageName())) {
                                         selectPosition = 0;
                                         selected = finalAppList.get(0);
-                                        Toast.makeText(con, "大坏淫!我不会自残的~(╯‵□′)╯︵┻━┻", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(con, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
                                     }
                                     aa.notifyDataSetChanged();
                                 }
@@ -212,6 +213,7 @@ public class Step1 extends WizardStep implements Searchable {
             return i;
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             ViewHolder viewHolder;
@@ -224,8 +226,8 @@ public class Step1 extends WizardStep implements Searchable {
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
-            viewHolder.name.setText(al.get(i).appName);
-            al.get(i).appIcon.setBounds(0, 0, 40, 40);
+            viewHolder.name.setText("    "+al.get(i).appName);
+            al.get(i).appIcon.setBounds(0, 0, 64, 64);
             viewHolder.name.setCompoundDrawables(al.get(i).appIcon, null, null, null);
             if (selectPosition == i) {
                 viewHolder.select.setChecked(true);

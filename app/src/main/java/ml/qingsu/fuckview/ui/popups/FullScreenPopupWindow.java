@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
 
@@ -42,7 +44,7 @@ class FullScreenPopupWindow extends GlobalPopupWindow {
     }
 
     @Override
-    protected View onCreateView(Context context) {
+    protected View onCreateView(final Context context) {
         absoluteLayout = new AbsoluteLayout(context);
         absoluteLayout.setBackgroundColor(Color.argb(120, 0, 0, 0));
         absoluteLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -66,22 +68,16 @@ class FullScreenPopupWindow extends GlobalPopupWindow {
                     final Drawable drawable = view.getBackground();
                     //弹出菜单
                     android.support.v7.widget.PopupMenu popupMenu = new android.support.v7.widget.PopupMenu(view.getContext(), view);
-                    popupMenu.getMenu().add("就它了");
-                    popupMenu.getMenu().add("结束标记");
+                    popupMenu.getMenu().add(R.string.popup_mark_it);
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getTitle().equals("就它了")) {
+                            if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                 ViewDumper.ViewItem item1 = (ViewDumper.ViewItem) view.getTag();
                                 Point p = item1.bounds;
                                 MainActivity.Append_Preferences("\n" + new MainActivity.ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
-                                Toast.makeText(getActivity(), "已保存标记", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
 
-                            } else {
-                                //选择“结束标记”，先隐藏自身，
-                                hide();
-                                //再显示悬浮窗
-                                popupView.show();
                             }
                             return true;
                         }
@@ -99,6 +95,18 @@ class FullScreenPopupWindow extends GlobalPopupWindow {
                     updateLayout();
                     popupMenu.show();
                 }
+            }
+        });
+        absoluteLayout.setFocusableInTouchMode(true);
+        absoluteLayout.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(keyCode==KeyEvent.KEYCODE_BACK){
+                    hide();
+                    popupView.show();
+                    return true;
+                }
+                return false;
             }
         });
         return absoluteLayout;

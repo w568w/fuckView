@@ -105,11 +105,11 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (mRefresh.getText().toString().equals("解析中...")) {
+            if (mRefresh.getText().toString().equals(appContext.getString(R.string.parsing_view))) {
                 cancel(true);
                 return;
             }
-            mRefresh.setText("解析中...");
+            mRefresh.setText(R.string.parsing_view);
         }
 
         @Override
@@ -122,10 +122,10 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         @Override
         protected void onPostExecute(Void vo) {
             super.onPostExecute(vo);
-            mRefresh.setText("刷新解析");
+            mRefresh.setText(R.string.parse_view);
 
             if (mList == null || mList.isEmpty()) {
-                Toast.makeText(appContext, "解析失败!您启用 净眼 的辅助服务了吗?\n\n启用后请强制停止应用重来！\n启用后请强制停止应用重来！\n启用后请强制停止应用重来！\n重要的事说三遍", Toast.LENGTH_LONG).show();
+                Toast.makeText(appContext, R.string.parse_failed, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -134,7 +134,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
                 mFullScreenPopupWindow = new FullScreenPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
             else {
                 if (FirstRun.isFirstRun(appContext, "list_popup"))
-                    Toast.makeText(appContext, "长按显示菜单,短按定位控件", Toast.LENGTH_LONG).show();
+                    Toast.makeText(appContext, R.string.mark_tip, Toast.LENGTH_LONG).show();
                 mFullScreenPopupWindow = new FullScreenListPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
             }
             mFullScreenPopupWindow.show();
@@ -149,7 +149,6 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             if(intent!=null){
                 int height=intent.getIntExtra("height",0);
                 int width=intent.getIntExtra("width",0);
-                Log.d("jy","Get a cast!");
                 Toast.makeText(context, "Get it!-->"+intent.getStringExtra("className"), Toast.LENGTH_SHORT).show();
             }
         }

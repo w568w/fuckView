@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -53,9 +54,9 @@ import static ml.qingsu.fuckview.hook.Hook.ViewBlocker.getViewPath;
 public class Hook implements IXposedHookLoadPackage {
 
     public static final String DIALOG_VIRTUAL_CLASSNAME = "Dialog";
-    private static final String SUPER_MODE_NAME = "superMode";
-    private static final String ONLY_ONCE_NAME = "onlyOnce";
-    private static final String STANDARD_MODE_NAME = "standardMode";
+    private static final String SUPER_MODE_NAME = "super_mode";
+    private static final String ONLY_ONCE_NAME = "only_once";
+    private static final String STANDARD_MODE_NAME = "standard_mode";
     private static final String PACKAGE_NAME_NAME = "package_name";
     private static final String LIST_FILENAME = "block_list";
     private static final String BROADCAST_ACTION = "tooYoungtooSimple";
@@ -99,26 +100,26 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-    private static void HandleLongClick(final View view) throws PackageManager.NameNotFoundException {
-        final Context con = view.getContext();
-        final AlertDialog adb = getContinueAskDialog(con);
-        DialogInterface.OnClickListener
-                onClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                ViewBlocker.getInstance().log(view).save();
-                OnlySingleToast.cancel();
-                adb.show();
-            }
-        };
-        //假如没啥信息...
-        new AlertDialog.Builder(con)
-                .setTitle(getString(R.string.captured, con))
-                .setMessage(String.format("确认以下信息：\n种类:%s\nID:%s\n路径:%s\n大小:%d×%d\n文本:%s"
-                        , view.getClass().getSimpleName(), view.getId(), getViewPath(view), view.getWidth(), view.getHeight(), getText(view)))
-                .setPositiveButton("屏蔽", onClickListener)
-                .setNegativeButton("好像不对", null).show();
-    }
+//    private static void HandleLongClick(final View view) throws PackageManager.NameNotFoundException {
+//        final Context con = view.getContext();
+//        final AlertDialog adb = getContinueAskDialog(con);
+//        DialogInterface.OnClickListener
+//                onClickListener = new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                ViewBlocker.getInstance().log(view).save();
+//                OnlySingleToast.cancel();
+//                adb.show();
+//            }
+//        };
+//        //假如没啥信息...
+//        new AlertDialog.Builder(con)
+//                .setTitle(getString(R.string.captured, con))
+//                .setMessage(String.format("确认以下信息：\n种类:%s\nID:%s\n路径:%s\n大小:%d×%d\n文本:%s"
+//                        , view.getClass().getSimpleName(), view.getId(), getViewPath(view), view.getWidth(), view.getHeight(), getText(view)))
+//                .setPositiveButton("屏蔽", onClickListener)
+//                .setNegativeButton("好像不对", null).show();
+//    }
 
     private void HandleClick(final View view) throws PackageManager.NameNotFoundException {
         //屏蔽几个按钮，防止调用多次Handle()
@@ -175,7 +176,6 @@ public class Hook implements IXposedHookLoadPackage {
                 .putExtra("className", view.getClass().getSimpleName())
                 .putExtra("path", ViewBlocker.getViewPath(view));
         context.sendBroadcast(broadcastIntent);
-        XposedBridge.log("净眼:Send a broadcast!");
     }
 
     //与上面唯一的区别是通知方式
@@ -295,12 +295,16 @@ public class Hook implements IXposedHookLoadPackage {
         }
         return arrayList;
     }
-
+    @SafeVarargs
+    static <E> E[] newArray(int length, E... array)
+    {
+        return Arrays.copyOf(array, length);
+    }
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        XposedBridge.log("Read File -->" + xSP.getFile().getAbsolutePath());
 
-        final ArrayList<BlockModel> mBlockList;
+        final ArrayList<BlockModel>[] mBlockList;
+        mBlockList= newArray(1);
         xSP.reload();
         xSP.makeWorldReadable();
         xSP.getFile().setWritable(true);
@@ -329,6 +333,7 @@ public class Hook implements IXposedHookLoadPackage {
         if ((pkg != null && loadPackageParam.packageName.equals(pkg))) {
             if (standardMode) {
                 XposedBridge.log("净眼:hook -->setOnClickListener");
+
                 XposedHelpers.findAndHookMethod(View.class, "setOnClickListener", View.OnClickListener.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
@@ -515,14 +520,28 @@ public class Hook implements IXposedHookLoadPackage {
         //------------------------------------标记部分结束，以下为拦截部分------------------------
         //------------------------------------华丽的分割线----------------------------------------
         //读取屏蔽列表
-        mBlockList = readBlockList(loadPackageParam.packageName);
+        mBlockList[0] = readBlockList(loadPackageParam.packageName);
 
         //以下为Hook
         //对话框取消那个APP，其实核心就这一行代码...
         XposedBridge.log("净眼:hook -->setCancelable");
         XposedHelpers.findAndHookMethod(Dialog.class, "setCancelable", boolean.class, new booleanSetterHooker(true));
-        if (isBlockPackage(mBlockList, loadPackageParam.packageName) && !loadPackageParam.packageName.equals(pkg)) {
-            XposedBridge.log("净眼:hook -->setVisibility");
+        if (isBlockPackage(mBlockList[0], loadPackageParam.packageName) && !loadPackageParam.packageName.equals(pkg)) {
+            XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    //Reload it!
+                    mBlockList[0] =readBlockList(loadPackageParam.packageName);
+                }
+            });
+//            HookHelper.HookEveryMethods(View.class, new XC_MethodHook() {
+//                @Override
+//                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                    super.afterHookedMethod(param);
+//                    XposedBridge.log("净眼:debug -->View."+param.method.getName()+" "+param.method.getModifiers());
+//                }
+//            });
             XposedHelpers.findAndHookMethod(View.class, "setVisibility", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -531,20 +550,19 @@ public class Hook implements IXposedHookLoadPackage {
                     if ((int) param.args[0] == View.GONE) {
                         return;
                     }
-                    if (ViewBlocker.getInstance().isBlocked(mBlockList, v)) {
+                    if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                         param.args[0] = View.GONE;
                         ViewBlocker.getInstance().block(v);
                     }
                 }
             });
-            XposedBridge.log("净眼:hook -->setText");
             XposedHelpers.findAndHookMethod(TextView.class, "setText", CharSequence.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
                     TextView v = (TextView) param.thisObject;
 
-                    if (ViewBlocker.getInstance().isBlocked(mBlockList, v))
+                    if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v))
                         ViewBlocker.getInstance().block(v);
                 }
             });
@@ -555,14 +573,13 @@ public class Hook implements IXposedHookLoadPackage {
                     if (layoutParams != null) {
                         if (layoutParams.height == 0 && layoutParams.width == 0)
                             return;
-                        if (ViewBlocker.getInstance().isBlocked(mBlockList, param.thisObject))
+                        if (ViewBlocker.getInstance().isBlocked(mBlockList[0], param.thisObject))
                             ViewBlocker.getInstance().block(param.thisObject);
                     }
                 }
             });
 
             final boolean finalSuper_mode = superMode;
-            XposedBridge.log("净眼:hook -->View<init>");
             final XC_MethodHook viewHooker = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -573,13 +590,13 @@ public class Hook implements IXposedHookLoadPackage {
                         public void onGlobalLayout() {
 
                             if (finalSuper_mode) {
-                                if (ViewBlocker.getInstance().isBlocked(mBlockList, v)) {
+                                if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                                     v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                                     ViewBlocker.getInstance().block(v);
                                 }
                             } else {
                                 v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                                if (ViewBlocker.getInstance().isBlocked(mBlockList, v)) {
+                                if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                                     ViewBlocker.getInstance().block(v);
                                 }
                             }
@@ -602,7 +619,7 @@ public class Hook implements IXposedHookLoadPackage {
                             View view = (View) param.args[0];
                             WindowManager windowManager = (WindowManager) param.thisObject;
                             if (view == null) return;
-                            if (DialogBlocker.getInstance().isBlocked(mBlockList, view))
+                            if (DialogBlocker.getInstance().isBlocked(mBlockList[0], view))
                                 windowManager.removeViewImmediate(view);
                         }
                     });
@@ -747,6 +764,7 @@ public class Hook implements IXposedHookLoadPackage {
         public String getPosition() {
             return position;
         }
+
         protected static BlockModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
@@ -772,7 +790,9 @@ public class Hook implements IXposedHookLoadPackage {
         final boolean isBlocked(ArrayList<BlockModel> arrayList, Object o) {
             Pair<Boolean, Integer> pair = isBlock(arrayList, o);
             if (onlyOnce && pair.second != null && pair.second >= 0) {
-                arrayList.remove((int) pair.second);
+                BlockModel blockModel = arrayList.remove((int) pair.second);
+
+                XposedBridge.log("净眼:删除规则 -->" + blockModel);
             }
             return pair.first;
         }
@@ -847,6 +867,10 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         private static void fuckView(View v, boolean shouldVisibility) {
+
+            if (shouldVisibility)
+                v.setVisibility(View.GONE);
+            v.setWillNotDraw(true);
             ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
             layoutParams.height = 0;
             layoutParams.width = 0;
@@ -858,11 +882,9 @@ public class Hook implements IXposedHookLoadPackage {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 v.setAlpha(0f);
             }
+
             v.setLayoutParams(layoutParams);
             v.clearAnimation();
-            if (shouldVisibility)
-                v.setVisibility(View.GONE);
-            v.setWillNotDraw(true);
         }
 
         @NonNull
@@ -874,7 +896,7 @@ public class Hook implements IXposedHookLoadPackage {
 
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList, Object o) {
-            XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
+            //XposedBridge.log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
 //            XposedBridge.log("list  --> "+arrayList);
             return isBlockView(arrayList, (View) o);
         }
@@ -895,7 +917,11 @@ public class Hook implements IXposedHookLoadPackage {
             final String className = view.getClass().getSimpleName();
             final int id = view.getId();
             final int len = mBlockList.size();
-
+            final String postion = getViewPosition(view);
+            final String p = getViewPath(view);
+            if(p.indexOf("/")==p.lastIndexOf("/")){
+                return new Pair<>(false,-1);
+            }
             for (int i = 0; i < len; i++) {
                 final BlockModel model = mBlockList.get(i);
                 //className都不对，免谈了，直接跳过
@@ -903,14 +929,14 @@ public class Hook implements IXposedHookLoadPackage {
                     continue;
                 if (model instanceof ViewModel) {
                     final String path = getViewPath(view);
-                    final String postion = getViewPosition(view);
+
                     if (path.equals(((ViewModel) model).getPath()))
                         return new Pair<>(true, i);
-                    if (id != 0 && ((ViewModel) model).getId().equals(id + ""))
+                    if (id > 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(id + ""))
                         return new Pair<>(true, i);
                     if (postion.equals(((ViewModel) model).getPosition()))
                         return new Pair<>(true, i);
-                    if (!model.getText().equals("")&&model.getText().equals(getText(view)))
+                    if (!model.getText().equals("") && model.getText().equals(getText(view)))
                         return new Pair<>(true, i);
                 }
             }

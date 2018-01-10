@@ -1,5 +1,6 @@
 package ml.qingsu.fuckview.ui.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.widget.Toast;
@@ -28,7 +30,11 @@ public class PreferencesActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme",false)){
+            setTheme(R.style.DayTheme);
+        }
         super.onCreate(savedInstanceState);
+
         addPreferencesFromResource(R.xml.preference);
         findPreference("super_mode").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -56,17 +62,17 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 final AppCompatEditText editText = new AppCompatEditText(PreferencesActivity.this);
-                editText.setHint("添加规则，每行一个");
+                editText.setHint(R.string.import_rules);
                 new AlertDialog.Builder(PreferencesActivity.this)
-                        .setTitle("导入规则")
+                        .setTitle(R.string.conf_import_rules_name)
                         .setView(editText)
-                        .setPositiveButton("导入", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 MainActivity.Append_Preferences("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
                             }
                         })
-                        .setNegativeButton("取消", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
                 return false;
             }
@@ -86,16 +92,16 @@ public class PreferencesActivity extends PreferenceActivity {
                     } catch (Throwable ignored) {
 
                     }
-                    Toast.makeText(PreferencesActivity.this, "清明时节雨纷纷，我为长者续五分!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PreferencesActivity.this, R.string.give_me_five_stars, Toast.LENGTH_LONG).show();
                 }
-                preference.setSummary(String.format(Locale.CHINA, "已献出生命%d分%d秒!", clickTime / 59, clickTime % 59));
+                preference.setSummary(String.format(Locale.CHINA, getString(R.string.conf_joke), clickTime / 59, clickTime % 59));
                 return false;
             }
         });
         findPreference("pay").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Toast.makeText(PreferencesActivity.this, "直接加群就好啦\n管那么多干嘛", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PreferencesActivity.this, R.string.no_donate, Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -103,9 +109,9 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new AlertDialog.Builder(PreferencesActivity.this)
-                        .setTitle("开放源代码许可")
-                        .setMessage("并没有这种东西")
-                        .setPositiveButton("好", null)
+                        .setTitle("Open Source")
+                        .setMessage("Nothing")
+                        .setPositiveButton(getString(R.string.OK), null)
                         .show();
                 return false;
             }
@@ -121,13 +127,18 @@ public class PreferencesActivity extends PreferenceActivity {
                 return false;
             }
         });
-//        findPreference("guide").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//            @Override
-//            public boolean onPreferenceClick(Preference preference) {
-//
-//                return false;
-//            }
-//        });
+        findPreference("guide").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://w568.wodemo.net/entry/467891")));
+                } catch (ActivityNotFoundException a) {
+                    a.printStackTrace();
+                    Toast.makeText(PreferencesActivity.this, getString(R.string.unsupport_of_package), Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
         findPreference("log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -147,6 +158,16 @@ public class PreferencesActivity extends PreferenceActivity {
                         });
                     }
                 }).start();
+                return false;
+            }
+        });
+        findPreference("theme").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                finish();
+                Intent restart=new Intent(PreferencesActivity.this,MainActivity.class);
+                restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(restart);
                 return false;
             }
         });

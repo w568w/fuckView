@@ -74,11 +74,11 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
             new DumpViewerPopupView(mCon, Step1.selected.packageName).show();
             mCon.finish();
         } catch (WindowManager.BadTokenException | SecurityException e) {
-            Toast.makeText(MyApplication.con, "无法启动悬浮窗，请给予净眼悬浮窗权限！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.con, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(MyApplication.con, "无法启动应用，请检查您是否将其冻结或隐藏", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
             CrashReport.postCatchedException(e);
         }
     }

@@ -29,14 +29,12 @@
                 android:id="@+id/info_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#fff"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/info_package_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#ddd"
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
@@ -82,7 +80,7 @@
             android:includeFontPadding="false"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:text="类名"
+            android:text="@string/class_name"
             android:textColor="#fff"
             android:textSize="16sp" />
 

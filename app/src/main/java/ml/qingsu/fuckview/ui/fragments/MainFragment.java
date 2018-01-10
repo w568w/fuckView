@@ -172,7 +172,6 @@ public class MainFragment extends Fragment implements Searchable {
             //所以需要转型
             //(PS:呆萌的AS告诉我转型是多余的2333)
             ((AppCompatActivity) context).invalidateOptionsMenu();
-
         }
     }
 
@@ -186,12 +185,12 @@ public class MainFragment extends Fragment implements Searchable {
             menu.add(0, 5, Menu.NONE, R.string.share_selections);
             return;
         }
-        menu.add(0, 1, Menu.NONE, "删除");
-        if (!model.className.equals("*")) {
-            menu.add(0, 2, Menu.NONE, "设为不按类名定位");
-        }
-        menu.add(0, 3, Menu.NONE, "分享规则");
-        menu.add(0, 6, Menu.NONE, model.enable ? "禁用此项" : "启用此项");
+        menu.add(0, 1, Menu.NONE, R.string.delete_item);
+//        if (!model.className.equals("*")) {
+//            menu.add(0, 2, Menu.NONE, "设为不按类名定位");
+//        }
+        menu.add(0, 3, Menu.NONE, R.string.share);
+        menu.add(0, 6, Menu.NONE, model.enable ?R.string.disable_item: R.string.enable_item);
     }
 
     public void setSearchText(String text) {

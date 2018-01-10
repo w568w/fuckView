@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
 
@@ -73,7 +74,7 @@ class FullScreenListPopupWindow extends GlobalPopupWindow {
                 return position;
             }
 
-            @SuppressLint("SetTextI18n")
+
             @Override
             public View getView(final int position, View convertView, final ViewGroup parent) {
                 TextView textView;
@@ -109,21 +110,15 @@ class FullScreenListPopupWindow extends GlobalPopupWindow {
                     @Override
                     public boolean onLongClick(View v) {
                         PopupMenu popupMenu = new PopupMenu(context, v);
-                        popupMenu.getMenu().add("标记该项");
-                        popupMenu.getMenu().add("退出选择");
+                        popupMenu.getMenu().add(R.string.popup_mark_it);
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
-                                if (item.getTitle().equals("标记该项")) {
+                                if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                     ViewDumper.ViewItem item1 = list.get(position);
                                     Point p = item1.bounds;
                                     MainActivity.Append_Preferences("\n" + new MainActivity.ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
-                                    Toast.makeText(getActivity(), "已保存标记", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    //选择“结束标记”，先隐藏自身，
-                                    hide();
-                                    //再显示悬浮窗
-                                    popupView.show();
+                                    Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
                                 }
                                 return true;
                             }

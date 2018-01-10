@@ -1,6 +1,7 @@
 package ml.qingsu.fuckview.ui.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
@@ -33,14 +35,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import ml.qingsu.fuckview.hook.Hook;
-import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.faq.Faq;
-import ml.qingsu.fuckview.utils.first_run.FirstRun;
-import ml.qingsu.fuckview.ui.fragments.first_run_wizard.Helper;
+import ml.qingsu.fuckview.ui.fragments.first_run_guide.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
+import ml.qingsu.fuckview.utils.first_run.FirstRun;
 
 public class MainActivity extends AppCompatActivity {
     public boolean shouldShowFAQ = false;
@@ -62,15 +63,20 @@ public class MainActivity extends AppCompatActivity {
     private static SharedPreferences mSharedPreferences;
     public Fragment currentFragment;
 
+    @SuppressLint("WorldReadableFiles")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme",false)){
+            setTheme(R.style.DayTheme);
+        }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         mSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
 
-        if (FirstRun.isFirstRun(this,"app")) {
-            setFragmentWithoutBack(new Helper());
+        dealWithIntent();
+        if (FirstRun.isFirstRun(this, "app")) {
+            setFragmentWithoutBack(new WelcomeFragment());
         } else if (Read_Preferences(LIST_NAME).equals("")) {
             setFragmentWithoutBack(new SelectAppWizard());
             if (!isModuleActive()) {
@@ -91,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+    }
+
+    private void dealWithIntent() {
         Write_Preferences("", PACKAGE_NAME_NAME);
 
         //此处详见Hook.java
@@ -103,10 +113,11 @@ public class MainActivity extends AppCompatActivity {
             final ViewModel blockInfo = ViewModel.fromString(cache);
             if (blockInfo == null) return;
             blockInfo.save();
+
         } else {
             Append_Preferences(cache, LIST_NAME);
         }
-
+        Toast.makeText(this, R.string.rule_saved, Toast.LENGTH_SHORT).show();
     }
 
     private void checkAndCallPermission(String permission) {
@@ -114,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             try {
                 ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
-            }catch (ActivityNotFoundException e){
+            } catch (ActivityNotFoundException e) {
                 e.printStackTrace();
                 Toast.makeText(this, R.string.no_file_ro_permission, Toast.LENGTH_SHORT).show();
             }
@@ -265,6 +276,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> lines = readPreferenceByLine(LIST_NAME);
         for (String str : lines) {
             BlockModel model = BlockModel.fromString(str);
+            if(model==null)
+                continue;
             if (model.record.contains(ALL_SPLIT)) {
                 model = ViewModel.fromString(str);
             }
@@ -277,7 +290,6 @@ public class MainActivity extends AppCompatActivity {
     public static class BlockModel {
         public String record;
         public String packageName;
-
 
 
         public String text;
@@ -357,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
         public String getPosition() {
             return position;
         }
+
         protected static ViewModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
@@ -374,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
         if (oldFile.exists()) {
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
-                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Append_Preferences("\n" + Read_File("fuckview/" + LIST_FILE_NAME), LIST_NAME);
@@ -382,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Toast.makeText(MainActivity.this, "注意!\n净眼将暂时无法正常标记和屏蔽，要更新规则，请重新打开净眼。", Toast.LENGTH_SHORT).show();
@@ -391,7 +404,9 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
     }
+    private void process_rules(){
 
+    }
     public static void Append_Preferences(String data, String filename) {
         Write_Preferences(Read_Preferences(filename) + data, filename);
     }
@@ -409,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
             String line;
             while ((line = bufReader.readLine()) != null)
                 result += ("\n" + line);
+
             bufReader.close();
             isr.close();
             is.close();
