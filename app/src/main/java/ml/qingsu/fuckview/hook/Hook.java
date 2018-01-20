@@ -15,8 +15,10 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.sax.RootElement;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.MarginLayoutParamsCompat;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +28,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +63,7 @@ public class Hook implements IXposedHookLoadPackage {
     private static final String PACKAGE_NAME_NAME = "package_name";
     private static final String LIST_FILENAME = "block_list";
     private static final String BROADCAST_ACTION = "tooYoungtooSimple";
-    private static final String ALL_SPLIT = "~~";
+    private static final String ALL_SPLIT = "~~~";
     private static final int NOTIFICATION_ID = 0x123;
     //由于目标APP不一定有读写文件权限，所以想到了这么个
     // 奇巧淫技，自己维护个缓存区
@@ -157,24 +160,34 @@ public class Hook implements IXposedHookLoadPackage {
         //看！奇巧淫技x2！
         intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
         intent.putExtra("Dialog", true);
-        Notification n = new NotificationCompat.Builder(context)
-                .setAutoCancel(true)
-                .setTicker(getString(R.string.captured, context))
-                .setSmallIcon(android.R.drawable.stat_sys_warning)
-                .setContentTitle(getString(R.string.notification_title, context))
-                .setContentText(view.getClass().getSimpleName())
-                .setOngoing(false)
-                .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
-                .build();
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_ID, n);
-
+        //Fix: NullPointerE in VAEXposed.
+        //VAEXposed throws a exception with chain styles.
+        //So you cannot write:
+        //nb.xxx().xxx().xxx();
+        //You should write:
+        //nb.xxx();
+        //nb.xxx();
+        //nb.xxx();
+        try {
+            NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
+            nb.setAutoCancel(true);
+            nb.setTicker(getString(R.string.captured, context));
+            nb.setSmallIcon(android.R.drawable.stat_sys_warning);
+            nb.setContentText(view.getClass().getSimpleName());
+            nb.setOngoing(false);
+            nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+            nb.setContentTitle(getString(R.string.notification_title, context));
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(NOTIFICATION_ID, nb.build());
+        }catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
         //BroadcastReceiver
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
                 .putExtra("className", view.getClass().getSimpleName())
-                .putExtra("path", ViewBlocker.getViewPath(view));
+                .putExtra("record", ViewBlocker.getInstance().log(view).toString());
         context.sendBroadcast(broadcastIntent);
     }
 
@@ -216,25 +229,27 @@ public class Hook implements IXposedHookLoadPackage {
         XposedBridge.log(BlockModel.getInstanceByAll(view).toString());
         intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
         intent.putExtra("Dialog", true);
-        Notification n = new NotificationCompat.Builder(context)
-                .setAutoCancel(true)
-                .setTicker(getString(R.string.captured, context))
-                .setSmallIcon(android.R.drawable.stat_sys_warning)
-                .setContentTitle(getString(R.string.notification_title, context))
-                .setContentText(view.getClass().getSimpleName())
-                .setOngoing(false)
-                .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
-                .build();
-
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_ID, n);
+        try {
+            NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
+            nb.setAutoCancel(true);
+            nb.setTicker(getString(R.string.captured, context));
+            nb.setSmallIcon(android.R.drawable.stat_sys_warning);
+            nb.setContentText(view.getClass().getSimpleName());
+            nb.setOngoing(false);
+            nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+            nb.setContentTitle(getString(R.string.notification_title, context));
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(NOTIFICATION_ID, nb.build());
+        }catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
 
         //BroadcastReceiver
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
                 .putExtra("className", view.getClass().getSimpleName())
-                .putExtra("path", ViewBlocker.getViewPath(view));
+                .putExtra("record", ViewBlocker.getInstance().log(view).toString());
         XposedBridge.log("净眼:Send a broadcast!");
         context.sendBroadcast(broadcastIntent);
     }
@@ -295,16 +310,17 @@ public class Hook implements IXposedHookLoadPackage {
         }
         return arrayList;
     }
+
     @SafeVarargs
-    static <E> E[] newArray(int length, E... array)
-    {
+    static <E> E[] newArray(int length, E... array) {
         return Arrays.copyOf(array, length);
     }
+
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
         final ArrayList<BlockModel>[] mBlockList;
-        mBlockList= newArray(1);
+        mBlockList = newArray(1);
         xSP.reload();
         xSP.makeWorldReadable();
         xSP.getFile().setWritable(true);
@@ -527,12 +543,18 @@ public class Hook implements IXposedHookLoadPackage {
         XposedBridge.log("净眼:hook -->setCancelable");
         XposedHelpers.findAndHookMethod(Dialog.class, "setCancelable", boolean.class, new booleanSetterHooker(true));
         if (isBlockPackage(mBlockList[0], loadPackageParam.packageName) && !loadPackageParam.packageName.equals(pkg)) {
-            XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
+            XposedBridge.hookAllMethods(Activity.class, "onCreate", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    //Reload it!
+                    mBlockList[0] = readBlockList(loadPackageParam.packageName);
+                }
+
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    //Reload it!
-                    mBlockList[0] =readBlockList(loadPackageParam.packageName);
+
                 }
             });
 //            HookHelper.HookEveryMethods(View.class, new XC_MethodHook() {
@@ -867,24 +889,29 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         private static void fuckView(View v, boolean shouldVisibility) {
+            try {
+                if (shouldVisibility)
+                    v.setVisibility(View.GONE);
 
-            if (shouldVisibility)
-                v.setVisibility(View.GONE);
-            v.setWillNotDraw(true);
-            ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-            layoutParams.height = 0;
-            layoutParams.width = 0;
-            v.setPadding(0, 0, 0, 0);
-            v.setMinimumHeight(0);
-            v.setMinimumWidth(0);
-
-            v.setBackgroundColor(Color.TRANSPARENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                v.setAlpha(0f);
+                ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
+                layoutParams.height = 0;
+                layoutParams.width = 0;
+                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+                    ((ViewGroup.MarginLayoutParams) layoutParams).setMargins(0, 0, 0, 0);
+                }
+                v.setPadding(0, 0, 0, 0);
+                v.setMinimumHeight(0);
+                v.setMinimumWidth(0);
+                v.setBackgroundColor(Color.TRANSPARENT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    v.setAlpha(0f);
+                }
+                v.setLayoutParams(layoutParams);
+                v.clearAnimation();
+                v.setWillNotDraw(true);
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-
-            v.setLayoutParams(layoutParams);
-            v.clearAnimation();
         }
 
         @NonNull
@@ -919,8 +946,8 @@ public class Hook implements IXposedHookLoadPackage {
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
             final String p = getViewPath(view);
-            if(p.indexOf("/")==p.lastIndexOf("/")){
-                return new Pair<>(false,-1);
+            if (p.indexOf("/") == p.lastIndexOf("/")) {
+                return new Pair<>(false, -1);
             }
             for (int i = 0; i < len; i++) {
                 final BlockModel model = mBlockList.get(i);

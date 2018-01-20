@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,11 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.first_run.FirstRun;
 import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
 import ml.qingsu.fuckview.utils.view_dumper.ViewDumperProxy;
@@ -35,6 +41,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     private GlobalPopupWindow mFullScreenPopupWindow;
     private boolean isNotList;
     private Button mRefresh;
+    private TextView info;
     private HookBrocastReceiver mReceiver;
 
 
@@ -51,9 +58,9 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     protected View onCreateView(final Context context) {
         LinearLayout layout = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.dump_viewer_view, null);
         mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
+        info=(TextView)layout.findViewById(R.id.dump_info);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
-
 
         setFocusable(false);
         mRefresh.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +85,14 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
                 updateLayout();
             }
         });
+        info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.ViewModel model= (MainActivity.ViewModel) info.getTag();
+                model.save();
+                Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
+            }
+        });
         return layout;
     }
 
@@ -91,11 +106,14 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     protected void onHide() {
         super.onHide();
         try {
+            ShellUtils.killProcess(mPackageName);
+            MainActivity.Write_Preferences("", MainActivity.PACKAGE_NAME_NAME);
             appContext.unregisterReceiver(mReceiver);
-        }catch (IllegalArgumentException e){
+        }catch (IllegalArgumentException | IOException e){
             e.printStackTrace();
         }
     }
+
     @Override
     protected int getGravity() {
         return mGravity;
@@ -149,7 +167,9 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             if(intent!=null){
                 int height=intent.getIntExtra("height",0);
                 int width=intent.getIntExtra("width",0);
-                Toast.makeText(context, "Get it!-->"+intent.getStringExtra("className"), Toast.LENGTH_SHORT).show();
+                MainActivity.ViewModel viewModel= MainActivity.ViewModel.fromString(intent.getStringExtra("record"));
+                info.setTag(viewModel);
+                info.setText(viewModel.toString());
             }
         }
     }

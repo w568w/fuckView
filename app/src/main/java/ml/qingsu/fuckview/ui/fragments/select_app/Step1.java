@@ -25,6 +25,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import java.util.List;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
 import static ml.qingsu.fuckview.MyApplication.con;
@@ -64,6 +66,7 @@ public class Step1 extends WizardStep implements Searchable {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, 1, Menu.NONE, R.string.goto_app_detail);
+        menu.add(0, 2, Menu.NONE, R.string.force_stop);
     }
 
     @Override
@@ -79,6 +82,14 @@ public class Step1 extends WizardStep implements Searchable {
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(mCon, R.string.unsupport_of_package, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 2:
+                try {
+                    ShellUtils.killProcess(info.packageName);
+                    Toast.makeText(mCon, R.string.finish, Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 break;
         }

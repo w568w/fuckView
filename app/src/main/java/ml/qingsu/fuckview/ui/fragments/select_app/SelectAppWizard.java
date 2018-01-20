@@ -66,7 +66,7 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //killProcess(Step1.selected.packageName);
+
         PackageManager pm = MyApplication.con.getPackageManager();
         try {
             MyApplication.con.startActivity(pm.getLaunchIntentForPackage(Step1.selected.packageName));
@@ -75,10 +75,13 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
             mCon.finish();
         } catch (WindowManager.BadTokenException | SecurityException e) {
             Toast.makeText(MyApplication.con, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         } catch (ActivityNotFoundException e) {
             Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         } catch (Exception e) {
             Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
             CrashReport.postCatchedException(e);
         }
     }

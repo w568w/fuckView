@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -36,7 +37,14 @@ public class ShellUtils {
     private ShellUtils() {
         throw new AssertionError();
     }
-
+    public static void killProcess(String pkg) throws IOException {
+        java.lang.Process process = Runtime.getRuntime().exec("su");
+        OutputStream out = process.getOutputStream();
+        String cmd = "am force-stop " + pkg + " \n";
+        out.write(cmd.getBytes());
+        out.flush();
+        out.close();
+    }
     /**
      * check whether has root permission
      *

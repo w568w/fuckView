@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -41,6 +42,7 @@ import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.faq.Faq;
 import ml.qingsu.fuckview.ui.fragments.first_run_guide.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
+import ml.qingsu.fuckview.utils.ConvertUtils;
 import ml.qingsu.fuckview.utils.first_run.FirstRun;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PACKAGE_NAME_NAME = "package_name";
 
     private static final int REQUEST_PERMISSION = 0x123;
-    public static final String ALL_SPLIT = "~~";
+    public static final String ALL_SPLIT = "~~~";
     private static SharedPreferences mSharedPreferences;
     public Fragment currentFragment;
 
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme",false)){
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
         }
         setContentView(R.layout.activity_main);
@@ -276,10 +278,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> lines = readPreferenceByLine(LIST_NAME);
         for (String str : lines) {
             BlockModel model = BlockModel.fromString(str);
-            if(model==null)
+            if (model == null)
                 continue;
             if (model.record.contains(ALL_SPLIT)) {
                 model = ViewModel.fromString(str);
+            } else {
+                //轉換老版(0.8.5-)規則到新版
+                model = ViewModel.fromString(ConvertUtils.oldToNew(model).toString());
             }
             if (model != null)
                 list.add(model);
@@ -287,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 
-    public static class BlockModel {
+    public static class BlockModel implements Serializable{
         public String record;
         public String packageName;
 
@@ -370,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
             return position;
         }
 
-        protected static ViewModel fromString(String text) {
+        public static ViewModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
                 return new ViewModel(var[0], var[1], var[2], var[3]);
@@ -404,9 +409,11 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
     }
-    private void process_rules(){
+
+    private void process_rules() {
 
     }
+
     public static void Append_Preferences(String data, String filename) {
         Write_Preferences(Read_Preferences(filename) + data, filename);
     }

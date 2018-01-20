@@ -81,4 +81,5 @@
     <string name="disable_item">禁用此项</string>
     <string name="enable_item">启用此项</string>
     <string name="class_name">类名</string>
+    <string name="force_stop">强制停止</string>
 </resources>

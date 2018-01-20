@@ -8,19 +8,19 @@
     <string name="OK">OK</string>
     <string name="captured">Captured</string>
     <string name="notification_title">fuckView(Click here to block)</string>
-    <string name="no_file_ro_permission">emmm... Maybe there\'re not any permission management app,please manually give fuckView file read/write permission!</string>
+    <string name="no_file_ro_permission">emmm… Maybe there\'re not any permission management app,please manually give fuckView file read/write permission!</string>
     <string name="delete_selections">Delete Selections</string>
     <string name="share_selections">Share Selections</string>
     <string name="confirm">Confirm?</string>
     <string name="cancel">Cancel</string>
     <string name="no_share_app">No app which can share to.</string>
-    <string name="select_app_tip">Select App (You should FORCE STOP that app before，otherwise Fuckview can\'t work well.)</string>
+    <string name="select_app_tip">Select App (You should FORCE stop that app before，otherwise Fuckview can\'t work well.)</string>
     <string name="parse_view">Parse</string>
     <string name="prev_step">Prev</string>
     <string name="next_step">Next</string>
     <string name="start_mark">Fuck it</string>
     <string name="start_mark_toast">Click view to mark it.</string>
-    <string name="dont_mark_myself">Wow,do you want automutilation?What a bad boy...</string>
+    <string name="dont_mark_myself">Wow,do you want automutilation?What a bad boy…</string>
     <string name="module_des">Fuckview is used to fuck views.</string>
     <string name="no_app_list_permission">Maybe you don\'t give Fuckview READ APP LIST permission?</string>
     <string name="goto_app_detail">Goto app detail page</string>
@@ -34,7 +34,7 @@
     <string name="conf_super_mode_des">It may cause slow runs of apps,but it\'s more powerful on ads.</string>
     <string name="conf_only_once_name">Each rule is only used once</string>
     <string name="conf_only_once_des">Each rule blocks only once and then disabled until the next time you open the application.</string>
-    <string name="conf_import_rules_name">Import rules ...</string>
+    <string name="conf_import_rules_name">Import rules …</string>
     <string name="conf_import_rules_des">Click me to import new rules.</string>
     <string name="conf_mark">Marking</string>
     <string name="conf_force_root_name">Root mode in the floating window</string>
@@ -81,4 +81,5 @@
     <string name="disable_item">Disable it</string>
     <string name="enable_item">Enable it</string>
     <string name="class_name">Class</string>
+    <string name="force_stop">Force Stop</string>
 </resources>
