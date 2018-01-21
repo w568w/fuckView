@@ -3,8 +3,9 @@ package ml.qingsu.fuckview;
 import android.app.Application;
 import android.content.Context;
 
-
 import com.tencent.bugly.crashreport.CrashReport;
+
+import ml.qingsu.fuckview.utils.root.AppRulesUtils;
 
 
 /**
@@ -13,11 +14,20 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 public class MyApplication extends Application {
     public static Context con;
+    // 暂时关闭，按需修改
+    private boolean isOpenSharedFile = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         con = this;
+
+        // 设置文件夹权限，让其他 App 可以读取
+        if(isOpenSharedFile) {
+            AppRulesUtils.setFilePermissions(getApplicationInfo().dataDir, 0757, -1, -1);
+            AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
+        }
+
 //        if (LeakCanary.isInAnalyzerProcess(this)) {
 //            // This process is dedicated to LeakCanary for heap analysis.
 //            // You should not init your app in this process.
