@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
@@ -292,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 
-    public static class BlockModel implements Serializable{
+    public static class BlockModel implements Serializable {
         public String record;
         public String packageName;
 
@@ -318,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
             this.enable = enable;
         }
 
-        protected static BlockModel fromString(String text) {
+        public static BlockModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
                 return new BlockModel(var[0], var[1], var[2], var[3]);
@@ -384,6 +385,15 @@ public class MainActivity extends AppCompatActivity {
                 return new ViewModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
             }
             return null;
+        }
+
+        public static boolean isInstance(String str) {
+            try {
+                if (!fromString(str).getPath().equals(""))
+                    return true;
+            } catch (Throwable ignored) {
+            }
+            return false;
         }
     }
 

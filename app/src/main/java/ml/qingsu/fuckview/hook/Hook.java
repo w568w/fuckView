@@ -179,7 +179,7 @@ public class Hook implements IXposedHookLoadPackage {
             nb.setContentTitle(getString(R.string.notification_title, context));
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.notify(NOTIFICATION_ID, nb.build());
-        }catch (NullPointerException npe){
+        } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
         //BroadcastReceiver
@@ -240,7 +240,7 @@ public class Hook implements IXposedHookLoadPackage {
             nb.setContentTitle(getString(R.string.notification_title, context));
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.notify(NOTIFICATION_ID, nb.build());
-        }catch (NullPointerException npe){
+        } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
 
@@ -907,8 +907,6 @@ public class Hook implements IXposedHookLoadPackage {
                     v.setAlpha(0f);
                 }
                 v.setLayoutParams(layoutParams);
-                v.clearAnimation();
-                v.setWillNotDraw(true);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -955,15 +953,18 @@ public class Hook implements IXposedHookLoadPackage {
                 if (!model.className.equals("*") && !model.className.equals(className))
                     continue;
                 if (model instanceof ViewModel) {
-                    final String path = getViewPath(view);
-
+                    String path = getViewPath(view);
+                    int successTimes = 0;
                     if (path.equals(((ViewModel) model).getPath()))
-                        return new Pair<>(true, i);
+                        successTimes++;
                     if (id > 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(id + ""))
-                        return new Pair<>(true, i);
+                        successTimes++;
+
                     if (postion.equals(((ViewModel) model).getPosition()))
-                        return new Pair<>(true, i);
+                        successTimes++;
                     if (!model.getText().equals("") && model.getText().equals(getText(view)))
+                        successTimes++;
+                    if (successTimes >= 2)
                         return new Pair<>(true, i);
                 }
             }

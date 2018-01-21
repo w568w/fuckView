@@ -81,4 +81,5 @@
     <string name="disable_item">Desativar isto</string>
     <string name="enable_item">Ativar isto</string>
     <string name="class_name">Class</string>
+    <string name="force_stop">Força pára</string>
 </resources>
