@@ -37,8 +37,6 @@ import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
-import static ml.qingsu.fuckview.MyApplication.con;
-
 /**
  * Created by w568w on 17-6-18.
  * 这代码没啥可看的，走吧走吧
@@ -118,7 +116,7 @@ public class Step1 extends WizardStep implements Searchable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final Context act = con;
+                    final Context act = mCon;
                     appList = new ArrayList<>();
                     PackageManager pm = act.getPackageManager();
                     List<PackageInfo> packages = pm.getInstalledPackages(0);
@@ -133,6 +131,8 @@ public class Step1 extends WizardStep implements Searchable {
                     }
                     for (int i = 0; i < packages.size(); i++) {
                         PackageInfo packageInfo = packages.get(i);
+                        //TODO somethings Terrible
+                        //无法在MIUI上读取系统应用
                         if (getArguments() != null && !getArguments().containsKey("sys")) {
                             if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)
                                 continue;
@@ -177,7 +177,7 @@ public class Step1 extends WizardStep implements Searchable {
                                     if (selected.packageName.equals(lv.getContext().getPackageName())) {
                                         selectPosition = 0;
                                         selected = finalAppList.get(0);
-                                        Toast.makeText(con, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
                                     }
                                     aa.notifyDataSetChanged();
                                 }
@@ -248,7 +248,7 @@ public class Step1 extends WizardStep implements Searchable {
             }
             if (!searchText.equals("") && !al.get(i).appName.toLowerCase().contains(searchText.toLowerCase())) {
                 view.setVisibility(View.GONE);
-                view = new View(con);
+                view = new View(mCon);
             } else {
                 view.setVisibility(View.VISIBLE);
             }

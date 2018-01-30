@@ -1,10 +1,11 @@
-package ml.qingsu.fuckview.utils.view_dumper;
+package ml.qingsu.fuckview.utils.dumper;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.Xml;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -126,17 +127,20 @@ public class ViewDumper {
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    private synchronized static ViewItem nodeInfoToViewItem(AccessibilityNodeInfo node, int depth) {
+    private synchronized static ViewItem nodeInfoToViewItem(@Nullable AccessibilityNodeInfo node, int depth) {
         ViewItem vi = new ViewItem();
-        Rect rect = new Rect();
-        node.getBoundsInScreen(rect);
-        vi.bounds = new Point(rect.left, rect.top);
-        vi.wh = new Point(rect.width(), rect.height());
+
 
         vi.id = id++;
         vi.level = depth;
         ViewItem v = getLastTopLevelNode(itemList, depth - 1);
         vi.parentId = (v == null ? NO_PARENT : v.id);
+        if (node == null)
+            return vi;
+        Rect rect = new Rect();
+        node.getBoundsInScreen(rect);
+        vi.bounds = new Point(rect.left, rect.top);
+        vi.wh = new Point(rect.width(), rect.height());
         vi.simpleClassName = node.getClassName().toString();
         if (vi.simpleClassName.contains(".")) {
             vi.simpleClassName = vi.simpleClassName.substring(vi.simpleClassName.lastIndexOf("."));
@@ -146,4 +150,5 @@ public class ViewDumper {
 
     private static int id = 0;
     private static ArrayList<ViewItem> itemList;
+
 }

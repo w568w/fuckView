@@ -1,4 +1,4 @@
-package ml.qingsu.fuckview.utils.first_run;
+package ml.qingsu.fuckview.utils;
 
 
 import android.content.Context;

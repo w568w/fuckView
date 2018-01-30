@@ -7,7 +7,7 @@
     <string name="enable_module">请在Xposed Installer中启用我，然后软重启以激活!</string>
     <string name="OK">好</string>
     <string name="captured">已捕获</string>
-    <string name="notification_title">净眼(点击以屏蔽)</string>
+    <string name="notification_title">Online:%1$d regra \\n Local:%2$d regra</string>
     <string name="no_file_ro_permission">emmm… 似乎你的手机上没有授权管理，请手动给予净眼文件读写权限！</string>
     <string name="delete_selections">删除选中项</string>
     <string name="share_selections">分享选中项</string>
@@ -82,4 +82,8 @@
     <string name="enable_item">启用此项</string>
     <string name="class_name">类名</string>
     <string name="force_stop">强制停止</string>
+    <string name="click_to_save">[点击保存规则]</string>
+    <string name="online_rules">在线规则</string>
+    <string name="online_rules_info">在线: %1$d 条规则\n本地: %2$d 条规则</string>
+    <string name="sync_rules">同步</string>
 </resources>

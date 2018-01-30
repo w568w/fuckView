@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +23,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
@@ -41,10 +39,10 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.faq.Faq;
-import ml.qingsu.fuckview.ui.fragments.first_run_guide.WelcomeFragment;
+import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.utils.ConvertUtils;
-import ml.qingsu.fuckview.utils.first_run.FirstRun;
+import ml.qingsu.fuckview.utils.FirstRun;
 
 public class MainActivity extends AppCompatActivity {
     public boolean shouldShowFAQ = false;
@@ -420,9 +418,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void process_rules() {
-
-    }
 
     public static void Append_Preferences(String data, String filename) {
         Write_Preferences(Read_Preferences(filename) + data, filename);

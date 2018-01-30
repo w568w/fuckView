@@ -11,14 +11,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
-import android.sax.RootElement;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.MarginLayoutParamsCompat;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,8 +24,6 @@ import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,11 +39,8 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 import static ml.qingsu.fuckview.hook.Hook.ViewBlocker.getAllText;
-import static ml.qingsu.fuckview.hook.Hook.ViewBlocker.getText;
-import static ml.qingsu.fuckview.hook.Hook.ViewBlocker.getViewPath;
 
 /**
  * w568w on 2017-6-30.
@@ -126,25 +118,26 @@ public class Hook implements IXposedHookLoadPackage {
 
     private void HandleClick(final View view) throws PackageManager.NameNotFoundException {
         //屏蔽几个按钮，防止调用多次Handle()
-        if (view instanceof Button
-                && ((Button) view).getText().equals("就它了")
-                )
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("放弃标记"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("屏蔽"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("坚持屏蔽"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("好像不对"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("好吧"))
-            return;
+        //2018-1-26:已經沒用了
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("就它了")
+//                )
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("放弃标记"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("屏蔽"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("坚持屏蔽"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("好像不对"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("好吧"))
+//            return;
 
         final Context context = view.getContext();
         //设置View
@@ -194,33 +187,30 @@ public class Hook implements IXposedHookLoadPackage {
     //与上面唯一的区别是通知方式
     private void HandleTouch(final View view) throws PackageManager.NameNotFoundException {
         //屏蔽几个按钮，防止调用多次Handle()
-        if (view instanceof Button
-                && ((Button) view).getText().equals("就它了")
-                )
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("放弃标记"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("屏蔽"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("坚持屏蔽"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("好像不对"))
-            return;
-        if (view instanceof Button
-                && ((Button) view).getText().equals("好吧"))
-            return;
+        //2018-1-26:已經沒用了
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("就它了")
+//                )
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("放弃标记"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("屏蔽"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("坚持屏蔽"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("好像不对"))
+//            return;
+//        if (view instanceof Button
+//                && ((Button) view).getText().equals("好吧"))
+//            return;
 
         final Context context = view.getContext();
-        //设置View
-//        TextView infomation = new TextView(context);
-//        infomation.setText("长按以标记");
         //增加红框
         addViewShape(view);
-        //OnlySingleToast.showToast(context, infomation, Toast.LENGTH_SHORT);
         //显示通知栏
         //设置Intent
         Intent intent = context.getPackageManager().getLaunchIntentForPackage("ml.qingsu.fuckview");
@@ -242,6 +232,25 @@ public class Hook implements IXposedHookLoadPackage {
             nm.notify(NOTIFICATION_ID, nb.build());
         } catch (NullPointerException npe) {
             npe.printStackTrace();
+
+        } catch (Throwable t) {
+            /*
+            Deal with Class Not Found thrown when creating NotificationCompat in [Exposed](https://github.com/android-hacker/exposed) Environment.
+            But it's not supported in API 10 and below,let's TODO it.
+            */
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                Notification.Builder nb = new Notification.Builder(context);
+                nb.setAutoCancel(true);
+                nb.setTicker(getString(R.string.captured, context));
+                nb.setSmallIcon(android.R.drawable.stat_sys_warning);
+                nb.setContentText(view.getClass().getSimpleName());
+                nb.setOngoing(false);
+                nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                nb.setContentTitle(getString(R.string.notification_title, context));
+                NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                nm.notify(NOTIFICATION_ID, nb.getNotification());
+            }
         }
 
         //BroadcastReceiver
@@ -250,7 +259,6 @@ public class Hook implements IXposedHookLoadPackage {
                 .putExtra("width", view.getWidth())
                 .putExtra("className", view.getClass().getSimpleName())
                 .putExtra("record", ViewBlocker.getInstance().log(view).toString());
-        XposedBridge.log("净眼:Send a broadcast!");
         context.sendBroadcast(broadcastIntent);
     }
 
@@ -312,7 +320,7 @@ public class Hook implements IXposedHookLoadPackage {
     }
 
     @SafeVarargs
-    static <E> E[] newArray(int length, E... array) {
+    private static <E> E[] newArray(int length, E... array) {
         return Arrays.copyOf(array, length);
     }
 
@@ -525,12 +533,12 @@ public class Hook implements IXposedHookLoadPackage {
             }
             XposedHelpers.findAndHookMethod("android.view.WindowManagerImpl", Dialog.class.getClassLoader(), "removeView", View.class, new windowHook());
             XposedHelpers.findAndHookMethod("android.view.WindowManagerImpl", Dialog.class.getClassLoader(), "removeViewImmediate", View.class, new windowHook());
-            XposedBridge.hookAllMethods(Activity.class, "onCreate", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                }
-            });
+//            XposedBridge.hookAllMethods(Activity.class, "onCreate", new XC_MethodHook() {
+//                @Override
+//                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                    super.afterHookedMethod(param);
+//                }
+//            });
         }
 
         //------------------------------------标记部分结束，以下为拦截部分------------------------
@@ -551,11 +559,6 @@ public class Hook implements IXposedHookLoadPackage {
                     mBlockList[0] = readBlockList(loadPackageParam.packageName);
                 }
 
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-
-                }
             });
 //            HookHelper.HookEveryMethods(View.class, new XC_MethodHook() {
 //                @Override
@@ -601,7 +604,7 @@ public class Hook implements IXposedHookLoadPackage {
                 }
             });
 
-            final boolean finalSuper_mode = superMode;
+            final boolean finalSuperMode = superMode;
             final XC_MethodHook viewHooker = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -611,7 +614,7 @@ public class Hook implements IXposedHookLoadPackage {
                         @Override
                         public void onGlobalLayout() {
 
-                            if (finalSuper_mode) {
+                            if (finalSuperMode) {
                                 if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                                     v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                                     ViewBlocker.getInstance().block(v);
@@ -658,7 +661,6 @@ public class Hook implements IXposedHookLoadPackage {
             if (model.packageName.equals(pkg))
                 return true;
         }
-
         return false;
     }
 

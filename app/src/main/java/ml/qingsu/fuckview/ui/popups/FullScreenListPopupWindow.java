@@ -1,6 +1,5 @@
 package ml.qingsu.fuckview.ui.popups;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
+import ml.qingsu.fuckview.utils.dumper.ViewDumper;
 
 /**
  * Created by w568w on 2017-7-29.

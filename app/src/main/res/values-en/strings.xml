@@ -82,4 +82,8 @@
     <string name="enable_item">Enable it</string>
     <string name="class_name">Class</string>
     <string name="force_stop">Force Stop</string>
+    <string name="click_to_save">[Click to save]</string>
+    <string name="online_rules">Web Rules</string>
+    <string name="online_rules_info">Online: %1$d rule(s)\nLocal: %2$d rule(s)</string>
+    <string name="sync_rules">Sync</string>
 </resources>

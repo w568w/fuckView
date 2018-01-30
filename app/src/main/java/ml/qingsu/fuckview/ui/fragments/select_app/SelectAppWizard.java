@@ -58,7 +58,7 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
     public void onWizardComplete() {
         super.onWizardComplete();
         if (Step1.selected == null) return;
-        getActivity().getSharedPreferences("data", Context.MODE_WORLD_READABLE)
+        mCon.getSharedPreferences("data", Context.MODE_WORLD_READABLE)
                 .edit().putString(MainActivity.PACKAGE_NAME_NAME, Step1.selected.packageName).commit();
         //等待數據寫入完成
         try {
@@ -67,20 +67,20 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
             e.printStackTrace();
         }
 
-        PackageManager pm = MyApplication.con.getPackageManager();
+        PackageManager pm = mCon.getPackageManager();
         try {
-            MyApplication.con.startActivity(pm.getLaunchIntentForPackage(Step1.selected.packageName));
-            Toast.makeText(MyApplication.con, R.string.start_mark_toast, Toast.LENGTH_SHORT).show();
+            mCon.startActivity(pm.getLaunchIntentForPackage(Step1.selected.packageName));
+            Toast.makeText(mCon, R.string.start_mark_toast, Toast.LENGTH_SHORT).show();
             new DumpViewerPopupView(mCon, Step1.selected.packageName).show();
             mCon.finish();
         } catch (WindowManager.BadTokenException | SecurityException e) {
-            Toast.makeText(MyApplication.con, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mCon, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mCon, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         } catch (Exception e) {
-            Toast.makeText(MyApplication.con, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mCon, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
             CrashReport.postCatchedException(e);
         }

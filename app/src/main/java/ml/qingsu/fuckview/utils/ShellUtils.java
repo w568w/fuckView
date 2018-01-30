@@ -224,8 +224,10 @@ public class ShellUtils {
         } finally {
             if (p != null) {
                 try {
+                    p.getInputStream().close();
                     p.destroy();
-                } catch (Throwable throwable) {
+                } catch (Throwable ignored) {
+
                 }
 
             }

@@ -9,16 +9,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 
-import java.util.ArrayList;
-
-import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
-
 /**
  * Created by w568w on 2017-7-29.
  */
 
 public class RedBoundPopupWindow extends GlobalPopupWindow {
-    private AbsoluteLayout absoluteLayout;
+
 
     RedBoundPopupWindow(Activity activity, Point point, Point wh) {
         super(activity);
@@ -31,7 +27,7 @@ public class RedBoundPopupWindow extends GlobalPopupWindow {
 
     @Override
     protected View onCreateView(Context context) {
-        absoluteLayout = new AbsoluteLayout(context);
+        AbsoluteLayout absoluteLayout = new AbsoluteLayout(context);
         GradientDrawable gd = new GradientDrawable();
         gd.setStroke(4, Color.RED);
         absoluteLayout.setBackgroundDrawable(gd);

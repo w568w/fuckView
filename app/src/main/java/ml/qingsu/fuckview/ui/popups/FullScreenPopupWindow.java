@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
+import ml.qingsu.fuckview.utils.dumper.ViewDumper;
 
 /**
  * Created by w568w on 2017-7-29.

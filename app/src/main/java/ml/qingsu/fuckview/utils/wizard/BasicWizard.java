@@ -27,10 +27,10 @@ public abstract class BasicWizard extends Fragment {
     protected Activity mCon;
 
     public class Settings {
-        String prev;
-        String next;
-        String finish;
-        WizardStep[] fragments;
+        final String prev;
+        final String next;
+        final String finish;
+        final WizardStep[] fragments;
 
         public Settings(String prev, String next, String finish, WizardStep[] fragments) {
             this.prev = prev;
@@ -43,10 +43,6 @@ public abstract class BasicWizard extends Fragment {
     protected abstract Settings getSettings();
 
     int position = 0;
-
-    public BasicWizard() {
-        super();
-    }
 
     public void onWizardComplete() {
     }

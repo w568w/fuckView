@@ -1,4 +1,4 @@
-package ml.qingsu.fuckview.utils.view_dumper;
+package ml.qingsu.fuckview.utils.dumper;
 
 import android.content.Context;
 import android.os.Build;

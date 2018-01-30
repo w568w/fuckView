@@ -1,4 +1,4 @@
-package ml.qingsu.fuckview.ui.fragments.first_run_guide;
+package ml.qingsu.fuckview.ui.fragments;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;

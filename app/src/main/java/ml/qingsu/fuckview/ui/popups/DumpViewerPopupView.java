@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
-import android.os.Process;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +16,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.ShellUtils;
-import ml.qingsu.fuckview.utils.first_run.FirstRun;
-import ml.qingsu.fuckview.utils.view_dumper.ViewDumper;
-import ml.qingsu.fuckview.utils.view_dumper.ViewDumperProxy;
+import ml.qingsu.fuckview.utils.FirstRun;
+import ml.qingsu.fuckview.utils.dumper.ViewDumper;
+import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
 
 /**
  * Created by w568w on 2017-7-12.
@@ -41,7 +38,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     private GlobalPopupWindow mFullScreenPopupWindow;
     private boolean isNotList;
     private Button mRefresh;
-    private TextView info;
+    private TextView mInfo;
     private HookBrocastReceiver mReceiver;
 
 
@@ -58,7 +55,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     protected View onCreateView(final Context context) {
         LinearLayout layout = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.dump_viewer_view, null);
         mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
-        info=(TextView)layout.findViewById(R.id.dump_info);
+        mInfo = (TextView) layout.findViewById(R.id.dump_info);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
 
@@ -67,7 +64,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             @Override
             public void onClick(View view) {
                 //一个null会被误认为Runnable
-                new refreshTask().execute(null, null);
+                new RefreshTask().execute(null, null);
             }
         });
         close.setOnClickListener(new View.OnClickListener() {
@@ -85,12 +82,18 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
                 updateLayout();
             }
         });
-        info.setOnClickListener(new View.OnClickListener() {
+        mInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.ViewModel model= (MainActivity.ViewModel) info.getTag();
-                model.save();
-                Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
+                try {
+                    MainActivity.ViewModel model = (MainActivity.ViewModel) mInfo.getTag();
+                    model.save();
+                    Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
+                    mInfo.setTag(null);
+                    mInfo.setText("");
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
             }
         });
         return layout;
@@ -109,7 +112,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             ShellUtils.killProcess(mPackageName);
             MainActivity.Write_Preferences("", MainActivity.PACKAGE_NAME_NAME);
             appContext.unregisterReceiver(mReceiver);
-        }catch (IllegalArgumentException | IOException e){
+        } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -119,15 +122,14 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         return mGravity;
     }
 
-    private class refreshTask extends AsyncTask<Void, Void, Void> {
+    private class RefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             if (mRefresh.getText().toString().equals(appContext.getString(R.string.parsing_view))) {
                 cancel(true);
-                return;
-            }
-            mRefresh.setText(R.string.parsing_view);
+            } else
+                mRefresh.setText(R.string.parsing_view);
         }
 
         @Override
@@ -164,12 +166,12 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent!=null){
-                int height=intent.getIntExtra("height",0);
-                int width=intent.getIntExtra("width",0);
-                MainActivity.ViewModel viewModel= MainActivity.ViewModel.fromString(intent.getStringExtra("record"));
-                info.setTag(viewModel);
-                info.setText(viewModel.toString());
+            if (intent != null) {
+                int height = intent.getIntExtra("height", 0);
+                int width = intent.getIntExtra("width", 0);
+                MainActivity.ViewModel viewModel = MainActivity.ViewModel.fromString(intent.getStringExtra("record"));
+                mInfo.setTag(viewModel);
+                mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
             }
         }
     }

@@ -1,4 +1,4 @@
-package ml.qingsu.fuckview.utils.view_dumper;
+package ml.qingsu.fuckview.utils.dumper;
 
 import android.accessibilityservice.AccessibilityService;
 import android.view.accessibility.AccessibilityEvent;

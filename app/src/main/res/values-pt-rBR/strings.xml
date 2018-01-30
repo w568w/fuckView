@@ -82,4 +82,8 @@
     <string name="enable_item">Ativar isto</string>
     <string name="class_name">Class</string>
     <string name="force_stop">Força pára</string>
+    <string name="click_to_save">[Clique para salvar]</string>
+    <string name="online_rules">Regra</string>
+    <string name="online_rules_info">Online:%1$d regra \n Local:%2$d regra</string>
+    <string name="sync_rules">Sincronizar</string>
 </resources>

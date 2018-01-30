@@ -108,6 +108,7 @@ public class PreferencesActivity extends PreferenceActivity {
         findPreference("source").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+
                 new AlertDialog.Builder(PreferencesActivity.this)
                         .setTitle("Open Source")
                         .setMessage("Nothing")
@@ -166,7 +167,11 @@ public class PreferencesActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 finish();
                 Intent restart=new Intent(PreferencesActivity.this,MainActivity.class);
-                restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                }else {
+                    restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
                 startActivity(restart);
                 return false;
             }
