@@ -31,13 +31,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Locale;
 
+import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
+import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.faq.Faq;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
@@ -48,18 +50,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean shouldShowFAQ = false;
 
 
-    public static final String LIST_FILE_NAME = "block_list";
-    public static final String SUPER_MODE_FILE_NAME = "super_mode";
-    public static final String ONLY_ONCE_FILE_NAME = "only_once";
-
-    public static final String LIST_NAME = LIST_FILE_NAME;
-    public static final String SUPER_MODE_NAME = SUPER_MODE_FILE_NAME;
-    public static final String ONLY_ONCE_NAME = ONLY_ONCE_FILE_NAME;
+    public static final String LIST_NAME = "block_list";
+    public static final String SUPER_MODE_NAME = "super_mode";
+    public static final String ONLY_ONCE_NAME = "only_once";
     public static final String STANDARD_MODE_NAME = "standard_mode";
+    public static final String ENABLE_LOG_NAME = "enable_log";
 
     public static final String PACKAGE_NAME_NAME = "package_name";
 
     private static final int REQUEST_PERMISSION = 0x123;
+    private static final int REQUEST_NEW_FRAGMENT = 0x124;
     public static final String ALL_SPLIT = "~~~";
     private static SharedPreferences mSharedPreferences;
     public Fragment currentFragment;
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.no_file_ro_permission, Toast.LENGTH_SHORT).show();
             }
         } else {
-            //處理老文件
+            //Process old-style rules
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
@@ -197,6 +197,13 @@ public class MainActivity extends AppCompatActivity {
             process_file();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_OK)
+            setFragment(new OnlineRulesFragment());
+    }
+
     public void setFragmentWithoutBack(Fragment fragment) {
         setFragment(fragment, false);
     }
@@ -252,25 +259,12 @@ public class MainActivity extends AppCompatActivity {
         //为啥不用switch呢？
         //懒....
         if (item.getItemId() == R.id.action_about)
-            setFragment(new Faq());
+            setFragment(new CheckerFragment());
         else if (item.getItemId() == R.id.action_settings)
-            startActivity(new Intent(this, PreferencesActivity.class));
+            startActivityForResult(new Intent(this, PreferencesActivity.class), REQUEST_NEW_FRAGMENT);
         return super.onOptionsItemSelected(item);
     }
 
-    //你可以在hook.java中看到一毛一样的以下代码
-    //为啥要写两遍呢？
-    //因为hook是脱离程序运行的，此时如果用MainActivity.XX()，由于应用尚未加载，会扔出NPE
-    //
-    //MainActivity中调用hook.XX()也是相同道理(这句话未经验证，只是猜测)
-
-    //2017-11-19:上面这句话已得到验证。原因如下：
-    //在build.gradle中，Xposed的API通过Provided模式而不是Compile模式载入应用中，
-    // 这意味着打包出来的APK中不会含有de.robv.android.xposed.IXposedHookLoadPackage这些类和接口，
-    // 它们由Xposed在开机时手动装载。
-    // 但是，它们并不是Android类库的一部分，
-    // 因此，如果调用Hook类中的方法或字段，系统会尝试装载Hook.class，但是发现找不到IXposedHookLoadPackage这个接口。
-    // 所以会妥妥地报ClassNotFound：IXposedHookLoadPackage，并且继而爆出ClassNotFound：Hook，使应用异常。
     public static ArrayList<BlockModel> read() {
         ArrayList<BlockModel> list = new ArrayList<>();
 
@@ -291,119 +285,15 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 
-    public static class BlockModel implements Serializable {
-        public String record;
-        public String packageName;
-
-
-        public String text;
-        public String className;
-        public boolean enable;
-
-
-        private BlockModel(String packageName, String record, String text, String className) {
-            this.packageName = packageName;
-            this.record = record;
-            this.text = text;
-            this.className = className;
-            enable = true;
-        }
-
-        private BlockModel(String packageName, String record, String text, String className, boolean enable) {
-            this.packageName = packageName;
-            this.record = record;
-            this.text = text;
-            this.className = className;
-            this.enable = enable;
-        }
-
-        public static BlockModel fromString(String text) {
-            String[] var = text.split("@@@");
-            if (var.length == 4) {
-                return new BlockModel(var[0], var[1], var[2], var[3]);
-            }
-            if (var.length == 5) {
-                return new BlockModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
-            }
-            return null;
-        }
-
-
-        public void save() {
-            Write_Preferences(Read_Preferences(LIST_FILE_NAME) + "\n" + toString(), LIST_FILE_NAME);
-        }
-
-        @Override
-        public String toString() {
-            return String.format(Locale.CHINA, "%s@@@%s@@@%s@@@%s@@@%s", packageName, record, text, className, enable + "");
-        }
-
-    }
-
-    public static class ViewModel extends BlockModel {
-        private String id;
-        private String path;
-        private String position;
-
-        public ViewModel(String packageName, String record, String text, String className) {
-            super(packageName, record, text, className);
-            prepare();
-        }
-
-        private ViewModel(String packageName, String record, String text, String className, boolean enable) {
-            super(packageName, record, text, className, enable);
-            prepare();
-        }
-
-        private void prepare() {
-            String[] spilted = record.split(ALL_SPLIT);
-            id = spilted[0];
-            path = spilted[1];
-            position = spilted[2];
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getPosition() {
-            return position;
-        }
-
-        public static ViewModel fromString(String text) {
-            String[] var = text.split("@@@");
-            if (var.length == 4) {
-                return new ViewModel(var[0], var[1], var[2], var[3]);
-            }
-            if (var.length == 5) {
-                return new ViewModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
-            }
-            return null;
-        }
-
-        public static boolean isInstance(String str) {
-            try {
-                if (!fromString(str).getPath().equals(""))
-                    return true;
-            } catch (Throwable ignored) {
-            }
-            return false;
-        }
-    }
-
     private void process_file() {
-        final File oldFile = new File(File_Get_SD_Path() + "/fuckview/" + LIST_FILE_NAME);
+        final File oldFile = new File(File_Get_SD_Path() + "/fuckview/" + LIST_NAME);
         if (oldFile.exists()) {
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            Append_Preferences("\n" + Read_File("fuckview/" + LIST_FILE_NAME), LIST_NAME);
+                            Append_Preferences("\n" + Read_File("fuckview/" + LIST_NAME), LIST_NAME);
                             oldFile.delete();
                             Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
                         }
@@ -505,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
         return arrayList;
     }
 
-    private static boolean isModuleActive() {
+    public static boolean isModuleActive() {
         return false;
     }
 }

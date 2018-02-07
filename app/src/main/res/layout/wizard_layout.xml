@@ -15,13 +15,14 @@
             android:id="@+id/button_prev"
             android:layout_weight="0.5"
             android:layout_width="0dp"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:enabled="false"
             android:layout_height="wrap_content" />
         <Button
             android:id="@+id/button_next"
             android:layout_weight="0.5"
             android:layout_width="0dp"
-
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_height="wrap_content" />
     </LinearLayout>
 </LinearLayout>

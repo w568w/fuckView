@@ -8,16 +8,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
+import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.OnlineRulesUtils;
@@ -29,7 +30,7 @@ import ml.qingsu.fuckview.utils.OnlineRulesUtils;
 public class OnlineRulesFragment extends Fragment {
     TextView mInfo;
     Button mDownload;
-    ArrayList<MainActivity.BlockModel> mRules;
+    ArrayList<BlockModel> mRules;
     SwipeRefreshLayout mLayout;
     ProgressBar mProgressBar;
     @Nullable
@@ -59,6 +60,13 @@ public class OnlineRulesFragment extends Fragment {
                 new RefreshTask().execute();
             }
         });
+
+        mLayout.findViewById(R.id.online_rules_rl).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return event.getAction() == MotionEvent.ACTION_DOWN;
+            }
+        });
         return layout;
     }
 
@@ -69,6 +77,7 @@ public class OnlineRulesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mLayout.setRefreshing(true);
+        new RefreshTask().execute();
     }
 
     /**
@@ -78,7 +87,7 @@ public class OnlineRulesFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            mInfo.setText("");
             mDownload.setEnabled(false);
         }
 
@@ -92,7 +101,7 @@ public class OnlineRulesFragment extends Fragment {
                 mInfo.setText(Log.getStackTraceString((Throwable) blockModels));
             } else if (blockModels instanceof ArrayList) {
                 mDownload.setEnabled(true);
-                mRules = (ArrayList<MainActivity.BlockModel>) blockModels;
+                mRules = (ArrayList<BlockModel>) blockModels;
                 mInfo.setText(String.format(Locale.getDefault(), getString(R.string.online_rules_info), mRules.size(), MainActivity.read().size()));
             }
         }
@@ -107,7 +116,7 @@ public class OnlineRulesFragment extends Fragment {
         }
     }
 
-    private class FliterTask extends AsyncTask<ArrayList<MainActivity.BlockModel>,Integer,ArrayList<MainActivity.BlockModel>>{
+    private class FliterTask extends AsyncTask<ArrayList<BlockModel>,Integer,ArrayList<BlockModel>>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -122,29 +131,32 @@ public class OnlineRulesFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<MainActivity.BlockModel> blockModels) {
+        protected void onPostExecute(ArrayList<BlockModel> blockModels) {
             super.onPostExecute(blockModels);
             mProgressBar.setVisibility(View.INVISIBLE);
 
             //MainActivity.Write_Preferences("", MainActivity.LIST_NAME);
-            //TODO 可能会有重复规则，需要去重
-            for (MainActivity.BlockModel bm : blockModels)
+            for (BlockModel bm : blockModels)
                 bm.save();
+            //Refresh Rules...
             mLayout.setRefreshing(true);
         }
 
         @SafeVarargs
         @Override
-        protected final ArrayList<MainActivity.BlockModel> doInBackground(ArrayList<MainActivity.BlockModel>... params) {
-            ArrayList<MainActivity.BlockModel> models=params[0];
-            ArrayList<MainActivity.BlockModel> flitered=new ArrayList<>();
+        protected final ArrayList<BlockModel> doInBackground(ArrayList<BlockModel>... params) {
+            ArrayList<BlockModel> models=params[0];
+            ArrayList<BlockModel> flitered=new ArrayList<>();
+            ArrayList<BlockModel> originModels=MainActivity.read();
             PackageManager packageManager=getActivity().getPackageManager();
             for (int len = models.size(), i = 0; i < len; i++) {
                 publishProgress(i);
-                MainActivity.BlockModel blockModel = models.get(i);
+                BlockModel blockModel = models.get(i);
                 try {
+                    //去重&检查包名是否存在
                     packageManager.getApplicationInfo(blockModel.packageName, 0);
-                    flitered.add(blockModel);
+                    if(!originModels.contains(blockModel))
+                        flitered.add(blockModel);
                 } catch (PackageManager.NameNotFoundException ignored) {
                 }
             }

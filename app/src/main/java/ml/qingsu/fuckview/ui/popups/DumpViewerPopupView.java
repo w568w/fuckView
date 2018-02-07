@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.FirstRun;
@@ -47,8 +48,6 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         mPackageName = pkg;
         isNotList = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("no_list", true);
         mReceiver = new HookBrocastReceiver();
-
-
     }
 
     @Override
@@ -86,7 +85,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             @Override
             public void onClick(View v) {
                 try {
-                    MainActivity.ViewModel model = (MainActivity.ViewModel) mInfo.getTag();
+                    ViewModel model = (ViewModel) mInfo.getTag();
                     model.save();
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
@@ -169,7 +168,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             if (intent != null) {
                 int height = intent.getIntExtra("height", 0);
                 int width = intent.getIntExtra("width", 0);
-                MainActivity.ViewModel viewModel = MainActivity.ViewModel.fromString(intent.getStringExtra("record"));
+                ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
                 mInfo.setTag(viewModel);
                 mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
             }

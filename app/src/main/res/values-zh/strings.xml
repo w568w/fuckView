@@ -86,4 +86,10 @@
     <string name="online_rules">在线规则</string>
     <string name="online_rules_info">在线: %1$d 条规则\n本地: %2$d 条规则</string>
     <string name="sync_rules">同步</string>
+    <string name="conf_enable_log_des">启用日志</string>
+    <string name="conf_enable_log_name">启用Xposed日志输出</string>
+    <string name="conf_online_rules_name">在线规则</string>
+    <string name="conf_online_rules_des">管理在线规则</string>
+    <string name="check_item_module_enabled">Xposed模块启用</string>
+    <string name="check_item_floating_permission">悬浮窗权限</string>
 </resources>

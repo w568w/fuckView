@@ -111,8 +111,7 @@ public class ViewDumper {
         }
         AccessibilityNodeInfo root = DumperService.getInstance().getRootInActiveWindow();
         itemList = new ArrayList<>();
-        if (root == null)
-            return itemList;
+        if (root == null) return itemList;
         parseChild(root, 2);
         return itemList;
     }

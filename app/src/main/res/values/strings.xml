@@ -85,4 +85,10 @@
     <string name="online_rules">Web Rules</string>
     <string name="online_rules_info">Online: %1$d rule(s)\nLocal: %2$d rule(s)</string>
     <string name="sync_rules">Sync</string>
+    <string name="conf_enable_log_des">Enable log</string>
+    <string name="conf_enable_log_name">Enable xposed log</string>
+    <string name="conf_online_rules_name">Web Rules</string>
+    <string name="conf_online_rules_des">Configure web rules</string>
+    <string name="check_item_module_enabled">Module Enabled</string>
+    <string name="check_item_floating_permission">Floating Window Permission</string>
 </resources>

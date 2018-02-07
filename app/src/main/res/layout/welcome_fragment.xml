@@ -25,11 +25,13 @@
         android:id="@+id/welcome_textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:lineSpacingExtra="2sp"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/welcome_textView"
-        android:text="@string/welcome_word" />
+        android:layout_margin="16dp"
+        android:textColor="@android:color/white"
+        android:text="@string/welcome_word"
+        android:layout_below="@+id/welcome_textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:id="@+id/welcome_guide"

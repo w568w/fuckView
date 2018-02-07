@@ -83,7 +83,13 @@
     <string name="class_name">Class</string>
     <string name="force_stop">Força pára</string>
     <string name="click_to_save">[Clique para salvar]</string>
-    <string name="online_rules">Regra</string>
+    <string name="online_rules">Regras de web</string>
     <string name="online_rules_info">Online:%1$d regra \n Local:%2$d regra</string>
     <string name="sync_rules">Sincronizar</string>
+    <string name="conf_enable_log_des">Habilitar log</string>
+    <string name="conf_enable_log_name">Habilitar xposed log</string>
+    <string name="conf_online_rules_name">Regras de web</string>
+    <string name="conf_online_rules_des">Configure as regras da web</string>
+    <string name="check_item_module_enabled">Módulo habilitado</string>
+    <string name="check_item_floating_permission">Permissão de janela flutuante</string>
 </resources>

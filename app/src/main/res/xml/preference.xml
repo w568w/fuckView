@@ -15,6 +15,11 @@
         android:key="import"
         android:summary="@string/conf_import_rules_des"
         android:title="@string/conf_import_rules_name" />
+        <Preference
+            android:key="online_rules"
+            android:summary="@string/conf_online_rules_des"
+            android:title="@string/conf_online_rules_name"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/conf_mark">
         <CheckBoxPreference
@@ -75,6 +80,11 @@
             android:defaultValue="false"
             android:summary="@string/conf_theme_des"
             android:title="@string/conf_theme_name" />
+        <CheckBoxPreference
+            android:key="enable_log"
+            android:defaultValue="true"
+            android:summary="@string/conf_enable_log_des"
+            android:title="@string/conf_enable_log_name" />
     </PreferenceCategory>
 
 

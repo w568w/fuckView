@@ -21,13 +21,13 @@ import java.util.Locale;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.utils.ShellUtils;
 
+import static ml.qingsu.fuckview.ui.activities.MainActivity.ENABLE_LOG_NAME;
 import static ml.qingsu.fuckview.ui.activities.MainActivity.STANDARD_MODE_NAME;
 import static ml.qingsu.fuckview.ui.activities.MainActivity.SUPER_MODE_NAME;
 import static ml.qingsu.fuckview.ui.activities.MainActivity.ONLY_ONCE_NAME;
 
 public class PreferencesActivity extends PreferenceActivity {
     private int clickTime = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme",false)){
@@ -77,7 +77,14 @@ public class PreferencesActivity extends PreferenceActivity {
                 return false;
             }
         });
-
+        findPreference("online_rules").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                setResult(RESULT_OK);
+                finish();
+                return false;
+            }
+        });
         findPreference("about").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -174,6 +181,13 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
                 startActivity(restart);
                 return false;
+            }
+        });
+        findPreference("enable_log").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                MainActivity.Write_Preferences(newValue.toString(), ENABLE_LOG_NAME);
+                return true;
             }
         });
     }

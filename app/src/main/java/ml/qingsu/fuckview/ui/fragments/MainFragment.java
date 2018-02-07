@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
@@ -50,7 +51,7 @@ public class MainFragment extends Fragment implements Searchable {
     private AppAdapter adapter;
     private Activity context;
     PackageManager pm;
-    ArrayList<MainActivity.BlockModel> models;
+    ArrayList<BlockModel> models;
     ListView listView;
     String searchText = "";
     private ArrayList<Integer> deleteList = new ArrayList<>();
@@ -84,9 +85,9 @@ public class MainFragment extends Fragment implements Searchable {
         listView = (ListView) layout.findViewById(R.id.listView);
         models = MainActivity.read();
         try {
-            Collections.sort(models, new Comparator<MainActivity.BlockModel>() {
+            Collections.sort(models, new Comparator<BlockModel>() {
                 @Override
-                public int compare(MainActivity.BlockModel blockModel, MainActivity.BlockModel t1) {
+                public int compare(BlockModel blockModel, BlockModel t1) {
                     String s1 = getAppTitle(pm, blockModel.packageName);
                     String s2 = getAppTitle(pm, t1.packageName);
                     //JDK7: RFE: 6804124
@@ -118,7 +119,7 @@ public class MainFragment extends Fragment implements Searchable {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MainActivity.BlockModel model = models.get(i);
+                BlockModel model = models.get(i);
                 Bundle bundle = new Bundle();
                 bundle.putString("pkg", model.packageName);
                 bundle.putString("record", model.record);
@@ -179,7 +180,7 @@ public class MainFragment extends Fragment implements Searchable {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        MainActivity.BlockModel model = models.get(info.position);
+        BlockModel model = models.get(info.position);
         if (deleteList.size() > 0) {
             menu.add(0, 4, Menu.NONE, R.string.delete_selections);
             menu.add(0, 5, Menu.NONE, R.string.share_selections);
@@ -202,7 +203,7 @@ public class MainFragment extends Fragment implements Searchable {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        final MainActivity.BlockModel model = models.get(menuInfo.position);
+        final BlockModel model = models.get(menuInfo.position);
         switch (item.getItemId()) {
             case 1:
                 models.remove(menuInfo.position);
@@ -229,7 +230,7 @@ public class MainFragment extends Fragment implements Searchable {
                 share(model.toString());
                 break;
             case 4:
-                ArrayList<MainActivity.BlockModel> arrayList = new ArrayList<>();
+                ArrayList<BlockModel> arrayList = new ArrayList<>();
                 for (Integer postion : deleteList)
                     arrayList.add(models.get(postion));
                 models.removeAll(arrayList);
@@ -239,12 +240,12 @@ public class MainFragment extends Fragment implements Searchable {
                 saveAll();
                 break;
             case 5:
-                ArrayList<MainActivity.BlockModel> shares = new ArrayList<>();
+                ArrayList<BlockModel> shares = new ArrayList<>();
                 for (Integer postion : deleteList)
                     shares.add(models.get(postion));
                 deleteList.clear();
                 StringBuilder stringBuilder = new StringBuilder();
-                for (MainActivity.BlockModel model1 : shares) {
+                for (BlockModel model1 : shares) {
                     stringBuilder.append(model1.toString());
                     stringBuilder.append("\n");
                 }
@@ -274,7 +275,7 @@ public class MainFragment extends Fragment implements Searchable {
 
     private void saveAll() {
         MainActivity.Write_Preferences("", MainActivity.LIST_NAME);
-        for (MainActivity.BlockModel bm : models)
+        for (BlockModel bm : models)
             bm.save();
     }
 
@@ -322,7 +323,7 @@ public class MainFragment extends Fragment implements Searchable {
                     }
                 }
             });
-            MainActivity.BlockModel bm = models.get(i);
+            BlockModel bm = models.get(i);
             try {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));

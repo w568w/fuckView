@@ -1,28 +1,21 @@
 package ml.qingsu.fuckview.utils;
 
-import android.content.pm.PackageManager;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.models.BlockModel;
+import ml.qingsu.fuckview.models.ViewModel;
 
 /**
  * Created by w568w on 18-1-20.
  */
 
 public class OnlineRulesUtils {
-    public static ArrayList<MainActivity.BlockModel> getOnlineRules() throws Exception {
-        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL("http://w568w.ml/").openConnection();
+    public static ArrayList<BlockModel> getOnlineRules() throws Exception {
+        HttpURLConnection httpsURLConnection = (HttpURLConnection) new URL("http://w568w.ml/rules").openConnection();
         InputStream is = httpsURLConnection.getInputStream();
         byte buf[] = new byte[512];
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -37,18 +30,17 @@ public class OnlineRulesUtils {
 
     }
 
-    private static ArrayList<MainActivity.BlockModel> parse(String[] lines) {
-        ArrayList<MainActivity.BlockModel> list = new ArrayList<>();
+    private static ArrayList<BlockModel> parse(String[] lines) {
+        ArrayList<BlockModel> list = new ArrayList<>();
         for (String line : lines) {
             if (line.startsWith("#") || line.trim().equals(""))
                 continue;
-            if (MainActivity.ViewModel.isInstance(line))
-                list.add(MainActivity.ViewModel.fromString(line));
+            if (ViewModel.isInstance(line))
+                list.add(ViewModel.fromString(line));
             else
-                list.add(MainActivity.BlockModel.fromString(line));
+                list.add(BlockModel.fromString(line));
         }
         return list;
     }
-
 
 }

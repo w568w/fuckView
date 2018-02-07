@@ -7,8 +7,8 @@ android {
         applicationId "ml.qingsu.fuckview"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 19
-        versionName "0.9.0 experimental"
+        versionCode 20
+        versionName "0.9.1 experimental"
 
         //manifestPlaceholders = [fabricApiKey: project.fabricApiKey]
     }
@@ -45,11 +45,12 @@ dependencies {
     //debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     //BugHD已停止运营
     //compile 'im.fir:fir-sdk:latest.integration@aar'
-    //rhino無用
+    //Rhino無用
    // compile files('libs/rhino-1.7.7.1.jar')
     //Crashlytics在国外，太慢
 //    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
 //        transitive = true;
 //    }
 
+    compile 'com.android.support:cardview-v7:23.+'
 }
