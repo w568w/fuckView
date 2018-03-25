@@ -40,7 +40,6 @@ import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
-import ml.qingsu.fuckview.ui.fragments.faq.Faq;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.utils.ConvertUtils;
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION = 0x123;
     private static final int REQUEST_NEW_FRAGMENT = 0x124;
     public static final String ALL_SPLIT = "~~~";
-    private static SharedPreferences mSharedPreferences;
+    private static SharedPreferences sSharedPreferences;
     public Fragment currentFragment;
 
     @SuppressLint("WorldReadableFiles")
@@ -73,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        mSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
+        sSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
 
         dealWithIntent();
         if (FirstRun.isFirstRun(this, "app")) {
             setFragmentWithoutBack(new WelcomeFragment());
-        } else if (Read_Preferences(LIST_NAME).equals("")) {
+        } else if ("".equals(readPreferences(LIST_NAME))) {
             setFragmentWithoutBack(new SelectAppWizard());
             if (!isModuleActive()) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -102,21 +101,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void dealWithIntent() {
-        Write_Preferences("", PACKAGE_NAME_NAME);
+        writePreferences("", PACKAGE_NAME_NAME);
 
         //此处详见Hook.java
         //是否从通知栏里点过来
         boolean isDialog = getIntent().getBooleanExtra("Dialog", false);
         String cache = getIntent().getStringExtra("cache");
-        if (cache == null) return;
+        if (cache == null) {
+            return;
+        }
         if (isDialog) {
 
             final ViewModel blockInfo = ViewModel.fromString(cache);
-            if (blockInfo == null) return;
+            if (blockInfo == null) {
+                return;
+            }
             blockInfo.save();
 
         } else {
-            Append_Preferences(cache, LIST_NAME);
+            appendPreferences(cache, LIST_NAME);
         }
         Toast.makeText(this, R.string.rule_saved, Toast.LENGTH_SHORT).show();
     }
@@ -136,72 +139,33 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onGlobalLayout() {
                     getWindow().getDecorView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    process_file();
+                    processFile();
                 }
             });
         }
     }
-    //Useless?
-
-//    private void checkFile() {
-//        final String sdPath = File_Get_SD_Path() + "/";
-//        File dir = new File(sdPath + DIR_NAME);
-//        if (!dir.exists()) {
-//            if (!dir.mkdirs() && !dir.mkdir()) {
-//                new AlertDialog.Builder(MainActivity.this)
-//                        .setTitle("错误")
-//                        .setMessage("创建文件夹失败!\n请检查您是否限制了净眼创建文件夹的权限。\n\n提示:您也可以手动在SD卡中创建fuckView(注意大小写)文件夹并重试。")
-//                        .setPositiveButton("退出", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                finish();
-//                            }
-//                        })
-//                        .show();
-//            }
-//        }
-//        final File oldFile = new File(sdPath + LIST_FILE_NAME);
-//        if (oldFile.exists()) {
-//            new AlertDialog.Builder(MainActivity.this)
-//                    .setTitle("检测到旧文件")
-//                    .setMessage("检测到你曾经使用过0.7.1及之前版本的 净眼，是否要更新规则位置?")
-//                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            Append_Preferences(Read_Preferences(LIST_FILE_NAME), LIST_NAME);
-//                            oldFile.delete();
-//                            File oldFile = new File(sdPath + SUPER_MODE_FILE_NAME);
-//                            if (oldFile.exists()) oldFile.delete();
-//                            Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
-//                    .setNegativeButton("否", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            Toast.makeText(MainActivity.this, "注意!\n净眼将暂时无法正常标记和屏蔽，要更新规则，请重新打开净眼。", Toast.LENGTH_SHORT).show();
-//                        }
-//                    })
-//                    .show();
-//        }
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length <= 0) return;
+        if (grantResults.length <= 0) {
+            return;
+        }
         if (requestCode == REQUEST_PERMISSION
                 && Build.VERSION.SDK_INT >= 23
-                && grantResults[0] != PackageManager.PERMISSION_GRANTED)
+                && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
             checkAndCallPermission(permissions[0]);
-        else
-            process_file();
+        } else {
+            processFile();
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_OK)
+        if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_OK) {
             setFragment(new OnlineRulesFragment());
+        }
     }
 
     public void setFragmentWithoutBack(Fragment fragment) {
@@ -214,11 +178,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setFragment(Fragment fragment, boolean backable) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        //transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out);
-
         transaction.replace(R.id.fl, fragment);
-        if (backable)
+        if (backable) {
             transaction.addToBackStack(null);
+        }
         transaction.commitAllowingStateLoss();
         currentFragment = fragment;
         shouldShowFAQ = fragment instanceof Searchable;
@@ -246,8 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (shouldShowFAQ)
+                if (shouldShowFAQ) {
                     ((Searchable) currentFragment).setSearchText(newText);
+                }
                 return true;
             }
         });
@@ -258,10 +222,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         //为啥不用switch呢？
         //懒....
-        if (item.getItemId() == R.id.action_about)
+        if (item.getItemId() == R.id.action_about) {
             setFragment(new CheckerFragment());
-        else if (item.getItemId() == R.id.action_settings)
+        } else if (item.getItemId() == R.id.action_settings) {
             startActivityForResult(new Intent(this, PreferencesActivity.class), REQUEST_NEW_FRAGMENT);
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -271,29 +236,31 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> lines = readPreferenceByLine(LIST_NAME);
         for (String str : lines) {
             BlockModel model = BlockModel.fromString(str);
-            if (model == null)
+            if (model == null) {
                 continue;
+            }
             if (model.record.contains(ALL_SPLIT)) {
                 model = ViewModel.fromString(str);
             } else {
                 //轉換老版(0.8.5-)規則到新版
                 model = ViewModel.fromString(ConvertUtils.oldToNew(model).toString());
             }
-            if (model != null)
+            if (model != null) {
                 list.add(model);
+            }
         }
         return list;
     }
 
-    private void process_file() {
-        final File oldFile = new File(File_Get_SD_Path() + "/fuckview/" + LIST_NAME);
+    private void processFile() {
+        final File oldFile = new File(getSDPath() + "/fuckview/" + LIST_NAME);
         if (oldFile.exists()) {
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            Append_Preferences("\n" + Read_File("fuckview/" + LIST_NAME), LIST_NAME);
+                            appendPreferences("\n" + readFile("fuckview/" + LIST_NAME), LIST_NAME);
                             oldFile.delete();
                             Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
                         }
@@ -309,23 +276,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public static void Append_Preferences(String data, String filename) {
-        Write_Preferences(Read_Preferences(filename) + data, filename);
+    public static void appendPreferences(String data, String filename) {
+        writePreferences(readPreferences(filename) + data, filename);
     }
 
-    public static String Read_File(String filename) {
-        final String sdPath = File_Get_SD_Path() + "/";
+    public static String readFile(String filename) {
+        final String sdPath = getSDPath() + "/";
         File f = new File(sdPath + filename);
-        if (!f.exists())
+        if (!f.exists()) {
             return "";
+        }
         String result = "";
         try {
             FileInputStream is = new FileInputStream(f);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader bufReader = new BufferedReader(isr);
             String line;
-            while ((line = bufReader.readLine()) != null)
+            while ((line = bufReader.readLine()) != null) {
                 result += ("\n" + line);
+            }
 
             bufReader.close();
             isr.close();
@@ -337,14 +306,14 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    public static void Write_Preferences(String data, String filename) {
-        mSharedPreferences.edit().putString(filename, data).apply();
+    public static void writePreferences(String data, String filename) {
+        sSharedPreferences.edit().putString(filename, data).apply();
     }
-
-    //暴力美学
-    //检测SD卡路径
+    /**
+     * @return SD卡路径
+     */
     @Nullable
-    public static String File_Get_SD_Path() {
+    public static String getSDPath() {
         String[] partpaths = {
                 "/emulated/0",
                 "/extSdCard",
@@ -382,15 +351,17 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String Read_Preferences(String filename) {
-        return mSharedPreferences.getString(filename, "");
+    public static String readPreferences(String filename) {
+        return sSharedPreferences.getString(filename, "");
     }
 
     public static ArrayList<String> readPreferenceByLine(String filename) {
-        String data = Read_Preferences(filename);
+        String data = readPreferences(filename);
         ArrayList<String> arrayList = new ArrayList<>();
         for (String line : data.split("\n")) {
-            if (!line.equals("")) arrayList.add(line);
+            if (!"".equals(line)) {
+                arrayList.add(line);
+            }
         }
         return arrayList;
     }

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.base.BasePopupWindow;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.dumper.ViewDumper;
@@ -29,7 +30,7 @@ import ml.qingsu.fuckview.utils.dumper.ViewDumper;
  * Created by w568w on 2017-7-29.
  */
 
-class FullScreenListPopupWindow extends GlobalPopupWindow {
+class FullScreenListPopupWindow extends BasePopupWindow {
     private ArrayList<ViewDumper.ViewItem> list;
     private ListViewCompat listView;
     private String pkg;
@@ -78,10 +79,11 @@ class FullScreenListPopupWindow extends GlobalPopupWindow {
             @Override
             public View getView(final int position, View convertView, final ViewGroup parent) {
                 TextView textView;
-                if (convertView == null || convertView instanceof TextView)
+                if (convertView == null || convertView instanceof TextView) {
                     textView = new TextView(context);
-                else
+                } else {
                     textView = (TextView) convertView;
+                }
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 textView.setPadding(0, 12, 0, 12);
                 final ViewDumper.ViewItem item = (ViewDumper.ViewItem) getItem(position);
@@ -117,7 +119,7 @@ class FullScreenListPopupWindow extends GlobalPopupWindow {
                                 if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                     ViewDumper.ViewItem item1 = list.get(position);
                                     Point p = item1.bounds;
-                                    MainActivity.Append_Preferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
+                                    MainActivity.appendPreferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
                                     Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
                                 }
                                 return true;
@@ -151,6 +153,7 @@ class FullScreenListPopupWindow extends GlobalPopupWindow {
         });
     }
 
+    @Override
     protected int getGravity() {
         return Gravity.TOP | Gravity.LEFT;
     }

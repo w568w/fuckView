@@ -4,6 +4,7 @@ import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 /**
  * Moved by w568w on 18-2-4.
+ * @author w568w
  */
 public class ViewModel extends BlockModel {
     private String id;
@@ -52,8 +53,9 @@ public class ViewModel extends BlockModel {
 
     public static boolean isInstance(String str) {
         try {
-            if (!fromString(str).getPath().equals(""))
+            if (!"".equals(fromString(str).getPath())) {
                 return true;
+            }
         } catch (Throwable ignored) {
         }
         return false;

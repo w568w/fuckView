@@ -17,14 +17,15 @@ public class OnlineRulesUtils {
     public static ArrayList<BlockModel> getOnlineRules() throws Exception {
         HttpURLConnection httpsURLConnection = (HttpURLConnection) new URL("http://w568w.ml/rules").openConnection();
         InputStream is = httpsURLConnection.getInputStream();
-        byte buf[] = new byte[512];
+        byte[] buf = new byte[512];
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         while (is.read(buf) != -1) {
             byteArrayOutputStream.write(buf);
         }
         String source = byteArrayOutputStream.toString();
-        if ("".equals(source) || source == null)
+        if ("".equals(source) || source == null) {
             throw new Exception("Can\'t get list");
+        }
         return parse(source.split("\n"));
 
 
@@ -33,12 +34,14 @@ public class OnlineRulesUtils {
     private static ArrayList<BlockModel> parse(String[] lines) {
         ArrayList<BlockModel> list = new ArrayList<>();
         for (String line : lines) {
-            if (line.startsWith("#") || line.trim().equals(""))
+            if (line.startsWith("#") || "".equals(line.trim())) {
                 continue;
-            if (ViewModel.isInstance(line))
+            }
+            if (ViewModel.isInstance(line)) {
                 list.add(ViewModel.fromString(line));
-            else
+            } else {
                 list.add(BlockModel.fromString(line));
+            }
         }
         return list;
     }

@@ -19,7 +19,7 @@ import ml.qingsu.fuckview.R;
  * Created by w568w on 2017-7-9.
  */
 
-public abstract class BasicWizard extends Fragment {
+public abstract class BaseWizard extends Fragment {
     ViewPager pager;
     Settings settings;
     Button prev;
@@ -60,12 +60,13 @@ public abstract class BasicWizard extends Fragment {
             ws.setContext(mCon);
         }
         prev.setText(settings.prev);
-        if (settings.fragments.length == 1)
+        if (settings.fragments.length == 1) {
             next.setText(settings.finish);
-        else
+        } else {
             next.setText(settings.next);
+        }
         pager.setAdapter(new MyFragmentPagerAdapter(getChildFragmentManager()));
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -73,12 +74,13 @@ public abstract class BasicWizard extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                BasicWizard.this.position = position;
+                BaseWizard.this.position = position;
                 prev.setEnabled(position > 0);
-                if (position == settings.fragments.length - 1)
+                if (position == settings.fragments.length - 1) {
                     next.setText(settings.finish);
-                else
+                } else {
                     next.setText(settings.next);
+                }
             }
 
             @Override
@@ -95,10 +97,11 @@ public abstract class BasicWizard extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position < settings.fragments.length - 1)
+                if (position < settings.fragments.length - 1) {
                     pager.arrowScroll(View.FOCUS_FORWARD);
-                else
+                } else {
                     onWizardComplete();
+                }
             }
         });
         return linearLayout;

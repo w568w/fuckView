@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.base.BaseActionBroadcastReceiver;
+import ml.qingsu.fuckview.base.BasePopupWindow;
+import ml.qingsu.fuckview.hook.ViewReceiver;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.ShellUtils;
@@ -28,15 +31,16 @@ import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
 
 /**
  * Created by w568w on 2017-7-12.
+ * @author w568w
  */
 
-public class DumpViewerPopupView extends GlobalPopupWindow {
-    private static final String BROADCAST_ACTION = "tooYoungtooSimple";
+public class DumpViewerPopupView extends BasePopupWindow {
+
 
     private ArrayList<ViewDumper.ViewItem> mList;
     private final String mPackageName;
     private int mGravity = Gravity.TOP;
-    private GlobalPopupWindow mFullScreenPopupWindow;
+    private BasePopupWindow mFullScreenPopupWindow;
     private boolean isNotList;
     private Button mRefresh;
     private TextView mInfo;
@@ -69,8 +73,9 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mFullScreenPopupWindow != null)
+                if (mFullScreenPopupWindow != null) {
                     mFullScreenPopupWindow.hide();
+                }
                 hide();
             }
         });
@@ -87,9 +92,12 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
                 try {
                     ViewModel model = (ViewModel) mInfo.getTag();
                     model.save();
+                    //發送，以使View接收隱藏廣播
+                    appContext.sendBroadcast(new Intent(ViewReceiver.ACTION).putExtra("path",model.getPath()));
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
                     mInfo.setText("");
+
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -101,7 +109,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
     @Override
     protected void onShow() {
         super.onShow();
-        appContext.registerReceiver(mReceiver, new IntentFilter(BROADCAST_ACTION));
+        mReceiver.registerReceiver(appContext);
     }
 
     @Override
@@ -109,7 +117,7 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         super.onHide();
         try {
             ShellUtils.killProcess(mPackageName);
-            MainActivity.Write_Preferences("", MainActivity.PACKAGE_NAME_NAME);
+            MainActivity.writePreferences("", MainActivity.PACKAGE_NAME_NAME);
             appContext.unregisterReceiver(mReceiver);
         } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
@@ -127,14 +135,15 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             super.onPreExecute();
             if (mRefresh.getText().toString().equals(appContext.getString(R.string.parsing_view))) {
                 cancel(true);
-            } else
+            } else {
                 mRefresh.setText(R.string.parsing_view);
+            }
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            boolean force_root = PreferenceManager.getDefaultSharedPreferences(appContext).getBoolean("force_root", false);
-            mList = force_root ? ViewDumper.parseCurrentView() : ViewDumperProxy.parseCurrentView(getActivity());
+            boolean forceRoot = PreferenceManager.getDefaultSharedPreferences(appContext).getBoolean("force_root", false);
+            mList = forceRoot ? ViewDumper.parseCurrentView() : ViewDumperProxy.parseCurrentView(getActivity());
             return null;
         }
 
@@ -149,11 +158,12 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
             }
 
 
-            if (isNotList)
+            if (isNotList) {
                 mFullScreenPopupWindow = new FullScreenPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
-            else {
-                if (FirstRun.isFirstRun(appContext, "list_popup"))
+            } else {
+                if (FirstRun.isFirstRun(appContext, "list_popup")) {
                     Toast.makeText(appContext, R.string.mark_tip, Toast.LENGTH_LONG).show();
+                }
                 mFullScreenPopupWindow = new FullScreenListPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
             }
             mFullScreenPopupWindow.show();
@@ -161,17 +171,20 @@ public class DumpViewerPopupView extends GlobalPopupWindow {
         }
     }
 
-    private class HookBrocastReceiver extends BroadcastReceiver {
+    private class HookBrocastReceiver extends BaseActionBroadcastReceiver {
+        private static final String BROADCAST_ACTION = "tooYoungtooSimple";
+        @Override
+        public String getAction() {
+            return BROADCAST_ACTION;
+        }
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                int height = intent.getIntExtra("height", 0);
-                int width = intent.getIntExtra("width", 0);
-                ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
-                mInfo.setTag(viewModel);
-                mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
-            }
+        public void onReceiving(Context context, Intent intent) {
+            int height = intent.getIntExtra("height", 0);
+            int width = intent.getIntExtra("width", 0);
+            ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
+            mInfo.setTag(viewModel);
+            mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
         }
     }
 }

@@ -29,10 +29,10 @@ public class DebugUtils {
     /**
      *Hook某个类的所有方法
      */
-    public static void HookEveryMethods(Class<?> clz, XC_MethodHook xc_methodHook) {
+    public static void hookEveryMethods(Class<?> clz, XC_MethodHook methodHook) {
         Method[] methods = clz.getDeclaredMethods();
         for (Method m : methods) {
-            XposedBridge.hookMethod(m, xc_methodHook);
+            XposedBridge.hookMethod(m, methodHook);
         }
     }
 }

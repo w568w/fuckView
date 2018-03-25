@@ -10,6 +10,8 @@ import ml.qingsu.fuckview.utils.root.AppRulesUtils;
 
 /**
  * Created by w568w on 2017-6-30.
+ * @author w568w
+ * @author YanLu
  */
 
 public class MyApplication extends Application {
@@ -26,13 +28,6 @@ public class MyApplication extends Application {
             AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
         }
 
-//        if (LeakCanary.isInAnalyzerProcess(this)) {
-//            // This process is dedicated to LeakCanary for heap analysis.
-//            // You should not init your app in this process.
-//            return;
-//        }
-//        LeakCanary.install(this);
-        // Normal app init code...
         CrashReport.initCrashReport(getApplicationContext(), "cfccfa2c50", false);
     }
 }

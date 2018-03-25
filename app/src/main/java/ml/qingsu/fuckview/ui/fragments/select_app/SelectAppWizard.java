@@ -13,24 +13,24 @@ import com.tencent.bugly.crashreport.CrashReport;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.MyApplication;
 import ml.qingsu.fuckview.implement.Searchable;
-import ml.qingsu.fuckview.utils.wizard.BasicWizard;
+import ml.qingsu.fuckview.utils.wizard.BaseWizard;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
 /**
  * Created by w568w on 17-6-18.
  */
-public class SelectAppWizard extends BasicWizard implements Searchable {
+public class SelectAppWizard extends BaseWizard implements Searchable {
     Step1 step1;
 
     @Override
     protected Settings getSettings() {
         step1 = new Step1();
-        if (getArguments() != null)
+        if (getArguments() != null) {
             step1.setArguments(getArguments());
-        else
+        } else {
             step1.setArguments(new Bundle());
+        }
         return new Settings(getResources().getString(R.string.prev_step), getResources().getString(R.string.next_step), getResources().getString(R.string.start_mark), new WizardStep[]{step1});
     }
 
@@ -57,9 +57,11 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
     @Override
     public void onWizardComplete() {
         super.onWizardComplete();
-        if (Step1.selected == null) return;
+        if (Step1.sSelected == null) {
+            return;
+        }
         mCon.getSharedPreferences("data", Context.MODE_WORLD_READABLE)
-                .edit().putString(MainActivity.PACKAGE_NAME_NAME, Step1.selected.packageName).commit();
+                .edit().putString(MainActivity.PACKAGE_NAME_NAME, Step1.sSelected.packageName).commit();
         //等待數據寫入完成
         try {
             Thread.sleep(100);
@@ -69,9 +71,9 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
 
         PackageManager pm = mCon.getPackageManager();
         try {
-            mCon.startActivity(pm.getLaunchIntentForPackage(Step1.selected.packageName));
+            mCon.startActivity(pm.getLaunchIntentForPackage(Step1.sSelected.packageName));
             Toast.makeText(mCon, R.string.start_mark_toast, Toast.LENGTH_SHORT).show();
-            new DumpViewerPopupView(mCon, Step1.selected.packageName).show();
+            new DumpViewerPopupView(mCon, Step1.sSelected.packageName).show();
             mCon.finish();
         } catch (WindowManager.BadTokenException | SecurityException e) {
             Toast.makeText(mCon, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
@@ -88,7 +90,8 @@ public class SelectAppWizard extends BasicWizard implements Searchable {
 
     @Override
     public void setSearchText(String text) {
-        if (step1 != null)
+        if (step1 != null) {
             step1.setSearchText(text);
+        }
     }
 }

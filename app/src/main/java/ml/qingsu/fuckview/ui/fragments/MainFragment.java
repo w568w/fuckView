@@ -92,7 +92,9 @@ public class MainFragment extends Fragment implements Searchable {
                     String s2 = getAppTitle(pm, t1.packageName);
                     //JDK7: RFE: 6804124
                     //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
-                    if (s1.equals(s2)) return 0;
+                    if (s1.equals(s2)) {
+                        return 0;
+                    }
                     return Collator.getInstance(Locale.CHINA).compare(s1, s2);
                 }
             });
@@ -109,11 +111,13 @@ public class MainFragment extends Fragment implements Searchable {
             public void onClick(View view) {
                 SelectAppWizard tw = new SelectAppWizard();
                 Bundle bundle = new Bundle();
-                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("system_app", false))
+                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("system_app", false)) {
                     bundle.putBoolean("sys", true);
+                }
                 tw.setArguments(bundle);
-                if (context instanceof MainActivity)
+                if (context instanceof MainActivity) {
                     ((MainActivity) context).setFragment(tw);
+                }
             }
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -126,16 +130,24 @@ public class MainFragment extends Fragment implements Searchable {
                 bundle.putString("className", model.className);
                 InfoFragment infoFragment = new InfoFragment();
                 infoFragment.setArguments(bundle);
-                if (context instanceof MainActivity)
+                if (context instanceof MainActivity) {
                     ((MainActivity) context).setFragment(infoFragment);
+                }
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            boolean scrollFlag = false;//标记是否滑动
-            boolean isFirst = true;//标记第一次进入，因为第一次进来lastVisibleItemPosition默认为0，
-            // 此时如果listview的第一个显示的条目不是第一个（下表为0），则往下滑也会出现firstVisibleItem>lastVisibleItemPosition的情况
-            //所以第一次进入时不做操作，第二次进来已经给lastVisibleItemPosition赋值，就可以判断了
-            int lastVisibleItemPosition;//标记上次的显示位置
+            /* 标记是否滑动 */
+            boolean scrollFlag = false;
+            /* 标记第一次进入，因为第一次进来lastVisibleItemPosition默认为0， */
+            boolean isFirst = true;
+            /*
+            此时如果listview的第一个显示的条目不是第一个（下表为0），则往下滑也会出现firstVisibleItem>lastVisibleItemPosition的情况
+            所以第一次进入时不做操作，第二次进来已经给lastVisibleItemPosition赋值，就可以判断了
+            */
+
+            /* 标记上次的显示位置 */
+
+            int lastVisibleItemPosition;
 
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -152,7 +164,8 @@ public class MainFragment extends Fragment implements Searchable {
                     } else if (firstVisibleItem > lastVisibleItemPosition) {
                         button.hide();
                     }
-                    lastVisibleItemPosition = firstVisibleItem;//记录当前条目
+                    //记录当前条目
+                    lastVisibleItemPosition = firstVisibleItem;
 
                 }
                 isFirst = false;
@@ -187,17 +200,16 @@ public class MainFragment extends Fragment implements Searchable {
             return;
         }
         menu.add(0, 1, Menu.NONE, R.string.delete_item);
-//        if (!model.className.equals("*")) {
-//            menu.add(0, 2, Menu.NONE, "设为不按类名定位");
-//        }
         menu.add(0, 3, Menu.NONE, R.string.share);
         menu.add(0, 6, Menu.NONE, model.enable ?R.string.disable_item: R.string.enable_item);
     }
 
+    @Override
     public void setSearchText(String text) {
         searchText = text;
-        if (adapter != null)
+        if (adapter != null) {
             adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -231,8 +243,9 @@ public class MainFragment extends Fragment implements Searchable {
                 break;
             case 4:
                 ArrayList<BlockModel> arrayList = new ArrayList<>();
-                for (Integer postion : deleteList)
+                for (Integer postion : deleteList) {
                     arrayList.add(models.get(postion));
+                }
                 models.removeAll(arrayList);
                 deleteList.clear();
                 adapter.notifyDataSetChanged();
@@ -241,8 +254,9 @@ public class MainFragment extends Fragment implements Searchable {
                 break;
             case 5:
                 ArrayList<BlockModel> shares = new ArrayList<>();
-                for (Integer postion : deleteList)
+                for (Integer postion : deleteList) {
                     shares.add(models.get(postion));
+                }
                 deleteList.clear();
                 StringBuilder stringBuilder = new StringBuilder();
                 for (BlockModel model1 : shares) {
@@ -257,6 +271,8 @@ public class MainFragment extends Fragment implements Searchable {
                 models.set(menuInfo.position, model);
                 adapter.notifyDataSetChanged();
                 saveAll();
+                break;
+            default:
                 break;
         }
         return super.onContextItemSelected(item);
@@ -274,9 +290,10 @@ public class MainFragment extends Fragment implements Searchable {
     }
 
     private void saveAll() {
-        MainActivity.Write_Preferences("", MainActivity.LIST_NAME);
-        for (BlockModel bm : models)
+        MainActivity.writePreferences("", MainActivity.LIST_NAME);
+        for (BlockModel bm : models) {
             bm.save();
+        }
     }
 
     private class AppAdapter extends BaseAdapter {
@@ -297,16 +314,18 @@ public class MainFragment extends Fragment implements Searchable {
 
         private boolean contains(ArrayList<Integer> arrayList, int i) {
             for (Integer integer : arrayList) {
-                if (integer == i)
+                if (integer == i) {
                     return true;
+                }
             }
             return false;
         }
 
         @Override
         public View getView(final int i, View view, ViewGroup viewGroup) {
-            if (view == null || !(view instanceof ViewGroup))
+            if (view == null || !(view instanceof ViewGroup)) {
                 view = context.getLayoutInflater().inflate(R.layout.main_fragment_list_item, null);
+            }
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             TextView title = (TextView) view.findViewById(R.id.app_name);
             TextView type = (TextView) view.findViewById(R.id.class_name);
@@ -333,15 +352,15 @@ public class MainFragment extends Fragment implements Searchable {
                 title.setText(bm.packageName);
             }
             //是否是经典模式
-            if (bm.text.equals(""))
+            if ("".equals(bm.text)) {
                 type.setText(bm.className);
-            else
+            } else {
                 type.setText(String.format(Locale.CHINA, "%s ---> %s", bm.className, bm.text));
-            if (!bm.enable)
+            }
+            if (!bm.enable) {
                 view.setBackgroundColor(Color.GRAY);
-//            else
-//                view.setBackgroundColor(Color.BLACK);
-            if (!searchText.equals("") && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
+            }
+            if (!"".equals(searchText) && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
                 view = new View(context);
                 view.setVisibility(View.GONE);
             }

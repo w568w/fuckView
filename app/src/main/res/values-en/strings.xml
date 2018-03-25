@@ -92,4 +92,6 @@
     <string name="conf_online_rules_des">Configure web rules</string>
     <string name="check_item_module_enabled">Module Enabled</string>
     <string name="check_item_floating_permission">Floating Window Showable</string>
+    <string name="check_item_service_running">Accessibility Service Running</string>
+    <string name="check_item_root">Rooted</string>
 </resources>

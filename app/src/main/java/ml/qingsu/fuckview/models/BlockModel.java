@@ -47,7 +47,7 @@ public class BlockModel implements Serializable {
 
 
     public void save() {
-        MainActivity.Write_Preferences(MainActivity.Read_Preferences(MainActivity.LIST_NAME) + "\n" + toString(), MainActivity.LIST_NAME);
+        MainActivity.writePreferences(MainActivity.readPreferences(MainActivity.LIST_NAME) + "\n" + toString(), MainActivity.LIST_NAME);
     }
 
     @Override

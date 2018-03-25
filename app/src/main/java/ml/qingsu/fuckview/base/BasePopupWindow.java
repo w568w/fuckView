@@ -1,4 +1,4 @@
-package ml.qingsu.fuckview.ui.popups;
+package ml.qingsu.fuckview.base;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,11 +14,11 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
  */
 
 
-abstract class GlobalPopupWindow {
+public abstract class BasePopupWindow {
     private Activity activity;
-    Context appContext;
+    protected Context appContext;
     private WindowManager mWindowManager = null;
-    WindowManager.LayoutParams params;
+    protected WindowManager.LayoutParams params;
     private final View view;
     private boolean isShown = false;
 
@@ -26,7 +26,7 @@ abstract class GlobalPopupWindow {
 
     protected abstract int getGravity();
 
-    GlobalPopupWindow(Activity activity) {
+    public BasePopupWindow(Activity activity) {
         this.activity = activity;
         this.appContext = activity.getApplicationContext();
         mWindowManager = (WindowManager) appContext.getSystemService(Context.WINDOW_SERVICE);
@@ -43,8 +43,9 @@ abstract class GlobalPopupWindow {
     public void setFocusable(boolean focusable) {
         params.flags = focusable ? FLAG_NOT_TOUCH_MODAL : FLAG_NOT_FOCUSABLE | FLAG_NOT_TOUCH_MODAL;
         try {
-            if (isShown)
+            if (isShown) {
                 mWindowManager.updateViewLayout(view, params);
+            }
         } catch (Exception ignored) {
         }
     }
@@ -58,7 +59,9 @@ abstract class GlobalPopupWindow {
     }
 
     public final void show() {
-        if (isShown) return;
+        if (isShown) {
+            return;
+        }
         isShown = true;
         mWindowManager.addView(view, params);
         onShow();
@@ -71,7 +74,9 @@ abstract class GlobalPopupWindow {
     }
 
     public final void hide() {
-        if (!isShown) return;
+        if (!isShown) {
+            return;
+        }
         isShown = false;
         onHide();
         mWindowManager.removeView(view);

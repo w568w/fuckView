@@ -47,7 +47,9 @@ public class OnlineRulesFragment extends Fragment {
         mDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRules==null)return;
+                if(mRules==null) {
+                    return;
+                }
                 mProgressBar.setMax(mRules.size());
                 //noinspection unchecked
                 new FliterTask().execute(mRules);
@@ -135,9 +137,10 @@ public class OnlineRulesFragment extends Fragment {
             super.onPostExecute(blockModels);
             mProgressBar.setVisibility(View.INVISIBLE);
 
-            //MainActivity.Write_Preferences("", MainActivity.LIST_NAME);
-            for (BlockModel bm : blockModels)
+            //MainActivity.writePreferences("", MainActivity.LIST_NAME);
+            for (BlockModel bm : blockModels) {
                 bm.save();
+            }
             //Refresh Rules...
             mLayout.setRefreshing(true);
         }
@@ -155,8 +158,9 @@ public class OnlineRulesFragment extends Fragment {
                 try {
                     //去重&检查包名是否存在
                     packageManager.getApplicationInfo(blockModel.packageName, 0);
-                    if(!originModels.contains(blockModel))
+                    if(!originModels.contains(blockModel)) {
                         flitered.add(blockModel);
+                    }
                 } catch (PackageManager.NameNotFoundException ignored) {
                 }
             }

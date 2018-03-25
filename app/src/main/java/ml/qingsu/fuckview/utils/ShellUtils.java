@@ -42,8 +42,14 @@ public class ShellUtils {
         OutputStream out = process.getOutputStream();
         String cmd = "am force-stop " + pkg + " \n";
         out.write(cmd.getBytes());
+
         out.flush();
         out.close();
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     /**
      * check whether has root permission
@@ -216,8 +222,9 @@ public class ShellUtils {
             String str = in.readLine();
             if (str != null && str.length() >= 4) {
                 char flag = str.charAt(3);
-                if (flag == 's' || flag == 'x')
+                if (flag == 's' || flag == 'x') {
                     return true;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

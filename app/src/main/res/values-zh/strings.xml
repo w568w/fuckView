@@ -92,4 +92,6 @@
     <string name="conf_online_rules_des">管理在线规则</string>
     <string name="check_item_module_enabled">Xposed模块启用</string>
     <string name="check_item_floating_permission">悬浮窗权限</string>
+    <string name="check_item_service_running">辅助服务</string>
+    <string name="check_item_root">Root</string>
 </resources>

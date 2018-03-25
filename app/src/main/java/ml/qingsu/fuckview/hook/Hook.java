@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -40,13 +41,22 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.R;
 
-import static ml.qingsu.fuckview.hook.Hook.ViewBlocker.getAllText;
+import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
+import static ml.qingsu.fuckview.Constant.PKG_NAME;
+import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
+import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
+import static ml.qingsu.fuckview.utils.ViewUtils.getText;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewPath;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewPosition;
 
 /**
  * w568w on 2017-6-30.
+ *
+ * @author w568w
  */
 
-public class Hook implements IXposedHookLoadPackage {
+public class Hook {
+
 
     public static final String DIALOG_VIRTUAL_CLASSNAME = "Dialog";
     private static final String SUPER_MODE_NAME = "super_mode";
@@ -57,9 +67,12 @@ public class Hook implements IXposedHookLoadPackage {
     private static final String LIST_FILENAME = "block_list";
     private static final String BROADCAST_ACTION = "tooYoungtooSimple";
     private static final String ALL_SPLIT = "~~~";
+    private static final String RECEIVER_KEY = "motherfuckerreceiver";
     private static final int NOTIFICATION_ID = 0x123;
-    //由于目标APP不一定有读写文件权限，所以想到了这么个
-    // 奇巧淫技，自己维护个缓存区
+    /**
+     * 由于目标APP不一定有读写文件权限，所以想到了这么个
+     * 奇巧淫技，自己维护个缓存区
+     */
     private static String writeFileCache = "";
     private static boolean onlyOnce;
     private static boolean standardMode;
@@ -96,68 +109,36 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-//    private static void HandleLongClick(final View view) throws PackageManager.NameNotFoundException {
-//        final Context con = view.getContext();
-//        final AlertDialog adb = getContinueAskDialog(con);
-//        DialogInterface.OnClickListener
-//                onClickListener = new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                ViewBlocker.getInstance().log(view).save();
-//                OnlySingleToast.cancel();
-//                adb.show();
-//            }
-//        };
-//        //假如没啥信息...
-//        new AlertDialog.Builder(con)
-//                .setTitle(getString(R.string.captured, con))
-//                .setMessage(String.format("确认以下信息：\n种类:%s\nID:%s\n路径:%s\n大小:%d×%d\n文本:%s"
-//                        , view.getClass().getSimpleName(), view.getId(), getViewPath(view), view.getWidth(), view.getHeight(), getText(view)))
-//                .setPositiveButton("屏蔽", onClickListener)
-//                .setNegativeButton("好像不对", null).show();
-//    }
 
-    private void HandleClick(final View view) throws PackageManager.NameNotFoundException {
-        //屏蔽几个按钮，防止调用多次Handle()
-        //2018-1-26:已經沒用了
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("就它了")
-//                )
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("放弃标记"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("屏蔽"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("坚持屏蔽"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("好像不对"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("好吧"))
-//            return;
-
+    private void handleClick(final View view) throws PackageManager.NameNotFoundException {
         final Context context = view.getContext();
         //增加红框
         addViewShape(view);
-        //OnlySingleToast.showToast(context, infomation, Toast.LENGTH_SHORT);
+        //增加接收器
+        try {
+            ViewReceiver receiver;
+            if ((receiver = (ViewReceiver) XposedHelpers.getAdditionalInstanceField(view, RECEIVER_KEY)) == null) {
+                receiver = (ViewReceiver) ViewReceiver.createAndRegisterReceiver(ViewReceiver.class, context);
+                XposedHelpers.setAdditionalInstanceField(view, RECEIVER_KEY,
+                        receiver);
+            }
+            receiver.setView(view);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         //显示通知栏
         //设置Intent
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage("ml.qingsu.fuckview");
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
         intent.putExtra("Dialog", true);
         //Fix: NullPointerE in VAEXposed.
         //VAEXposed throws a exception with chain styles.
         //So you cannot write:
-        //nb.xxx().xxx().xxx();
+        //nb.xxx().xxx();
         //You should write:
-        //nb.xxx();
-        //nb.xxx();
-        //nb.xxx();
+        //nb.xxx();nb.xxx();
+
         try {
             NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
             nb.setAutoCancel(true);
@@ -172,7 +153,7 @@ public class Hook implements IXposedHookLoadPackage {
         } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
-        //BroadcastReceiver
+
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
@@ -182,35 +163,25 @@ public class Hook implements IXposedHookLoadPackage {
     }
 
     //与上面唯一的区别是通知方式
-    private void HandleTouch(final View view) throws PackageManager.NameNotFoundException {
-        //屏蔽几个按钮，防止调用多次Handle()
-        //2018-1-26:已經沒用了
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("就它了")
-//                )
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("放弃标记"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("屏蔽"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("坚持屏蔽"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("好像不对"))
-//            return;
-//        if (view instanceof Button
-//                && ((Button) view).getText().equals("好吧"))
-//            return;
-
+    private void handleTouch(final View view) throws PackageManager.NameNotFoundException {
         final Context context = view.getContext();
         //增加红框
         addViewShape(view);
+        //增加接收器
+        try {
+            ViewReceiver receiver;
+            if ((receiver = (ViewReceiver) XposedHelpers.getAdditionalInstanceField(view, RECEIVER_KEY)) == null) {
+                receiver = (ViewReceiver) ViewReceiver.createAndRegisterReceiver(ViewReceiver.class, context);
+                XposedHelpers.setAdditionalInstanceField(view, RECEIVER_KEY,
+                        receiver);
+            }
+            receiver.setView(view);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         //显示通知栏
         //设置Intent
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage("ml.qingsu.fuckview");
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //看！奇巧淫技x2！
         log(BlockModel.getInstanceByAll(view).toString());
@@ -286,19 +257,20 @@ public class Hook implements IXposedHookLoadPackage {
             if (model.record.contains(ALL_SPLIT)) {
                 model = ViewModel.fromString(line);
             }
-            if (model != null && model.packageName.equals(pkgFilter))
+            if (model != null && model.packageName.equals(pkgFilter)) {
                 list.add(model);
+            }
         }
         return list;
     }
 
-    private static void Write_Preference(String data, String filename) {
+    private static void writePreference(String data, String filename) {
         xSP.makeWorldReadable();
         xSP.getFile().setWritable(true);
         xSP.edit().putString(filename, data).apply();
     }
 
-    private static String Read_Preference(String filename) {
+    private static String readPreference(String filename) {
         if (filename.equals(LIST_FILENAME)) {
             //直接返回cache
             return writeFileCache;
@@ -306,12 +278,16 @@ public class Hook implements IXposedHookLoadPackage {
         return xSP.getString(filename, "");
     }
 
-    //正常的readfile,不做任何缓存代理
+    /**
+     * 正常的readfile,不做任何缓存代理
+     */
     private static ArrayList<String> readPreferenceByLine(String filename) {
         String data = xSP.getString(filename, "");
         ArrayList<String> arrayList = new ArrayList<>();
         for (String line : data.split("\n")) {
-            if (!line.equals("")) arrayList.add(line);
+            if (!"".equals(line)) {
+                arrayList.add(line);
+            }
         }
         return arrayList;
     }
@@ -322,11 +298,11 @@ public class Hook implements IXposedHookLoadPackage {
     }
 
     private static void log(String text) {
-        if (enableLog)
+        if (enableLog) {
             XposedBridge.log(text);
+        }
     }
 
-    @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
         final ArrayList<BlockModel>[] mBlockList;
@@ -351,9 +327,9 @@ public class Hook implements IXposedHookLoadPackage {
         }
         log("净眼:开始HOOK --> " + loadPackageParam.packageName);
         //@see MainActivity
-        if (loadPackageParam.packageName.equals("ml.qingsu.fuckview")) {
-            XposedHelpers.findAndHookMethod("ml.qingsu.fuckview.ui.activities.MainActivity", loadPackageParam.classLoader,
-                    "isModuleActive", XC_MethodReplacement.returnConstant(true));
+        if (PKG_NAME.equals(loadPackageParam.packageName)) {
+            XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
+                    VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
             return;
         }
 
@@ -373,7 +349,7 @@ public class Hook implements IXposedHookLoadPackage {
                             public void onClick(View view) {
                                 //处理，显示参数
                                 try {
-                                    HandleClick(view);
+                                    handleClick(view);
                                 } catch (PackageManager.NameNotFoundException e) {
                                     e.printStackTrace();
                                 }
@@ -389,7 +365,9 @@ public class Hook implements IXposedHookLoadPackage {
                                         e.printStackTrace();
                                     }
                                 }
-                                if (clickListener != null) clickListener.onClick(view);
+                                if (clickListener != null) {
+                                    clickListener.onClick(view);
+                                }
                             }
                         };
                     }
@@ -406,130 +384,26 @@ public class Hook implements IXposedHookLoadPackage {
                             @Override
                             public boolean onTouch(View view, MotionEvent motionEvent) {
                                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
-                                    //处理，显示参数
+                                //处理，显示参数
+                                {
                                     try {
-                                        HandleTouch(view);
+                                        handleTouch(view);
                                     } catch (PackageManager.NameNotFoundException e) {
                                         e.printStackTrace();
                                     }
-                                //Needn't the following.
-//                                //如果是ListView中的项目，手动CALL一次监听器
-//                                ViewArg model = getListView(view);
-//                                if (model != null && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//                                    try {
-//                                        int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
-//                                        long id = (long) XposedHelpers.callMethod(model.adapterView, "getItemIdAtPosition", new Class[]{int.class}, position);
-//                                        XposedHelpers.callMethod(model.adapterView, "performItemClick", new Class[]{View.class, int.class, int.class}, model.subView, position, id);
-//                                    } catch (Throwable e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
+                                }
                                 return touchListener != null && touchListener.onTouch(view, motionEvent);
                             }
                         };
                     }
                 });
             }
-            log("净眼:hook -->setOnLongClickListener");
-            //代码同上
-            //长按已废除
-//            XposedHelpers.findAndHookMethod(View.class, "setOnLongClickListener", View.OnLongClickListener.class, new XC_MethodHook() {
-//                @Override
-//                protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
-//                    super.beforeHookedMethod(param);
-//                    final View.OnLongClickListener listener = (View.OnLongClickListener) param.args[0];
-//                    param.args[0] = new View.OnLongClickListener() {
-//                        @Override
-//                        public boolean onLongClick(View view) {
-//                            //处理，显示参数
-//                            HandleLongClick(view);
-//                            if (listener != null) {
-//                                listener.onLongClick(view);
-//                            }
-//                            ViewArg model = getListView(view);
-//                            if (model != null) {
-//                                try {
-//                                    int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
-//                                    long id = (long) XposedHelpers.callMethod(model.adapterView, "getItemIdAtPosition", new Class[]{int.class}, position);
-//                                    XposedHelpers.callMethod(model.adapterView, "performItemLongClick", new Class[]{View.class, int.class, int.class}, model.subView, position, id);
-//                                } catch (Throwable e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                            return false;
-//                        }
-//                    };
-//                }
-//
-//
-//            });
             log("净眼:hook -->setClickable");
             XposedHelpers.findAndHookMethod(View.class, "setClickable", boolean.class, new BooleanSetterHooker(true));
             log("净眼:hook -->setLongClickable");
             XposedHelpers.findAndHookMethod(View.class, "setLongClickable", boolean.class, new BooleanSetterHooker(true));
             log("净眼:hook -->View<init>");
             XposedBridge.hookAllConstructors(View.class, new ConstructorHooker());
-            log("净眼:hook -->setCancelable");
-            //对话框部分
-            XposedHelpers.findAndHookMethod(Dialog.class, "setCancelable", boolean.class, new BooleanSetterHooker(true));
-//            log("净眼:hook -->show");
-//            XposedHelpers.findAndHookMethod(Dialog.class, "show", new XC_MethodHook() {
-//                @Override
-//                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                    super.beforeHookedMethod(param);
-//                    final Dialog dialog = (Dialog) param.thisObject;
-//                    dialog.setCancelable(true);
-//                    if (dialog instanceof AlertDialog) {
-//                        final AlertDialog alertDialog = (AlertDialog) dialog;
-//                        final String id = getDialogID(alertDialog);
-//                        final Context context = alertDialog.getContext();
-//                        System.out.println("DialogID = " + id);
-//
-//                        if (id != null && !id.contains("你确定要屏蔽这一项吗?") && !id.contains("继续标记"))
-//                            alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                                @Override
-//                                public void onCancel(DialogInterface dialogInterface) {
-//                                    new AlertDialog.Builder(context)
-//                                            .setTitle("你确定要屏蔽这一项吗?")
-//                                            .setMessage("按\"屏蔽\"来屏蔽这个对话框。")
-//                                            .setPositiveButton("屏蔽", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                                    DialogBlocker.getInstance().log(dialog).save();
-//                                                    getContinueAskDialog(context).show();
-//                                                }
-//                                            })
-//                                            .setNegativeButton("好像不对", null)
-//                                            .show();
-//                                }
-//                            });
-//                    } else if (dialog instanceof android.support.v7.app.AlertDialog) {
-//                        final android.support.v7.app.AlertDialog alertDialog = (android.support.v7.app.AlertDialog) dialog;
-//                        final String id = getDialogID(alertDialog);
-//                        final Context context = alertDialog.getContext();
-//                        System.out.println("DialogID = " + id);
-//
-//                        if (id != null && !id.contains("你确定要屏蔽这一项吗?") && !id.contains("继续标记"))
-//                            alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                                @Override
-//                                public void onCancel(DialogInterface dialogInterface) {
-//                                    new AlertDialog.Builder(context)
-//                                            .setTitle("你确定要屏蔽这一项吗?")
-//                                            .setMessage("按\"屏蔽\"来屏蔽这个对话框。")
-//                                            .setPositiveButton("屏蔽", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                                    DialogBlocker.getInstance().log(dialog).save();
-//                                                    getContinueAskDialog(context).show();
-//                                                }
-//                                            })
-//                                            .setNegativeButton("好像不对", null)
-//                                            .show();
-//                                }
-//                            });
-//                    }
-//                }
-//            })
             try {
                 XposedHelpers.findAndHookMethod("android.view.WindowManagerGlobal", Dialog.class.getClassLoader(), "removeView", View.class, boolean.class, new WindowHooker());
             } catch (Throwable throwable) {
@@ -537,17 +411,13 @@ public class Hook implements IXposedHookLoadPackage {
             }
             XposedHelpers.findAndHookMethod("android.view.WindowManagerImpl", Dialog.class.getClassLoader(), "removeView", View.class, new WindowHooker());
             XposedHelpers.findAndHookMethod("android.view.WindowManagerImpl", Dialog.class.getClassLoader(), "removeViewImmediate", View.class, new WindowHooker());
-//            XposedBridge.hookAllMethods(Activity.class, "onCreate", new XC_MethodHook() {
-//                @Override
-//                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                    super.afterHookedMethod(param);
-//                }
-//            });
         }
 
-        //------------------------------------标记部分结束，以下为拦截部分------------------------
-        //------------------------------------华丽的分割线----------------------------------------
-        //读取屏蔽列表
+        /*
+        ------------------------------------标记部分结束，以下为拦截部分------------------------
+        ------------------------------------华丽的分割线----------------------------------------
+        读取屏蔽列表
+        */
         mBlockList[0] = readBlockList(loadPackageParam.packageName);
 
         //以下为Hook
@@ -564,13 +434,6 @@ public class Hook implements IXposedHookLoadPackage {
                 }
 
             });
-//            HookHelper.HookEveryMethods(View.class, new XC_MethodHook() {
-//                @Override
-//                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                    super.afterHookedMethod(param);
-//                    log("净眼:debug -->View."+param.method.getName()+" "+param.method.getModifiers());
-//                }
-//            });
             XposedHelpers.findAndHookMethod(View.class, "setVisibility", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -591,8 +454,9 @@ public class Hook implements IXposedHookLoadPackage {
                     super.afterHookedMethod(param);
                     TextView v = (TextView) param.thisObject;
 
-                    if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v))
+                    if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                         ViewBlocker.getInstance().block(v);
+                    }
                 }
             });
             XposedHelpers.findAndHookMethod(View.class, "setLayoutParams", ViewGroup.LayoutParams.class, new XC_MethodHook() {
@@ -600,10 +464,12 @@ public class Hook implements IXposedHookLoadPackage {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) param.args[0];
                     if (layoutParams != null) {
-                        if (layoutParams.height == 0 && layoutParams.width == 0)
+                        if (layoutParams.height == 0 && layoutParams.width == 0) {
                             return;
-                        if (ViewBlocker.getInstance().isBlocked(mBlockList[0], param.thisObject))
+                        }
+                        if (ViewBlocker.getInstance().isBlocked(mBlockList[0], param.thisObject)) {
                             ViewBlocker.getInstance().block(param.thisObject);
+                        }
                     }
                 }
             });
@@ -647,13 +513,14 @@ public class Hook implements IXposedHookLoadPackage {
                             super.afterHookedMethod(param);
                             View view = (View) param.args[0];
                             WindowManager windowManager = (WindowManager) param.thisObject;
-                            if (view == null) return;
-                            if (DialogBlocker.getInstance().isBlocked(mBlockList[0], view))
+                            if (view == null) {
+                                return;
+                            }
+                            if (DialogBlocker.getInstance().isBlocked(mBlockList[0], view)) {
                                 windowManager.removeViewImmediate(view);
+                            }
                         }
                     });
-
-
         }
     }
 
@@ -661,8 +528,13 @@ public class Hook implements IXposedHookLoadPackage {
     //--------------------------------------------------------------
     //Block包判断
     private boolean isBlockPackage(ArrayList<BlockModel> arrayList, String pkg) {
-        for (BlockModel model : arrayList)
-            if (model.packageName.equals(pkg)) return true;
+        final int len = arrayList.size();
+        for (int i = 0; i < len; i++) {
+            final BlockModel model = arrayList.get(i);
+            if (model.packageName.equals(pkg)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -673,12 +545,14 @@ public class Hook implements IXposedHookLoadPackage {
     private ViewArg getListView(View v) {
         ViewParent vp = v.getParent();
         //如果它的父布局就是ListView
-        if (isAdapterView(v))
+        if (isAdapterView(v)) {
             return new ViewArg(vp, v);
+        }
         //向上遍历
         while (vp != null) {
-            if (isAdapterView(vp.getParent()))
+            if (isAdapterView(vp.getParent())) {
                 return new ViewArg(vp.getParent(), (View) vp);
+            }
             vp = vp.getParent();
         }
         return null;
@@ -729,7 +603,7 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         private void save() {
-            Write_Preference(Read_Preference(LIST_FILENAME) + "\n" + toString(), LIST_FILENAME);
+            writePreference(readPreference(LIST_FILENAME) + "\n" + toString(), LIST_FILENAME);
         }
 
         @Override
@@ -785,14 +659,26 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-    static abstract class Blocker {
+    static abstract class AbstractBlocker {
 
 
+        /**
+         * @param o 需要被记录的对象
+         * @return 记录Model
+         */
         @NonNull
         public abstract BlockModel log(Object o);
 
+        /**
+         * @param arrayList 记录列表
+         * @param o         需要检查的对象
+         * @return 是否需要屏蔽
+         */
         protected abstract Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList, Object o);
 
+        /**
+         * @param o 需要屏蔽的对象
+         */
         public abstract void block(Object o);
 
         final boolean isBlocked(ArrayList<BlockModel> arrayList, Object o) {
@@ -806,72 +692,14 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-    static class ViewBlocker extends Blocker {
+    static class ViewBlocker extends AbstractBlocker {
         private static ViewBlocker instance;
 
         static ViewBlocker getInstance() {
-            if (instance == null)
+            if (instance == null) {
                 instance = new ViewBlocker();
-            return instance;
-        }
-
-        static String getViewPath(View v) {
-            ViewParent viewParent = v.getParent();
-            Object object = v;
-            StringBuilder path = new StringBuilder();
-            while (viewParent != null) {
-                if (viewParent instanceof ViewGroup) {
-                    for (int i = 0; i < ((ViewGroup) viewParent).getChildCount(); i++) {
-                        View child = ((ViewGroup) viewParent).getChildAt(i);
-                        if (child.equals(object)) {
-                            path.append(i).append("|").append(child.getClass().getSimpleName()).append("/");
-                        }
-                    }
-                }
-                object = viewParent;
-                viewParent = viewParent.getParent();
             }
-            path.append("#");
-            return path.toString();
-        }
-
-        static String getViewPosition(View view) {
-            int[] loc = new int[2];
-            view.getLocationInWindow(loc);
-            return loc[0] + "," + loc[1] + "$$";
-        }
-
-        static String getText(View view) {
-            if (view == null)
-                return "";
-            if (view instanceof TextView)
-                return ((TextView) view).getText().toString();
-            if (view instanceof ViewGroup)
-                for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                    View child = ((ViewGroup) view).getChildAt(i);
-                    if (child instanceof TextView)
-                        return ((TextView) child).getText().toString().replace("\n", "");
-                }
-            return "";
-        }
-
-        //Also @see ml.qingsu.fuckview.ui.popups.DumpViewerPopupView#getAllText(View)
-        static String getAllText(View view) {
-            StringBuilder allText = new StringBuilder();
-            if (view == null)
-                return "";
-            if (view instanceof TextView)
-                return ((TextView) view).getText().toString();
-            if (view instanceof ViewGroup)
-                for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                    View child = ((ViewGroup) view).getChildAt(i);
-                    if (child instanceof TextView)
-                        if (!(allText.length()==0))
-                            allText.append(((TextView) child).getText().toString().replace("\n", "")).append("|");
-                    if (child instanceof ViewGroup)
-                        allText.append(getAllText(child));
-                }
-            return allText.toString();
+            return instance;
         }
 
         @NonNull
@@ -892,26 +720,33 @@ public class Hook implements IXposedHookLoadPackage {
             final String postion = getViewPosition(view);
             final String p = getViewPath(view);
 
-            if (p.indexOf("/") == p.lastIndexOf("/"))
+            if (p.indexOf("/") == p.lastIndexOf("/")) {
                 return new Pair<>(false, -1);
+            }
             for (int i = 0; i < len; i++) {
                 final BlockModel model = mBlockList.get(i);
                 //className都不对，免谈了，直接跳过
-                if (!(model.className.charAt(0)=='*') && !model.className.equals(className))
+                if (model.className.length() != 0 && model.className.charAt(0) != '*' && !model.className.equals(className)) {
                     continue;
+                }
                 if (model instanceof ViewModel) {
                     String path = getViewPath(view);
                     int successTimes = 0;
-                    if (path.equals(((ViewModel) model).getPath()))
+                    if (path.equals(((ViewModel) model).getPath())) {
                         ++successTimes;
-                    if (id > 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(id + ""))
+                    }
+                    if (id > 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(id + "")) {
                         ++successTimes;
-                    if (postion.equals(((ViewModel) model).getPosition()))
+                    }
+                    if (postion.equals(((ViewModel) model).getPosition())) {
                         ++successTimes;
-                    if (!(model.getText().length()==0) && model.getText().equals(getText(view)))
+                    }
+                    if (!(model.getText().length() == 0) && model.getText().equals(getText(view))) {
                         ++successTimes;
-                    if (successTimes >= 2)
+                    }
+                    if (successTimes >= 2) {
                         return new Pair<>(true, i);
+                    }
                 }
             }
             return new Pair<>(false, -1);
@@ -940,12 +775,13 @@ public class Hook implements IXposedHookLoadPackage {
 
     }
 
-    static class DialogBlocker extends Blocker {
+    static class DialogBlocker extends AbstractBlocker {
         private static DialogBlocker instance;
 
         public static DialogBlocker getInstance() {
-            if (instance == null)
+            if (instance == null) {
                 instance = new DialogBlocker();
+            }
             return instance;
         }
 
@@ -965,7 +801,9 @@ public class Hook implements IXposedHookLoadPackage {
         public void block(Object o) {
         }
 
-        //Block对话框判断
+        /**
+         * Block对话框判断
+         */
         private Pair<Boolean, Integer> isBlockDialog(ArrayList<BlockModel> mBlockList, View view) {
             final String pkg = view.getContext().getPackageName();
             final int len = mBlockList.size();
@@ -987,15 +825,16 @@ public class Hook implements IXposedHookLoadPackage {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
             super.beforeHookedMethod(param);
-            if (param.args.length == 0 || param.args[0] == null)
+            if (param.args.length == 0 || param.args[0] == null) {
                 return;
+            }
             View view = (View) param.args[0];
             final Context context = view.getContext();
             log("净眼:Message --> RemoveView");
             final BlockModel model = DialogBlocker.getInstance().log(view);
             log("净眼:Removed View -->" + model.record);
             //防止自残
-            if (!model.record.equals("") &&
+            if (!"".equals(model.record) &&
                     !model.record.contains("长按以标记")
                     && !model.record.contains("强制停止应用即可")
                     && !model.record.contains("你确定要屏蔽这一项吗?")
@@ -1043,7 +882,9 @@ public class Hook implements IXposedHookLoadPackage {
             // Don't call setOnClickListener for an AdapterView.
             // You probably want setOnItemClickListener() instead.
 
-            if (isAdapterView(view) || view == null) return;
+            if (isAdapterView(view) || view == null) {
+                return;
+            }
             try {
                 view.setFocusable(true);
                 view.setClickable(true);

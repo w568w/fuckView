@@ -92,4 +92,6 @@
     <string name="conf_online_rules_des">Configure as regras da web</string>
     <string name="check_item_module_enabled">Módulo habilitado</string>
     <string name="check_item_floating_permission">Permissão de janela flutuante</string>
+    <string name="check_item_service_running">Serviço de acessibilidade em execução</string>
+    <string name="check_item_root">Rooted</string>
 </resources>

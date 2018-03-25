@@ -104,8 +104,9 @@ public class AppRulesUtils {
         }
 
         try {
-            if (path.isDirectory()) { //目录
-                File files[] = path.listFiles();
+            //目录
+            if (path.isDirectory()) {
+                File[] files = path.listFiles();
                 for (File file : files) {
                     if (file.isFile()) {
                         file.delete();
@@ -206,20 +207,14 @@ public class AppRulesUtils {
      */
     public static boolean setFilePermissions(File file, int chmod, int uid, int gid) {
         if (file != null) {
-            Class<?> fileUtils = null;
+            Class<?> fileUtils;
             try {
                 fileUtils = Class.forName("android.os.FileUtils");
                 Method setPermissions = fileUtils.getMethod("setPermissions", File.class, int.class, int.class, int.class);
                 int result = (Integer) setPermissions.invoke(null, file, chmod, uid, gid);
 
                 return result == 0;
-            } catch (ClassNotFoundException e) {
-                XposedBridge.log(e);
-            } catch (NoSuchMethodException e) {
-                XposedBridge.log(e);
-            } catch (IllegalAccessException e) {
-                XposedBridge.log(e);
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 XposedBridge.log(e);
             }
 
@@ -240,20 +235,14 @@ public class AppRulesUtils {
      */
     public static boolean setFilePermissions(String path, int chmod, int uid, int gid) {
         if (!TextUtils.isEmpty(path)) {
-            Class<?> fileUtils = null;
+            Class<?> fileUtils;
             try {
                 fileUtils = Class.forName("android.os.FileUtils");
                 Method setPermissions = fileUtils.getMethod("setPermissions", String.class, int.class, int.class, int.class);
                 int result = (Integer) setPermissions.invoke(null, path, chmod, uid, gid);
 
                 return result == 0;
-            } catch (ClassNotFoundException e) {
-                XposedBridge.log(e);
-            } catch (NoSuchMethodException e) {
-                XposedBridge.log(e);
-            } catch (IllegalAccessException e) {
-                XposedBridge.log(e);
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 XposedBridge.log(e);
             }
 

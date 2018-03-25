@@ -47,7 +47,7 @@ public class ViewDumper {
 
 
         ShellUtils.execCommand("uiautomator dump /mnt/sdcard/dump.xml", true, false);
-        String xml = MainActivity.Read_File("dump.xml").replace("\n", "");
+        String xml = MainActivity.readFile("dump.xml").replace("\n", "");
         ArrayList<ViewItem> itemList = new ArrayList<>();
         ViewItem temp;
         XmlPullParser parser = Xml.newPullParser();
@@ -58,25 +58,27 @@ public class ViewDumper {
                 String tagName = parser.getName();
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
-                        if (tagName.equals("node")) {
+                        if ("node".equals(tagName)) {
                             temp = new ViewItem();
                             //读类名
                             String[] className = parser.getAttributeValue(null, "class").split("\\.");
                             temp.simpleClassName = className[className.length - 1];
                             //读坐标
                             String bounds = parser.getAttributeValue(null, "bounds");
-                            String[] temp_n = bounds.replaceFirst("\\[", "").split("\\]\\[");
-                            String[] point = temp_n[0].split(",");
-                            if (point.length == 2)
+                            String[] tempN = bounds.replaceFirst("\\[", "").split("\\]\\[");
+                            String[] point = tempN[0].split(",");
+                            if (point.length == 2) {
                                 temp.bounds = new Point(Integer.valueOf(point[0]), Integer.valueOf(point[1]));
-                            else
+                            } else {
                                 temp.bounds = new Point();
+                            }
                             //读宽高
                             point = bounds.split("\\]\\[")[1].split(",");
-                            if (point.length == 2)
+                            if (point.length == 2) {
                                 temp.wh = new Point(Integer.valueOf(point[0]) - temp.bounds.x, Integer.valueOf(point[1].replaceFirst("\\]", "")) - temp.bounds.y);
-                            else
+                            } else {
                                 temp.wh = new Point();
+                            }
                             //其他杂类信息
                             temp.id = itemList.size();
                             temp.level = parser.getDepth();
@@ -84,6 +86,8 @@ public class ViewDumper {
                             temp.parentId = (vi == null ? NO_PARENT : vi.id);
                             itemList.add(temp);
                         }
+                        break;
+                    default:
                         break;
                 }
                 eventType = parser.next();
@@ -98,8 +102,9 @@ public class ViewDumper {
         ArrayList<ViewItem> copy = new ArrayList<>(al);
         Collections.reverse(copy);
         for (ViewItem tn : copy) {
-            if (tn.level == depth)
+            if (tn.level == depth) {
                 return tn;
+            }
         }
         return null;
     }
@@ -111,7 +116,9 @@ public class ViewDumper {
         }
         AccessibilityNodeInfo root = DumperService.getInstance().getRootInActiveWindow();
         itemList = new ArrayList<>();
-        if (root == null) return itemList;
+        if (root == null) {
+            return itemList;
+        }
         parseChild(root, 2);
         return itemList;
     }
@@ -134,8 +141,9 @@ public class ViewDumper {
         vi.level = depth;
         ViewItem v = getLastTopLevelNode(itemList, depth - 1);
         vi.parentId = (v == null ? NO_PARENT : v.id);
-        if (node == null)
+        if (node == null) {
             return vi;
+        }
         Rect rect = new Rect();
         node.getBoundsInScreen(rect);
         vi.bounds = new Point(rect.left, rect.top);

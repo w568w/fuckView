@@ -24,6 +24,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep public class ml.qingsu.fuckview.hook.Hook
+-keep public class ml.qingsu.fuckview.hook.InitInjector
+-keep public class ml.qingsu.fuckview.hook.Hook{
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam);
+}
 -keep public class ml.qingsu.fuckview.ui.activities.MainActivity{
     private static boolean isModuleActive();
 }

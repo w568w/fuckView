@@ -9,11 +9,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 
+import ml.qingsu.fuckview.base.BasePopupWindow;
+
 /**
  * Created by w568w on 2017-7-29.
  */
 
-public class RedBoundPopupWindow extends GlobalPopupWindow {
+public class RedBoundPopupWindow extends BasePopupWindow {
 
 
     RedBoundPopupWindow(Activity activity, Point point, Point wh) {
@@ -43,6 +45,7 @@ public class RedBoundPopupWindow extends GlobalPopupWindow {
         return result;
     }
 
+    @Override
     protected int getGravity() {
         return Gravity.TOP | Gravity.LEFT;
     }

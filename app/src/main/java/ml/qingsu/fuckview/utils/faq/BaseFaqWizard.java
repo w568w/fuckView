@@ -20,17 +20,19 @@ import java.util.ArrayList;
 import ml.qingsu.fuckview.R;
 
 /**
- * Created by w568w on 2017-7-27.
+ *
+ * @author w568w
+ * @date 2017-7-27
  */
 
-public abstract class FaqWizard extends Fragment {
+public abstract class BaseFaqWizard extends Fragment {
 
     protected int currentId = FIRST_ID;
     public static final int FIRST_ID = 0;
 
-    protected abstract ArrayList<faqStep> getData();
+    protected abstract ArrayList<FaqStep> getData();
 
-    protected class faqStep {
+    protected class FaqStep {
         private int id;
         @NonNull
         private String question = "null";
@@ -38,14 +40,14 @@ public abstract class FaqWizard extends Fragment {
         private String[] choose;
         private int[] to;
 
-        public faqStep(int id, @NonNull String question, String[] choose, int[] to) {
+        public FaqStep(int id, @NonNull String question, String[] choose, int[] to) {
             this.id = id;
             this.question = question;
             this.choose = choose;
             this.to = to;
         }
 
-        public faqStep(int id, @NonNull String question) {
+        public FaqStep(int id, @NonNull String question) {
             this.id = id;
             this.question = question;
         }
@@ -53,7 +55,7 @@ public abstract class FaqWizard extends Fragment {
 
     TextView title;
     ListView choose;
-    ArrayList<faqStep> data;
+    ArrayList<FaqStep> data;
     ArrayAdapter<String> adapter;
     Context context;
 
@@ -67,8 +69,9 @@ public abstract class FaqWizard extends Fragment {
         choose.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (findStepById(currentId).to != null)
+                if (findStepById(currentId).to != null) {
                     jumpTo(findStepById(currentId).to[i]);
+                }
             }
         });
         data = getData();
@@ -77,7 +80,7 @@ public abstract class FaqWizard extends Fragment {
     }
 
     private void jumpTo(int id) {
-        faqStep faqStep = findStepById(id);
+        FaqStep faqStep = findStepById(id);
         if (faqStep != null) {
             if (faqStep.choose == null) {
                 faqStep.choose = new String[]{faqStep.question};
@@ -93,11 +96,12 @@ public abstract class FaqWizard extends Fragment {
 
     }
 
-    private faqStep findStepById(int id) {
-        for (faqStep faqStep : data) {
-            if (faqStep.id == id)
+    private FaqStep findStepById(int id) {
+        for (FaqStep faqStep : data) {
+            if (faqStep.id == id) {
                 return faqStep;
+            }
         }
-        return new faqStep(0, "", null, null);
+        return new FaqStep(0, "", null, null);
     }
 }

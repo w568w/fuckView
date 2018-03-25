@@ -39,8 +39,9 @@ public class WelcomeFragment extends Fragment {
         layout.findViewById(R.id.welcome_pass).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() instanceof MainActivity)
+                if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).setFragmentWithoutBack(new SelectAppWizard());
+                }
             }
         });
         return layout;

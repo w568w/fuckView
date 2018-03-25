@@ -39,24 +39,23 @@ import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
 /**
  * Created by w568w on 17-6-18.
- * 这代码没啥可看的，走吧走吧
  */
 public class Step1 extends WizardStep implements Searchable {
-    TextView tv;
-    ListView lv;
-    int selectPosition;
-    public static AppInfo selected;
+    TextView mText;
+    ListView mList;
+    int mSelectPosition;
+    public static AppInfo sSelected;
     String searchText = "";
-    ArrayList<AppInfo> appList;
+    ArrayList<AppInfo> mAppList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.select_app, null);
-        tv = (TextView) ll.findViewById(R.id.step1_textView);
-        lv = (ListView) ll.findViewById(R.id.step1_listView);
+        mText = (TextView) ll.findViewById(R.id.step1_textView);
+        mList = (ListView) ll.findViewById(R.id.step1_listView);
         ll.setPadding(5, 5, 5, 5);
-        registerForContextMenu(lv);
+        registerForContextMenu(mList);
         return ll;
     }
 
@@ -70,7 +69,7 @@ public class Step1 extends WizardStep implements Searchable {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        AppInfo info = appList.get(menuInfo.position);
+        AppInfo info = mAppList.get(menuInfo.position);
         switch (item.getItemId()) {
             case 1:
                 try {
@@ -89,6 +88,8 @@ public class Step1 extends WizardStep implements Searchable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
+            default:
                 break;
         }
         return super.onContextItemSelected(item);
@@ -117,7 +118,7 @@ public class Step1 extends WizardStep implements Searchable {
                 @Override
                 public void run() {
                     final Context act = mCon;
-                    appList = new ArrayList<>();
+                    mAppList = new ArrayList<>();
                     PackageManager pm = act.getPackageManager();
                     List<PackageInfo> packages = pm.getInstalledPackages(0);
                     if (packages == null || packages.size() == 0) {
@@ -134,10 +135,12 @@ public class Step1 extends WizardStep implements Searchable {
                         //TODO somethings Terrible
                         //无法在MIUI上读取系统应用
                         if (getArguments() != null && !getArguments().containsKey("sys")) {
-                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)
+                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) {
                                 continue;
-                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)
+                            }
+                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) {
                                 continue;
+                            }
                         }
                         AppInfo tmpInfo = new AppInfo();
                         tmpInfo.appName = packageInfo.applicationInfo.loadLabel(pm).toString();
@@ -146,9 +149,9 @@ public class Step1 extends WizardStep implements Searchable {
                         tmpInfo.versionCode = packageInfo.versionCode;
                         tmpInfo.packageInfo = packageInfo;
                         tmpInfo.appIcon = packageInfo.applicationInfo.loadIcon(pm);
-                        appList.add(tmpInfo);
+                        mAppList.add(tmpInfo);
                     }
-                    AppInfo[] s = appList.toArray(new AppInfo[0]);
+                    AppInfo[] s = mAppList.toArray(new AppInfo[0]);
                     try {
                         Arrays.sort(s, new Comparator<AppInfo>() {
                             @Override
@@ -160,31 +163,33 @@ public class Step1 extends WizardStep implements Searchable {
                         //So we will not sort them,OK?
                         e.printStackTrace();
                     }
-                    appList = new ArrayList<>(Arrays.asList(s));
-                    final ArrayList<AppInfo> finalAppList = appList;
-                    while (lv == null) ;
-                    lv.post(new Runnable() {
+                    mAppList = new ArrayList<>(Arrays.asList(s));
+                    final ArrayList<AppInfo> finalAppList = mAppList;
+                    while (mList == null) {
+                        ;
+                    }
+                    mList.post(new Runnable() {
                         @Override
                         public void run() {
                             final AppAdapter aa = new AppAdapter(finalAppList);
-                            lv.setAdapter(aa);
-                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            mList.setAdapter(aa);
+                            mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    selectPosition = position;
-                                    selected = finalAppList.get(position);
+                                    mSelectPosition = position;
+                                    sSelected = finalAppList.get(position);
                                     //自残？
-                                    if (selected.packageName.equals(lv.getContext().getPackageName())) {
-                                        selectPosition = 0;
-                                        selected = finalAppList.get(0);
+                                    if (sSelected.packageName.equals(mList.getContext().getPackageName())) {
+                                        mSelectPosition = 0;
+                                        sSelected = finalAppList.get(0);
                                         Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
                                     }
                                     aa.notifyDataSetChanged();
                                 }
                             });
-                            selectPosition = 0;
+                            mSelectPosition = 0;
                             aa.notifyDataSetChanged();
-                            selected = finalAppList.get(0);
+                            sSelected = finalAppList.get(0);
                         }
                     });
                 }
@@ -195,9 +200,11 @@ public class Step1 extends WizardStep implements Searchable {
     @Override
     public void setSearchText(String text) {
         searchText = text;
-        if (lv == null) return;
-        if (lv.getAdapter() instanceof BaseAdapter) {
-            ((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
+        if (mList == null) {
+            return;
+        }
+        if (mList.getAdapter() instanceof BaseAdapter) {
+            ((BaseAdapter) mList.getAdapter()).notifyDataSetChanged();
         }
     }
 
@@ -240,13 +247,13 @@ public class Step1 extends WizardStep implements Searchable {
             viewHolder.name.setText("    "+al.get(i).appName);
             al.get(i).appIcon.setBounds(0, 0, 64, 64);
             viewHolder.name.setCompoundDrawables(al.get(i).appIcon, null, null, null);
-            if (selectPosition == i) {
+            if (mSelectPosition == i) {
                 viewHolder.select.setChecked(true);
 
             } else {
                 viewHolder.select.setChecked(false);
             }
-            if (!searchText.equals("") && !al.get(i).appName.toLowerCase().contains(searchText.toLowerCase())) {
+            if (!"".equals(searchText) && !al.get(i).appName.toLowerCase().contains(searchText.toLowerCase())) {
                 view.setVisibility(View.GONE);
                 view = new View(mCon);
             } else {

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
+import ml.qingsu.fuckview.utils.ShellUtils;
+import ml.qingsu.fuckview.utils.dumper.DumperService;
 
 /**
  * Created by w568w on 18-2-7.
@@ -43,22 +45,28 @@ public class CheckerFragment extends Fragment {
         row.put("status", bool2Str(MainActivity.isModuleActive()));
         dataList.add(row);
 
-        row = new HashMap<>();
+        row = new HashMap<>(2);
         row.put("item", getString(R.string.check_item_floating_permission));
         row.put("status", bool2Str(canShowFloatingWindow()));
         dataList.add(row);
 
 
-        row = new HashMap<>();
-        row.put("item", getString(R.string.check_item_floating_permission));
-        row.put("status", bool2Str(canShowFloatingWindow()));
+        row = new HashMap<>(2);
+        row.put("item", getString(R.string.check_item_service_running));
+        row.put("status", bool2Str(DumperService.getInstance() != null && DumperService.getInstance().getRootInActiveWindow() != null));
+        dataList.add(row);
+
+
+        row = new HashMap<>(2);
+        row.put("item", getString(R.string.check_item_root));
+        row.put("status", bool2Str(ShellUtils.checkRootPermission()));
         dataList.add(row);
 
         mList.setAdapter(new SimpleAdapter(getContext(), dataList, R.layout.pairs, new String[]{"item", "status"}, new int[]{R.id.pairs_textView1, R.id.pairs_textView2}));
 
     }
 
-    private String bool2Str(boolean b) {
+    private static String bool2Str(boolean b) {
         return b ? "OK" : "Failed";
     }
 

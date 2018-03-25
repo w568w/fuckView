@@ -40,21 +40,21 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
 
-                MainActivity.Write_Preferences(o.toString(), SUPER_MODE_NAME);
+                MainActivity.writePreferences(o.toString(), SUPER_MODE_NAME);
                 return true;
             }
         });
         findPreference("only_once").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                MainActivity.Write_Preferences(newValue.toString(), ONLY_ONCE_NAME);
+                MainActivity.writePreferences(newValue.toString(), ONLY_ONCE_NAME);
                 return true;
             }
         });
         findPreference("standard_mode").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                MainActivity.Write_Preferences(newValue.toString(), STANDARD_MODE_NAME);
+                MainActivity.writePreferences(newValue.toString(), STANDARD_MODE_NAME);
                 return true;
             }
         });
@@ -69,7 +69,7 @@ public class PreferencesActivity extends PreferenceActivity {
                         .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                MainActivity.Append_Preferences("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
+                                MainActivity.appendPreferences("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -186,7 +186,7 @@ public class PreferencesActivity extends PreferenceActivity {
         findPreference("enable_log").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                MainActivity.Write_Preferences(newValue.toString(), ENABLE_LOG_NAME);
+                MainActivity.writePreferences(newValue.toString(), ENABLE_LOG_NAME);
                 return true;
             }
         });

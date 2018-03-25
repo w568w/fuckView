@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@android:color/background_dark"
     android:orientation="vertical">
@@ -13,12 +13,14 @@
             android:id="@+id/dump_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/parse_view" />
 
         <Button
             android:id="@+id/dump_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/switch_position" />
 
 
@@ -26,6 +28,7 @@
             android:id="@+id/dump_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/close_popup" />
 
 
