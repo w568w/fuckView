@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
@@ -303,6 +304,7 @@ public class Hook {
         }
     }
 
+    @Keep
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
         final ArrayList<BlockModel>[] mBlockList;
@@ -834,13 +836,7 @@ public class Hook {
             final BlockModel model = DialogBlocker.getInstance().log(view);
             log("净眼:Removed View -->" + model.record);
             //防止自残
-            if (!"".equals(model.record) &&
-                    !model.record.contains("长按以标记")
-                    && !model.record.contains("强制停止应用即可")
-                    && !model.record.contains("你确定要屏蔽这一项吗?")
-                    && !model.record.contains("继续标记")
-                    && !model.record.contains("模式选择")
-                    && !model.record.contains("已捕获")) {
+            if (!"".equals(model.record)) {
                 new AlertDialog.Builder(context)
                         .setTitle("你确定要屏蔽这一项吗?")
                         .setMessage("按\"屏蔽\"来屏蔽这个对话框。")

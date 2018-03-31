@@ -77,6 +77,13 @@ public class DumpViewerPopupView extends BasePopupWindow {
                     mFullScreenPopupWindow.hide();
                 }
                 hide();
+                try {
+                    ShellUtils.killProcess(mPackageName);
+                    MainActivity.writePreferences("", MainActivity.PACKAGE_NAME_NAME);
+                    appContext.unregisterReceiver(mReceiver);
+                } catch (IllegalArgumentException | IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         top.setOnClickListener(new View.OnClickListener() {
@@ -115,13 +122,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
     @Override
     protected void onHide() {
         super.onHide();
-        try {
-            ShellUtils.killProcess(mPackageName);
-            MainActivity.writePreferences("", MainActivity.PACKAGE_NAME_NAME);
-            appContext.unregisterReceiver(mReceiver);
-        } catch (IllegalArgumentException | IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
