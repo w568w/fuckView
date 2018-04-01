@@ -265,12 +265,6 @@ public class Hook {
         return list;
     }
 
-    private static void writePreference(String data, String filename) {
-        xSP.makeWorldReadable();
-        xSP.getFile().setWritable(true);
-        xSP.edit().putString(filename, data).apply();
-    }
-
     private static String readPreference(String filename) {
         if (filename.equals(LIST_FILENAME)) {
             //直接返回cache
@@ -605,7 +599,7 @@ public class Hook {
         }
 
         private void save() {
-            writePreference(readPreference(LIST_FILENAME) + "\n" + toString(), LIST_FILENAME);
+            throw new UnsupportedOperationException("Can not save in Hook class");
         }
 
         @Override

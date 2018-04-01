@@ -28,12 +28,17 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import ml.qingsu.fuckview.implement.ListFilter;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.utils.Lists;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
@@ -47,6 +52,7 @@ public class Step1 extends WizardStep implements Searchable {
     public static AppInfo sSelected;
     String searchText = "";
     ArrayList<AppInfo> mAppList;
+    ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,86 +120,7 @@ public class Step1 extends WizardStep implements Searchable {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final Context act = mCon;
-                    mAppList = new ArrayList<>();
-                    PackageManager pm = act.getPackageManager();
-                    List<PackageInfo> packages = pm.getInstalledPackages(0);
-                    if (packages == null || packages.size() == 0) {
-                        mCon.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(act, getString(R.string.no_app_list_permission), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                        return;
-                    }
-                    for (int i = 0; i < packages.size(); i++) {
-                        PackageInfo packageInfo = packages.get(i);
-                        //TODO somethings Terrible
-                        //无法在MIUI上读取系统应用
-                        if (getArguments() != null && !getArguments().containsKey("sys")) {
-                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) {
-                                continue;
-                            }
-                            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) {
-                                continue;
-                            }
-                        }
-                        AppInfo tmpInfo = new AppInfo();
-                        tmpInfo.appName = packageInfo.applicationInfo.loadLabel(pm).toString();
-                        tmpInfo.packageName = packageInfo.packageName;
-                        tmpInfo.versionName = packageInfo.versionName;
-                        tmpInfo.versionCode = packageInfo.versionCode;
-                        tmpInfo.packageInfo = packageInfo;
-                        tmpInfo.appIcon = packageInfo.applicationInfo.loadIcon(pm);
-                        mAppList.add(tmpInfo);
-                    }
-                    AppInfo[] s = mAppList.toArray(new AppInfo[0]);
-                    try {
-                        Arrays.sort(s, new Comparator<AppInfo>() {
-                            @Override
-                            public int compare(AppInfo appInfo, AppInfo t1) {
-                                return appInfo.appName.compareTo(t1.appName);
-                            }
-                        });
-                    } catch (IllegalArgumentException e) {
-                        //So we will not sort them,OK?
-                        e.printStackTrace();
-                    }
-                    mAppList = new ArrayList<>(Arrays.asList(s));
-                    final ArrayList<AppInfo> finalAppList = mAppList;
-                    while (mList == null) {
-                        ;
-                    }
-                    mList.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            final AppAdapter aa = new AppAdapter(finalAppList);
-                            mList.setAdapter(aa);
-                            mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    mSelectPosition = position;
-                                    sSelected = finalAppList.get(position);
-                                    //自残？
-                                    if (sSelected.packageName.equals(mList.getContext().getPackageName())) {
-                                        mSelectPosition = 0;
-                                        sSelected = finalAppList.get(0);
-                                        Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
-                                    }
-                                    aa.notifyDataSetChanged();
-                                }
-                            });
-                            mSelectPosition = 0;
-                            aa.notifyDataSetChanged();
-                            sSelected = finalAppList.get(0);
-                        }
-                    });
-                }
-            }).start();
+            singleThreadPool.execute(new LoadTask());
         }
     }
 
@@ -203,27 +130,42 @@ public class Step1 extends WizardStep implements Searchable {
         if (mList == null) {
             return;
         }
-        if (mList.getAdapter() instanceof BaseAdapter) {
-            ((BaseAdapter) mList.getAdapter()).notifyDataSetChanged();
+        if (mList.getAdapter() instanceof AppAdapter) {
+            AppAdapter adapter = (AppAdapter) mList.getAdapter();
+            if ("".equals(text)) {
+                adapter.setList(mAppList);
+            } else {
+                adapter.setList(Lists.filter(mAppList, new ListFilter<AppInfo>() {
+                    @Override
+                    public boolean filter(AppInfo object) {
+                        return object.appName.toLowerCase().contains(searchText.toLowerCase());
+                    }
+                }));
+            }
         }
     }
 
     private class AppAdapter extends BaseAdapter {
-        private ArrayList<AppInfo> al;
+        private List<AppInfo> mAppList;
 
-        AppAdapter(ArrayList<AppInfo> a) {
-            al = a;
-
+        AppAdapter(List<AppInfo> a) {
+            mAppList = a;
         }
+
+        public void setList(List<AppInfo> a) {
+            mAppList = a;
+            notifyDataSetChanged();
+        }
+
 
         @Override
         public int getCount() {
-            return al.size();
+            return mAppList.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return al.get(i);
+            return mAppList.get(i);
         }
 
         @Override
@@ -244,20 +186,14 @@ public class Step1 extends WizardStep implements Searchable {
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
-            viewHolder.name.setText("    "+al.get(i).appName);
-            al.get(i).appIcon.setBounds(0, 0, 64, 64);
-            viewHolder.name.setCompoundDrawables(al.get(i).appIcon, null, null, null);
+            viewHolder.name.setText("    " + mAppList.get(i).appName);
+            mAppList.get(i).appIcon.setBounds(0, 0, 64, 64);
+            viewHolder.name.setCompoundDrawables(mAppList.get(i).appIcon, null, null, null);
             if (mSelectPosition == i) {
                 viewHolder.select.setChecked(true);
 
             } else {
                 viewHolder.select.setChecked(false);
-            }
-            if (!"".equals(searchText) && !al.get(i).appName.toLowerCase().contains(searchText.toLowerCase())) {
-                view.setVisibility(View.GONE);
-                view = new View(mCon);
-            } else {
-                view.setVisibility(View.VISIBLE);
             }
             return view;
         }
@@ -275,5 +211,86 @@ public class Step1 extends WizardStep implements Searchable {
         public int versionCode = 0;
         public Drawable appIcon = null;
         public PackageInfo packageInfo;
+    }
+
+    public class LoadTask extends Thread{
+        @Override
+        public void run() {
+            final Context act = mCon;
+            mAppList = new ArrayList<>();
+            PackageManager pm = act.getPackageManager();
+            List<PackageInfo> packages = pm.getInstalledPackages(0);
+            if (packages == null || packages.size() == 0) {
+                mCon.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(act, getString(R.string.no_app_list_permission), Toast.LENGTH_LONG).show();
+                    }
+                });
+                return;
+            }
+            for (int i = 0; i < packages.size(); i++) {
+                PackageInfo packageInfo = packages.get(i);
+                //TODO somethings Terrible
+                //无法在MIUI上读取系统应用
+                if (getArguments() != null && !getArguments().containsKey("sys")) {
+                    if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM) {
+                        continue;
+                    }
+                    if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) {
+                        continue;
+                    }
+                }
+                AppInfo tmpInfo = new AppInfo();
+                tmpInfo.appName = packageInfo.applicationInfo.loadLabel(pm).toString();
+                tmpInfo.packageName = packageInfo.packageName;
+                tmpInfo.versionName = packageInfo.versionName;
+                tmpInfo.versionCode = packageInfo.versionCode;
+                tmpInfo.packageInfo = packageInfo;
+                tmpInfo.appIcon = packageInfo.applicationInfo.loadIcon(pm);
+                mAppList.add(tmpInfo);
+            }
+            AppInfo[] s = mAppList.toArray(new AppInfo[0]);
+            try {
+                Arrays.sort(s, new Comparator<AppInfo>() {
+                    @Override
+                    public int compare(AppInfo appInfo, AppInfo t1) {
+                        return appInfo.appName.compareTo(t1.appName);
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                //So we will not sort them,OK?
+                e.printStackTrace();
+            }
+            mAppList = new ArrayList<>(Arrays.asList(s));
+            final ArrayList<AppInfo> finalAppList = mAppList;
+            while (mList == null) {
+
+            }
+            mList.post(new Runnable() {
+                @Override
+                public void run() {
+                    final AppAdapter aa = new AppAdapter(finalAppList);
+                    mList.setAdapter(aa);
+                    mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            mSelectPosition = position;
+                            sSelected = finalAppList.get(position);
+                            //自残？
+                            if (sSelected.packageName.equals(mList.getContext().getPackageName())) {
+                                mSelectPosition = 0;
+                                sSelected = finalAppList.get(0);
+                                Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
+                            }
+                            aa.notifyDataSetChanged();
+                        }
+                    });
+                    mSelectPosition = 0;
+                    aa.notifyDataSetChanged();
+                    sSelected = finalAppList.get(0);
+                }
+            });
+        }
     }
 }

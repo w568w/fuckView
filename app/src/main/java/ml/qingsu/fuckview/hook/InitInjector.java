@@ -19,7 +19,6 @@ import ml.qingsu.fuckview.Constant;
  * Created by w568w on 18-3-2.
  * <p>
  * So we do not need to reboot,but it'll run slowlier.
- * Just for debug cycle period.
  *
  * @author w568w
  */
@@ -51,9 +50,9 @@ public class InitInjector implements IXposedHookLoadPackage {
                     if (pkgPath != null) {
                         PathClassLoader loader = new PathClassLoader(pkgPath, ClassLoader.getSystemClassLoader());
                         Class<?> hookerClz = Class.forName(Constant.PKG_NAME + ".hook.Hook", true, loader);
-                        Object hooker =  hookerClz.newInstance();
-                        Method handleLoadPackage=hookerClz.getDeclaredMethod("handleLoadPackage",XC_LoadPackage.LoadPackageParam.class);
-                        handleLoadPackage.invoke(hooker,loadPackageParam);
+                        Object hooker = hookerClz.newInstance();
+                        Method handleLoadPackage = hookerClz.getDeclaredMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
+                        handleLoadPackage.invoke(hooker, loadPackageParam);
                     }
                 }
             }

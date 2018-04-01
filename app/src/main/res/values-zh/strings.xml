@@ -4,7 +4,7 @@
     <string name="des">干掉你不喜欢的View!</string>
     <string name="service_des">您不想跟某APP说话，并*了一下他的祖宗。</string>
     <string name="xposed_is_unabled">模块未启用/更新</string>
-    <string name="enable_module">请在Xposed Installer中启用我，然后软重启以激活!</string>
+    <string name="enable_module">请在Xposed Installer中启用我，然后软重启以激活!\n(有时可能是误判，请自行验证屏蔽是否正常)</string>
     <string name="OK">好</string>
     <string name="captured">已捕获</string>
     <string name="notification_title">Online:%1$d regra \\n Local:%2$d regra</string>

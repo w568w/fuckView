@@ -13,7 +13,7 @@
     <string name="confirm">Confirm?</string>
     <string name="cancel">Cancel</string>
     <string name="no_share_app">No app which can share to.</string>
-    <string name="select_app_tip">Select App (You should FORCE STOP that app before，otherwise Fuckview can\'t work well.)</string>
+    <string name="select_app_tip">Select App (Force stop that app beforehand，otherwise Fuckview can\'t work properly.)</string>
     <string name="parse_view">Parse</string>
     <string name="prev_step">Prev</string>
     <string name="next_step">Next</string>
@@ -21,7 +21,7 @@
     <string name="start_mark_toast">Click view to mark it.</string>
     <string name="dont_mark_myself">Wow,do you want automutilation?What a bad boy…</string>
     <string name="module_des">Fuckview is used to fuck views.</string>
-    <string name="no_app_list_permission">Maybe you don\'t give Fuckview READ APP LIST permission?</string>
+    <string name="no_app_list_permission">Maybe you forget giving Fuckview reading-application-list permission?</string>
     <string name="goto_app_detail">Goto app detail page</string>
     <string name="unsupport_of_package">Sorry,your device don\'t support the feature.</string>
     <string name="finish">Finish</string>
