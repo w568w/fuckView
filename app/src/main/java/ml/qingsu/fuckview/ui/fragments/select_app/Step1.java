@@ -74,8 +74,11 @@ public class Step1 extends WizardStep implements Searchable {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if (!(mList.getAdapter() instanceof AppAdapter)){
+            return super.onContextItemSelected(item);
+        }
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        AppInfo info = mAppList.get(menuInfo.position);
+        AppInfo info = ((AppAdapter) mList.getAdapter()).getList().get(menuInfo.position);
         switch (item.getItemId()) {
             case 1:
                 try {
@@ -156,8 +159,9 @@ public class Step1 extends WizardStep implements Searchable {
             mAppList = a;
             notifyDataSetChanged();
         }
-
-
+        public List<AppInfo> getList(){
+            return mAppList;
+        }
         @Override
         public int getCount() {
             return mAppList.size();
@@ -263,24 +267,26 @@ public class Step1 extends WizardStep implements Searchable {
                 e.printStackTrace();
             }
             mAppList = new ArrayList<>(Arrays.asList(s));
-            final ArrayList<AppInfo> finalAppList = mAppList;
             while (mList == null) {
 
             }
             mList.post(new Runnable() {
                 @Override
                 public void run() {
-                    final AppAdapter aa = new AppAdapter(finalAppList);
+                    final AppAdapter aa = new AppAdapter(mAppList);
                     mList.setAdapter(aa);
                     mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            if(!(parent.getAdapter() instanceof AppAdapter)){
+                                return;
+                            }
                             mSelectPosition = position;
-                            sSelected = finalAppList.get(position);
+                            sSelected = ((AppAdapter) parent.getAdapter()).getList().get(position);
                             //自残？
                             if (sSelected.packageName.equals(mList.getContext().getPackageName())) {
                                 mSelectPosition = 0;
-                                sSelected = finalAppList.get(0);
+                                sSelected = ((AppAdapter) parent.getAdapter()).getList().get(0);
                                 Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
                             }
                             aa.notifyDataSetChanged();
@@ -288,7 +294,7 @@ public class Step1 extends WizardStep implements Searchable {
                     });
                     mSelectPosition = 0;
                     aa.notifyDataSetChanged();
-                    sSelected = finalAppList.get(0);
+                    sSelected = mAppList.get(0);
                 }
             });
         }

@@ -22,10 +22,14 @@ public class ViewModel extends BlockModel {
     }
 
     private void prepare() {
-        String[] spilted = record.split(MainActivity.ALL_SPLIT);
-        id = spilted[0];
-        path = spilted[1];
-        position = spilted[2];
+        try {
+            String[] spilted = record.split(MainActivity.ALL_SPLIT);
+            id = spilted[0];
+            path = spilted[1];
+            position = spilted[2];
+        }catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+        }
     }
 
     public String getId() {

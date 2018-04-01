@@ -11,9 +11,14 @@ import java.util.List;
 import dalvik.system.PathClassLoader;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.Constant;
+
+import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
+import static ml.qingsu.fuckview.Constant.PKG_NAME;
+import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
 
 /**
  * Created by w568w on 18-3-2.
@@ -30,6 +35,12 @@ public class InitInjector implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+        //Moved (see Issue #3)
+        if (PKG_NAME.equals(loadPackageParam.packageName)) {
+            XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
+                    VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
+            return;
+        }
         XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

@@ -322,12 +322,7 @@ public class Hook {
             enableLog = true;
         }
         log("净眼:开始HOOK --> " + loadPackageParam.packageName);
-        //@see MainActivity
-        if (PKG_NAME.equals(loadPackageParam.packageName)) {
-            XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
-                    VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
-            return;
-        }
+
 
         log("净眼:检测模块正常 -->" + pkg);
         if ((pkg != null && loadPackageParam.packageName.equals(pkg))) {

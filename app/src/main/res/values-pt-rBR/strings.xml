@@ -94,4 +94,5 @@
     <string name="check_item_floating_permission">Permissão de janela flutuante</string>
     <string name="check_item_service_running">Serviço de acessibilidade em execução</string>
     <string name="check_item_root">Rooted</string>
+    <string name="conf_version">Version</string>
 </resources>

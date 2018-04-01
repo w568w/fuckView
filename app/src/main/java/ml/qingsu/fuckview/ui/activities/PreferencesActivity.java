@@ -105,6 +105,7 @@ public class PreferencesActivity extends PreferenceActivity {
                 return false;
             }
         });
+        findPreference("version").setSummary(getVersionName(this));
         findPreference("pay").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

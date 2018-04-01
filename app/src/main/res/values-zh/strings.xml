@@ -94,4 +94,5 @@
     <string name="check_item_floating_permission">悬浮窗权限</string>
     <string name="check_item_service_running">辅助服务</string>
     <string name="check_item_root">Root</string>
+    <string name="conf_version">版本</string>
 </resources>

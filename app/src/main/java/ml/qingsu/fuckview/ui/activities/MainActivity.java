@@ -369,4 +369,5 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isModuleActive() {
         return false;
     }
+
 }
