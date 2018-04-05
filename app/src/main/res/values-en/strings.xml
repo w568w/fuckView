@@ -99,4 +99,6 @@
     <string name="conf_delete_all_rules_des">Clear all of your rules.</string>
     <string name="conf_enable_floating_window_name">Enable layout parsing</string>
     <string name="conf_enable_floating_window_des">[Unrecommended] Enable layout parsing in the floating window.</string>
+    <string name="module_active">Fuckview is active.</string>
+    <string name="module_not_active">Fuckview is not active.</string>
 </resources>

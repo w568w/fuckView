@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:padding="16dp"
-    android:weightSum="1">
+    android:padding="8dp">
 
 
     <RadioButton
@@ -17,16 +16,21 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/icon"
+        android:layout_toRightOf="@id/radioButton"
+        android:id="@+id/icon_view"/>
     <TextView
-
         android:id="@+id/textView"
         android:textSize="16sp"
-        android:drawableLeft="@drawable/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@id/radioButton"
-        android:layout_toEndOf="@id/radioButton" />
+        android:layout_toRightOf="@id/icon_view"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>

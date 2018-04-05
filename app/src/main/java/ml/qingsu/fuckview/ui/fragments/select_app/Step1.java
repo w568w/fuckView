@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -74,7 +76,7 @@ public class Step1 extends WizardStep implements Searchable {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (!(mList.getAdapter() instanceof AppAdapter)){
+        if (!(mList.getAdapter() instanceof AppAdapter)) {
             return super.onContextItemSelected(item);
         }
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -159,9 +161,11 @@ public class Step1 extends WizardStep implements Searchable {
             mAppList = a;
             notifyDataSetChanged();
         }
-        public List<AppInfo> getList(){
+
+        public List<AppInfo> getList() {
             return mAppList;
         }
+
         @Override
         public int getCount() {
             return mAppList.size();
@@ -186,13 +190,13 @@ public class Step1 extends WizardStep implements Searchable {
                 viewHolder = new ViewHolder();
                 viewHolder.name = (TextView) view.findViewById(R.id.textView);
                 viewHolder.select = (RadioButton) view.findViewById(R.id.radioButton);
+                viewHolder.icon = (ImageView) view.findViewById(R.id.icon_view);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
             viewHolder.name.setText("    " + mAppList.get(i).appName);
-            mAppList.get(i).appIcon.setBounds(0, 0, 64, 64);
-            viewHolder.name.setCompoundDrawables(mAppList.get(i).appIcon, null, null, null);
+            viewHolder.icon.setImageDrawable(mAppList.get(i).appIcon);
             if (mSelectPosition == i) {
                 viewHolder.select.setChecked(true);
 
@@ -205,6 +209,7 @@ public class Step1 extends WizardStep implements Searchable {
         public class ViewHolder {
             TextView name;
             RadioButton select;
+            ImageView icon;
         }
     }
 
@@ -217,7 +222,7 @@ public class Step1 extends WizardStep implements Searchable {
         public PackageInfo packageInfo;
     }
 
-    public class LoadTask extends Thread{
+    public class LoadTask extends Thread {
         @Override
         public void run() {
             final Context act = mCon;
@@ -268,7 +273,6 @@ public class Step1 extends WizardStep implements Searchable {
             }
             mAppList = new ArrayList<>(Arrays.asList(s));
             while (mList == null) {
-
             }
             mList.post(new Runnable() {
                 @Override
@@ -278,7 +282,7 @@ public class Step1 extends WizardStep implements Searchable {
                     mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            if(!(parent.getAdapter() instanceof AppAdapter)){
+                            if (!(parent.getAdapter() instanceof AppAdapter)) {
                                 return;
                             }
                             mSelectPosition = position;

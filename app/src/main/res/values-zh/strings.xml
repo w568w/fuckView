@@ -100,4 +100,6 @@
     <string name="conf_delete_all_rules_des">清空你的所有规则。</string>
     <string name="conf_enable_floating_window_name">启用布局解析</string>
     <string name="conf_enable_floating_window_des">[不推荐] 在悬浮窗中启用布局解析。</string>
+    <string name="module_active">净眼 已启用</string>
+    <string name="module_not_active">净眼 可能未启用</string>
 </resources>

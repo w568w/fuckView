@@ -48,6 +48,8 @@ import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.utils.ConvertUtils;
 import ml.qingsu.fuckview.utils.FirstRun;
 
+import static java.lang.System.out;
+
 /**
  * @author w568w
  */
@@ -66,7 +68,6 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
-
         }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);

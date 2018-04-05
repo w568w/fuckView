@@ -116,6 +116,7 @@ public class Hook {
         //增加红框
         addViewShape(view);
         //增加接收器
+
         try {
             ViewReceiver receiver;
             if ((receiver = (ViewReceiver) XposedHelpers.getAdditionalInstanceField(view, RECEIVER_KEY)) == null) {
