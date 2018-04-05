@@ -3,8 +3,12 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
         <item name="android:textColorPrimary">#fff</item>
+        <item name="floating_action_button_color">#0061b2</item>
+        <item name="floating_action_button_ripple_color">#004198</item>
     </style>
     <style name="DayTheme" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimary">#000</item>
+        <item name="floating_action_button_color">#80cbc4</item>
+        <item name="floating_action_button_ripple_color">#009688</item>
         </style>
 </resources>

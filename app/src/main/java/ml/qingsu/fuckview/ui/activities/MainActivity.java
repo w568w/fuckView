@@ -66,6 +66,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
+
         }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);

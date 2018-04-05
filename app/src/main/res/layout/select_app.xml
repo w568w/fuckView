@@ -8,7 +8,7 @@
         android:id="@+id/step1_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ff0099cc"
+        android:background="?attr/floating_action_button_color"
         android:gravity="center_vertical"
         android:padding="6dp"
         android:text="@string/select_app_tip"
