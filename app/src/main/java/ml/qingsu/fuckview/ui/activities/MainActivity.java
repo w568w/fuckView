@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +21,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import ml.qingsu.fuckview.Constant;
+import ml.qingsu.fuckview.base.BaseAppCompatActivity;
 import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.models.ViewModel;
@@ -45,17 +48,11 @@ import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.utils.ConvertUtils;
 import ml.qingsu.fuckview.utils.FirstRun;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * @author w568w
+ */
+public class MainActivity extends BaseAppCompatActivity {
     public boolean shouldShowFAQ = false;
-
-
-    public static final String LIST_NAME = "block_list";
-    public static final String SUPER_MODE_NAME = "super_mode";
-    public static final String ONLY_ONCE_NAME = "only_once";
-    public static final String STANDARD_MODE_NAME = "standard_mode";
-    public static final String ENABLE_LOG_NAME = "enable_log";
-
-    public static final String PACKAGE_NAME_NAME = "package_name";
 
     private static final int REQUEST_PERMISSION = 0x123;
     private static final int REQUEST_NEW_FRAGMENT = 0x124;
@@ -72,12 +69,21 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse(String.format("package:%s", getPackageName()))));
+            }
+        }
         sSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
 
         dealWithIntent();
+        //If it is the first time to run...
         if (FirstRun.isFirstRun(this, "app")) {
             setFragmentWithoutBack(new WelcomeFragment());
-        } else if ("".equals(readPreferences(LIST_NAME))) {
+            //else if there's no rule...
+        } else if ("".equals(readPreferences(Constant.LIST_NAME))) {
             setFragmentWithoutBack(new SelectAppWizard());
             if (!isModuleActive()) {
                 new AlertDialog.Builder(MainActivity.this)
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(R.string.OK, null)
                         .show();
             }
+            //else we go to the main fragment...
         } else {
             setFragmentWithoutBack(new MainFragment());
             if (!isModuleActive()) {
@@ -101,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void dealWithIntent() {
-        writePreferences("", PACKAGE_NAME_NAME);
+        writePreferences("", Constant.PACKAGE_NAME_NAME);
 
         //此处详见Hook.java
         //是否从通知栏里点过来
@@ -111,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (isDialog) {
-
             final ViewModel blockInfo = ViewModel.fromString(cache);
             if (blockInfo == null) {
                 return;
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             blockInfo.save();
 
         } else {
-            appendPreferences(cache, LIST_NAME);
+            appendPreferences(cache, Constant.LIST_NAME);
         }
         Toast.makeText(this, R.string.rule_saved, Toast.LENGTH_SHORT).show();
     }
@@ -233,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<BlockModel> read() {
         ArrayList<BlockModel> list = new ArrayList<>();
 
-        ArrayList<String> lines = readPreferenceByLine(LIST_NAME);
+        ArrayList<String> lines = readPreferenceByLine(Constant.LIST_NAME);
         for (String str : lines) {
             BlockModel model = BlockModel.fromString(str);
             if (model == null) {
@@ -253,14 +259,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processFile() {
-        final File oldFile = new File(getSDPath() + "/fuckview/" + LIST_NAME);
+        final File oldFile = new File(getSDPath() + "/fuckview/" + Constant.LIST_NAME);
         if (oldFile.exists()) {
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            appendPreferences("\n" + readFile("fuckview/" + LIST_NAME), LIST_NAME);
+                            appendPreferences("\n" + readFile("fuckview/" + Constant.LIST_NAME), Constant.LIST_NAME);
                             oldFile.delete();
                             Toast.makeText(MainActivity.this, "更新已完成.", Toast.LENGTH_SHORT).show();
                         }
@@ -309,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
     public static void writePreferences(String data, String filename) {
         sSharedPreferences.edit().putString(filename, data).apply();
     }
+
     /**
      * @return SD卡路径
      */

@@ -94,4 +94,9 @@
     <string name="check_item_service_running">Accessibility Service Running</string>
     <string name="check_item_root">Rooted</string>
     <string name="conf_version">Version</string>
+    <string name="multi_select">Multi-select Mode</string>
+    <string name="conf_delete_all_rules_name">Delete all rules</string>
+    <string name="conf_delete_all_rules_des">Clear all of your rules.</string>
+    <string name="conf_enable_floating_window_name">Enable layout parsing</string>
+    <string name="conf_enable_floating_window_des">[Unrecommended] Enable layout parsing in the floating window.</string>
 </resources>

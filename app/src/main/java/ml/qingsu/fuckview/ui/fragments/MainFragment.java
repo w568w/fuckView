@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
@@ -201,7 +202,7 @@ public class MainFragment extends Fragment implements Searchable {
         }
         menu.add(0, 1, Menu.NONE, R.string.delete_item);
         menu.add(0, 3, Menu.NONE, R.string.share);
-        menu.add(0, 6, Menu.NONE, model.enable ?R.string.disable_item: R.string.enable_item);
+        menu.add(0, 6, Menu.NONE, model.enable ? R.string.disable_item : R.string.enable_item);
     }
 
     @Override
@@ -290,7 +291,7 @@ public class MainFragment extends Fragment implements Searchable {
     }
 
     private void saveAll() {
-        MainActivity.writePreferences("", MainActivity.LIST_NAME);
+        MainActivity.writePreferences("", Constant.LIST_NAME);
         for (BlockModel bm : models) {
             bm.save();
         }
@@ -340,6 +341,7 @@ public class MainFragment extends Fragment implements Searchable {
                     } else {
                         deleteList.remove(Integer.valueOf(i));
                     }
+                    getActivity().setTitle(deleteList.isEmpty() ? R.string.app_name : R.string.multi_select);
                 }
             });
             BlockModel bm = models.get(i);

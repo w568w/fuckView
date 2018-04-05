@@ -3,6 +3,7 @@ package ml.qingsu.fuckview.models;
 import java.io.Serializable;
 import java.util.Locale;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 /**
@@ -47,7 +48,7 @@ public class BlockModel implements Serializable {
 
 
     public void save() {
-        MainActivity.writePreferences(MainActivity.readPreferences(MainActivity.LIST_NAME) + "\n" + toString(), MainActivity.LIST_NAME);
+        MainActivity.writePreferences(MainActivity.readPreferences(Constant.LIST_NAME) + "\n" + toString(), Constant.LIST_NAME);
     }
 
     @Override

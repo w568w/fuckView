@@ -95,4 +95,9 @@
     <string name="check_item_service_running">辅助服务</string>
     <string name="check_item_root">Root</string>
     <string name="conf_version">版本</string>
+    <string name="multi_select">多选模式</string>
+    <string name="conf_delete_all_rules_name">清空规则</string>
+    <string name="conf_delete_all_rules_des">清空你的所有规则。</string>
+    <string name="conf_enable_floating_window_name">启用布局解析</string>
+    <string name="conf_enable_floating_window_des">[不推荐] 在悬浮窗中启用布局解析。</string>
 </resources>

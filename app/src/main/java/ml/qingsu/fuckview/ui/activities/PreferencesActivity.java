@@ -18,13 +18,14 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.utils.ShellUtils;
 
-import static ml.qingsu.fuckview.ui.activities.MainActivity.ENABLE_LOG_NAME;
-import static ml.qingsu.fuckview.ui.activities.MainActivity.STANDARD_MODE_NAME;
-import static ml.qingsu.fuckview.ui.activities.MainActivity.SUPER_MODE_NAME;
-import static ml.qingsu.fuckview.ui.activities.MainActivity.ONLY_ONCE_NAME;
+import static ml.qingsu.fuckview.Constant.ENABLE_LOG_NAME;
+import static ml.qingsu.fuckview.Constant.STANDARD_MODE_NAME;
+import static ml.qingsu.fuckview.Constant.SUPER_MODE_NAME;
+import static ml.qingsu.fuckview.Constant.ONLY_ONCE_NAME;
 
 public class PreferencesActivity extends PreferenceActivity {
     private int clickTime = 0;
@@ -69,7 +70,7 @@ public class PreferencesActivity extends PreferenceActivity {
                         .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                MainActivity.appendPreferences("\n" + editText.getText().toString(), MainActivity.LIST_NAME);
+                                MainActivity.appendPreferences("\n" + editText.getText().toString(), Constant.LIST_NAME);
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)

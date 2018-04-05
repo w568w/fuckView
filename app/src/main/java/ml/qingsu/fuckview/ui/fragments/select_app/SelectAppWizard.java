@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.tencent.bugly.crashreport.CrashReport;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
@@ -61,7 +62,7 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
             return;
         }
         mCon.getSharedPreferences("data", Context.MODE_WORLD_READABLE)
-                .edit().putString(MainActivity.PACKAGE_NAME_NAME, Step1.sSelected.packageName).commit();
+                .edit().putString(Constant.PACKAGE_NAME_NAME, Step1.sSelected.packageName).commit();
         //等待數據寫入完成
         try {
             Thread.sleep(100);

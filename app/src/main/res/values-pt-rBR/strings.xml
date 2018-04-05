@@ -95,4 +95,9 @@
     <string name="check_item_service_running">Serviço de acessibilidade em execução</string>
     <string name="check_item_root">Rooted</string>
     <string name="conf_version">Version</string>
+    <string name="multi_select">Multi-selecione o modo</string>
+    <string name="conf_delete_all_rules_name">Excluir todas as regras</string>
+    <string name="conf_delete_all_rules_des">Limpe todas as suas regras.</string>
+    <string name="conf_enable_floating_window_name">Ativar análise de layout</string>
+    <string name="conf_enable_floating_window_des">[Não recomendado] Habilite a análise de layout na janela flutuante.</string>
 </resources>

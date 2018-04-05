@@ -730,7 +730,7 @@ public class Hook {
                         ++successTimes;
                     }
                     if (postion.equals(((ViewModel) model).getPosition())) {
-                        ++successTimes;
+                        successTimes += 2;
                     }
                     if (!(model.getText().length() == 0) && model.getText().equals(getText(view))) {
                         ++successTimes;

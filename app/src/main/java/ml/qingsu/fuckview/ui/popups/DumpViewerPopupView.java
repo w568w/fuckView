@@ -1,10 +1,9 @@
 package ml.qingsu.fuckview.ui.popups;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
@@ -18,6 +17,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseActionBroadcastReceiver;
 import ml.qingsu.fuckview.base.BasePopupWindow;
@@ -31,6 +31,7 @@ import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
 
 /**
  * Created by w568w on 2017-7-12.
+ *
  * @author w568w
  */
 
@@ -42,6 +43,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
     private int mGravity = Gravity.TOP;
     private BasePopupWindow mFullScreenPopupWindow;
     private boolean isNotList;
+    private boolean isLayoutParsingEnabled;
     private Button mRefresh;
     private TextView mInfo;
     private HookBrocastReceiver mReceiver;
@@ -51,6 +53,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
         super(activity);
         mPackageName = pkg;
         isNotList = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("no_list", true);
+        isLayoutParsingEnabled = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_layout_parse", false);
         mReceiver = new HookBrocastReceiver();
     }
 
@@ -61,7 +64,11 @@ public class DumpViewerPopupView extends BasePopupWindow {
         mInfo = (TextView) layout.findViewById(R.id.dump_info);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
-
+        if (isLayoutParsingEnabled) {
+            mRefresh.setVisibility(View.VISIBLE);
+        } else {
+            mRefresh.setVisibility(View.GONE);
+        }
         setFocusable(false);
         mRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +86,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
                 hide();
                 try {
                     ShellUtils.killProcess(mPackageName);
-                    MainActivity.writePreferences("", MainActivity.PACKAGE_NAME_NAME);
+                    MainActivity.writePreferences("", Constant.PACKAGE_NAME_NAME);
                     appContext.unregisterReceiver(mReceiver);
                 } catch (IllegalArgumentException | IOException e) {
                     e.printStackTrace();
@@ -100,7 +107,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
                     ViewModel model = (ViewModel) mInfo.getTag();
                     model.save();
                     //發送，以使View接收隱藏廣播
-                    appContext.sendBroadcast(new Intent(ViewReceiver.ACTION).putExtra("path",model.getPath()));
+                    appContext.sendBroadcast(new Intent(ViewReceiver.ACTION).putExtra("path", model.getPath()));
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
                     mInfo.setText("");
@@ -174,6 +181,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
 
     private class HookBrocastReceiver extends BaseActionBroadcastReceiver {
         private static final String BROADCAST_ACTION = "tooYoungtooSimple";
+
         @Override
         public String getAction() {
             return BROADCAST_ACTION;

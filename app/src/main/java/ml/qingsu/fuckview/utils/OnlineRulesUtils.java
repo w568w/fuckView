@@ -10,7 +10,9 @@ import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.models.ViewModel;
 
 /**
- * Created by w568w on 18-1-20.
+ *
+ * @author w568w
+ * @date 18-1-20
  */
 
 public class OnlineRulesUtils {

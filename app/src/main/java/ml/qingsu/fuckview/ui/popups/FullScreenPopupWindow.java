@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BasePopupWindow;
 import ml.qingsu.fuckview.models.ViewModel;
@@ -79,7 +80,7 @@ class FullScreenPopupWindow extends BasePopupWindow {
                             if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                 ViewDumper.ViewItem item1 = (ViewDumper.ViewItem) view.getTag();
                                 Point p = item1.bounds;
-                                MainActivity.appendPreferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), MainActivity.LIST_NAME);
+                                MainActivity.appendPreferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), Constant.LIST_NAME);
                                 Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
 
                             }
