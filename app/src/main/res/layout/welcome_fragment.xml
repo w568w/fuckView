@@ -42,6 +42,7 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
     <Button
         android:id="@+id/welcome_pass"
         android:layout_width="match_parent"

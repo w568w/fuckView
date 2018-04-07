@@ -101,4 +101,5 @@
     <string name="conf_enable_floating_window_des">[Unrecommended] Enable layout parsing in the floating window.</string>
     <string name="module_active">Fuckview is active.</string>
     <string name="module_not_active">Fuckview is not active.</string>
+    <string name="force_closing">Force Closing ...</string>
 </resources>

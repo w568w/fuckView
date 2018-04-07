@@ -10,6 +10,7 @@ import ml.qingsu.fuckview.utils.root.AppRulesUtils;
 
 /**
  * Created by w568w on 2017-6-30.
+ *
  * @author w568w
  * @author YanLu
  */
@@ -23,7 +24,7 @@ public class MyApplication extends Application {
         super.onCreate();
 
         // 设置文件夹权限，让其他 App 可以读取
-        if(isOpenSharedFile) {
+        if (isOpenSharedFile) {
             AppRulesUtils.setFilePermissions(getApplicationInfo().dataDir, 0757, -1, -1);
             AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
         }

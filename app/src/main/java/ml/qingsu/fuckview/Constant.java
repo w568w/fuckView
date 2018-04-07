@@ -1,5 +1,11 @@
 package ml.qingsu.fuckview;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.SystemClock;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by w568w on 18-3-2.
  *

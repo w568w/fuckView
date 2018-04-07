@@ -16,20 +16,25 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
     <ImageView
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:scaleType="fitXY"
         android:src="@drawable/icon"
         android:layout_toRightOf="@id/radioButton"
-        android:id="@+id/icon_view"/>
+        android:id="@+id/icon_view" />
+
     <TextView
         android:id="@+id/textView"
         android:textSize="16sp"
+        android:text="ssss"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:gravity="center_vertical"
+        android:textStyle="bold"
         android:layout_toRightOf="@id/icon_view"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true" />

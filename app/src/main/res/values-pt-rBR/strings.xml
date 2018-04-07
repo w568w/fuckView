@@ -102,4 +102,5 @@
     <string name="conf_enable_floating_window_des">[Não recomendado] Habilite a análise de layout na janela flutuante.</string>
     <string name="module_active">Fuckview está ativo.</string>
     <string name="module_not_active">Fuckview não está ativo.</string>
+    <string name="force_closing">Forçar fechamento ...</string>
 </resources>

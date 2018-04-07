@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">净眼</string>
     <string name="des">干掉你不喜欢的View!</string>
-    <string name="service_des">您不想跟某APP说话，并*了一下他的祖宗。</string>
+    <string name="service_des">用於淨眼的佈局解析等。</string>
     <string name="xposed_is_unabled">模块未启用/更新</string>
     <string name="enable_module">请在Xposed Installer中启用我，然后软重启以激活!\n(有时可能是误判，请自行验证屏蔽是否正常)</string>
     <string name="OK">好</string>
@@ -102,4 +102,5 @@
     <string name="conf_enable_floating_window_des">[不推荐] 在悬浮窗中启用布局解析。</string>
     <string name="module_active">净眼 已启用</string>
     <string name="module_not_active">净眼 可能未启用</string>
+    <string name="force_closing">强制停止中...</string>
 </resources>

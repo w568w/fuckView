@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="floating_action_button_color" format="reference|color"/>
-    <attr name="floating_action_button_ripple_color" format="reference|color"/>
+    <attr name="floating_action_button_color" format="reference|color" />
+    <attr name="floating_action_button_ripple_color" format="reference|color" />
 </resources>

@@ -28,23 +28,18 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
-import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.R;
 
-import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
-import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
 import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
 import static ml.qingsu.fuckview.utils.ViewUtils.getText;
 import static ml.qingsu.fuckview.utils.ViewUtils.getViewPath;
@@ -475,7 +470,6 @@ public class Hook {
                     v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                         @Override
                         public void onGlobalLayout() {
-
                             if (finalSuperMode) {
                                 if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                                     v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
@@ -701,6 +695,25 @@ public class Hook {
             return new BlockModel(view.getContext().getPackageName(), view.getId() + ALL_SPLIT + getViewPath(view) + ALL_SPLIT + getViewPosition(view), getText(view), view.getClass().getSimpleName());
         }
 
+        private static boolean singleStr(String str, char a) {
+            final int length = str.length();
+            boolean appeared = false;
+            for (int i = 0; i < length; i++) {
+                if (str.charAt(i) == a) {
+                    if (appeared) {
+                        return false;
+                    } else {
+                        appeared = true;
+                    }
+                }
+            }
+            return appeared;
+        }
+
+        /**
+        Be serious on time.
+        Think about it that will be invoked around 6,000 times on each app starts.
+        */
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
             //log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
@@ -708,11 +721,12 @@ public class Hook {
             View view = (View) o;
             final String className = view.getClass().getSimpleName();
             final int id = view.getId();
+            final String strId = id + "";
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
             final String p = getViewPath(view);
 
-            if (p.indexOf("/") == p.lastIndexOf("/")) {
+            if (singleStr(p, '/')) {
                 return new Pair<>(false, -1);
             }
             for (int i = 0; i < len; i++) {
@@ -722,18 +736,18 @@ public class Hook {
                     continue;
                 }
                 if (model instanceof ViewModel) {
-                    String path = getViewPath(view);
+                    final String path = getViewPath(view);
                     int successTimes = 0;
                     if (path.equals(((ViewModel) model).getPath())) {
                         ++successTimes;
                     }
-                    if (id > 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(id + "")) {
+                    if (id != 0 && id != android.R.id.text1 && id != android.R.id.text2 && ((ViewModel) model).getId().equals(strId)) {
                         ++successTimes;
                     }
                     if (postion.equals(((ViewModel) model).getPosition())) {
                         successTimes += 2;
                     }
-                    if (!(model.getText().length() == 0) && model.getText().equals(getText(view))) {
+                    if (model.getText().length() != 0 && model.getText().equals(getText(view))) {
                         ++successTimes;
                     }
                     if (successTimes >= 2) {
@@ -750,16 +764,19 @@ public class Hook {
             try {
                 v.setVisibility(View.GONE);
                 ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-                layoutParams.height = 0;
-                layoutParams.width = 0;
-                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
-                    ((ViewGroup.MarginLayoutParams) layoutParams).setMargins(0, 0, 0, 0);
+                if(layoutParams!=null) {
+                    layoutParams.height = 0;
+                    layoutParams.width = 0;
+                    if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+                        ((ViewGroup.MarginLayoutParams) layoutParams).setMargins(0, 0, 0, 0);
+                    }
+                    v.setLayoutParams(layoutParams);
                 }
                 v.setPadding(0, 0, 0, 0);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     v.setAlpha(0f);
                 }
-                v.setLayoutParams(layoutParams);
+
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -894,6 +911,5 @@ public class Hook {
             this.subView = subView;
         }
     }
-
 
 }
