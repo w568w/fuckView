@@ -103,4 +103,6 @@
     <string name="module_active">净眼 已启用</string>
     <string name="module_not_active">净眼 可能未启用</string>
     <string name="force_closing">强制停止中...</string>
+    <string name="finish_guide">结束教程</string>
+    <string name="dont_show_again">不再提示</string>
 </resources>

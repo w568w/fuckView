@@ -102,4 +102,6 @@
     <string name="module_active">Fuckview is active.</string>
     <string name="module_not_active">Fuckview is not active.</string>
     <string name="force_closing">Force Closing ...</string>
+    <string name="finish_guide">Finish</string>
+    <string name="dont_show_again">Don\'t show again</string>
 </resources>

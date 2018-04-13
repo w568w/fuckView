@@ -38,6 +38,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.utils.ViewUtils;
 
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
@@ -141,7 +142,7 @@ public class Hook {
             nb.setAutoCancel(true);
             nb.setTicker(getString(R.string.captured, context));
             nb.setSmallIcon(android.R.drawable.stat_sys_warning);
-            nb.setContentText(view.getClass().getSimpleName());
+            nb.setContentText(ViewUtils.getClassName(view.getClass()));
             nb.setOngoing(false);
             nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
             nb.setContentTitle(getString(R.string.notification_title, context));
@@ -154,7 +155,7 @@ public class Hook {
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
-                .putExtra("className", view.getClass().getSimpleName())
+                .putExtra("className", ViewUtils.getClassName(view.getClass()))
                 .putExtra("record", ViewBlocker.getInstance().log(view).toString());
         context.sendBroadcast(broadcastIntent);
     }
@@ -189,7 +190,7 @@ public class Hook {
             nb.setAutoCancel(true);
             nb.setTicker(getString(R.string.captured, context));
             nb.setSmallIcon(android.R.drawable.stat_sys_warning);
-            nb.setContentText(view.getClass().getSimpleName());
+            nb.setContentText(ViewUtils.getClassName(view.getClass()));
             nb.setOngoing(false);
             nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
             nb.setContentTitle(getString(R.string.notification_title, context));
@@ -209,7 +210,7 @@ public class Hook {
                 nb.setAutoCancel(true);
                 nb.setTicker(getString(R.string.captured, context));
                 nb.setSmallIcon(android.R.drawable.stat_sys_warning);
-                nb.setContentText(view.getClass().getSimpleName());
+                nb.setContentText(ViewUtils.getClassName(view.getClass()));
                 nb.setOngoing(false);
                 nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
                 nb.setContentTitle(getString(R.string.notification_title, context));
@@ -222,7 +223,7 @@ public class Hook {
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
-                .putExtra("className", view.getClass().getSimpleName())
+                .putExtra("className", ViewUtils.getClassName(view.getClass()))
                 .putExtra("record", ViewBlocker.getInstance().log(view).toString());
         context.sendBroadcast(broadcastIntent);
     }
@@ -692,7 +693,7 @@ public class Hook {
         @Override
         public BlockModel log(Object o) {
             View view = (View) o;
-            return new BlockModel(view.getContext().getPackageName(), view.getId() + ALL_SPLIT + getViewPath(view) + ALL_SPLIT + getViewPosition(view), getText(view), view.getClass().getSimpleName());
+            return new BlockModel(view.getContext().getPackageName(), view.getId() + ALL_SPLIT + getViewPath(view) + ALL_SPLIT + getViewPosition(view), getText(view), ViewUtils.getClassName(view.getClass()));
         }
 
         private static boolean singleStr(String str, char a) {
@@ -711,15 +712,17 @@ public class Hook {
         }
 
         /**
-        Be serious on time.
-        Think about it that will be invoked around 6,000 times on each app starts.
+         Be serious on time.
+         Be serious on time.
+         Be serious on time.
+         Think about it that will be invoked around 6,0000 times on starting.
         */
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
             //log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
 //            log("list  --> "+arrayList);
             View view = (View) o;
-            final String className = view.getClass().getSimpleName();
+            final String className = ViewUtils.getClassName(view.getClass());
             final int id = view.getId();
             final String strId = id + "";
             final int len = mBlockList.size();

@@ -66,7 +66,8 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
+        final SharedPreferences settingsPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+        if (settingsPreferences.getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
         }
         setContentView(R.layout.activity_main);
@@ -87,11 +88,18 @@ public class MainActivity extends BaseAppCompatActivity {
             //else if there's no rule...
         } else if ("".equals(readPreferences(Constant.LIST_NAME))) {
             setFragmentWithoutBack(new SelectAppWizard());
-            if (!isModuleActive()) {
+            if (!isModuleActive()&&!settingsPreferences.getBoolean("dont_show",false)) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.xposed_is_unabled)
                         .setMessage(R.string.enable_module)
                         .setPositiveButton(R.string.OK, null)
+                        .setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                settingsPreferences.edit()
+                                        .putBoolean("dont_show",true).apply();
+                            }
+                        })
                         .show();
             }
             //else we go to the main fragment...

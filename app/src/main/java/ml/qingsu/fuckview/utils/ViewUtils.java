@@ -11,19 +11,26 @@ import android.widget.TextView;
  * @author w568w
  */
 
-public class ViewUtils {
-
+public final class ViewUtils {
+    public static String getClassName(Class<?> clz){
+        final String name = clz.getName();
+        final int dot = name.lastIndexOf('.');
+        if (dot != -1) {
+            return name.substring(dot + 1);
+        }
+        return name;
+    }
     public static String getViewPath(View v) {
         ViewParent viewParent = v.getParent();
         Object object = v;
         StringBuilder path = new StringBuilder();
         while (viewParent != null) {
             if (viewParent instanceof ViewGroup) {
-                final int len=((ViewGroup) viewParent).getChildCount();
+                final int len = ((ViewGroup) viewParent).getChildCount();
                 for (int i = 0; i < len; i++) {
                     View child = ((ViewGroup) viewParent).getChildAt(i);
                     if (child.equals(object)) {
-                        path.append(i).append("|").append(child.getClass().getSimpleName()).append("/");
+                        path.append(i).append("|").append(getClassName(child.getClass())).append("/");
                     }
                 }
             }
@@ -37,7 +44,8 @@ public class ViewUtils {
     public static String getViewPosition(View view) {
         int[] loc = new int[2];
         view.getLocationInWindow(loc);
-        return loc[0] + "," + loc[1] + "$$";
+        StringBuilder location = new StringBuilder().append(loc[0]).append(',').append(loc[1]).append("$$");
+        return location.toString();
     }
 
     public static String getText(View view) {
@@ -48,7 +56,8 @@ public class ViewUtils {
             return ((TextView) view).getText().toString();
         }
         if (view instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+            final int len=((ViewGroup) view).getChildCount();
+            for (int i = 0; i < len; i++) {
                 View child = ((ViewGroup) view).getChildAt(i);
                 if (child instanceof TextView) {
                     return ((TextView) child).getText().toString().replace("\n", "");
@@ -70,7 +79,8 @@ public class ViewUtils {
             return ((TextView) view).getText().toString();
         }
         if (view instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+            final int len=((ViewGroup) view).getChildCount();
+            for (int i = 0; i < len; i++) {
                 View child = ((ViewGroup) view).getChildAt(i);
                 if (child instanceof TextView) {
                     if (!(allText.length() == 0)) {
