@@ -11,43 +11,42 @@
 
         <Button
             android:id="@+id/dump_refresh"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/parse_view" />
 
         <Button
             android:id="@+id/dump_top"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/switch_position" />
 
 
         <Button
             android:id="@+id/dump_close"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:text="@string/close_popup" />
 
 
     </LinearLayout>
 
     <TextView
+        android:id="@+id/dump_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="99"
-        android:id="@+id/dump_info"
+        android:layout_margin="4dp"
         android:clickable="true" />
-
 
     <ProgressBar
         android:id="@+id/dump_progress"
-        android:visibility="gone"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </LinearLayout>

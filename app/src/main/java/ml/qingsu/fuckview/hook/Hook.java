@@ -1,13 +1,11 @@
 package ml.qingsu.fuckview.hook;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -26,7 +24,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +52,7 @@ import static ml.qingsu.fuckview.utils.ViewUtils.getViewPosition;
 public class Hook {
 
 
-    public static final String DIALOG_VIRTUAL_CLASSNAME = "Dialog";
+    private static final String DIALOG_VIRTUAL_CLASSNAME = "Dialog";
     private static final String SUPER_MODE_NAME = "super_mode";
     private static final String ONLY_ONCE_NAME = "only_once";
     private static final String STANDARD_MODE_NAME = "standard_mode";
@@ -66,11 +63,7 @@ public class Hook {
     private static final String ALL_SPLIT = "~~~";
     private static final String RECEIVER_KEY = "motherfuckerreceiver";
     private static final int NOTIFICATION_ID = 0x123;
-    /**
-     * 由于目标APP不一定有读写文件权限，所以想到了这么个
-     * 奇巧淫技，自己维护个缓存区
-     */
-    private static String writeFileCache = "";
+
     private static boolean onlyOnce;
     private static boolean standardMode;
     private static boolean superMode;
@@ -78,24 +71,10 @@ public class Hook {
 
     private static XSharedPreferences xSP = new XSharedPreferences("ml.qingsu.fuckview", "data");
 
+    /**
+     * @removed Nowhere to use.
+     */
     private static int mNotificationId = NOTIFICATION_ID + 1;
-
-    private static AlertDialog getContinueAskDialog(final Context con) {
-        return new AlertDialog.Builder(con)
-                .setMessage("继续标记?\n是:暂时不保存结果，等会儿再说\n否:保存刚刚标记的所有结果，并返回净眼")
-                .setPositiveButton("是", null)
-                .setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(con, "强制停止应用即可", Toast.LENGTH_LONG).show();
-                        Intent intent = con.getPackageManager().getLaunchIntentForPackage("ml.qingsu.fuckview");
-                        //看！奇巧淫技！
-                        intent.putExtra("cache", writeFileCache);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        con.startActivity(intent);
-                    }
-                }).create();
-    }
 
     private static String getString(int resId, Context context) throws PackageManager.NameNotFoundException {
         try {
@@ -106,13 +85,13 @@ public class Hook {
         }
     }
 
+    // FIXME: 18-4-21 These two methods are the same.
 
     private void handleClick(final View view) throws PackageManager.NameNotFoundException {
         final Context context = view.getContext();
         //增加红框
         addViewShape(view);
         //增加接收器
-
         try {
             ViewReceiver receiver;
             if ((receiver = (ViewReceiver) XposedHelpers.getAdditionalInstanceField(view, RECEIVER_KEY)) == null) {
@@ -137,6 +116,7 @@ public class Hook {
         //You should write:
         //nb.xxx();nb.xxx();
 
+        //TODO too much trying.
         try {
             NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
             nb.setAutoCancel(true);
@@ -150,6 +130,28 @@ public class Hook {
             nm.notify(NOTIFICATION_ID, nb.build());
         } catch (NullPointerException npe) {
             npe.printStackTrace();
+
+        } catch (Throwable t) {
+            /*
+            Deal with Class Not Found thrown when creating NotificationCompat in [Exposed](https://github.com/android-hacker/exposed) Environment.
+            But it's not supported in API 10 and below, todo it.
+            */
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    Notification.Builder nb = new Notification.Builder(context);
+                    nb.setAutoCancel(true);
+                    nb.setTicker(getString(R.string.captured, context));
+                    nb.setSmallIcon(android.R.drawable.stat_sys_warning);
+                    nb.setContentText(ViewUtils.getClassName(view.getClass()));
+                    nb.setOngoing(false);
+                    nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                    nb.setContentTitle(getString(R.string.notification_title, context));
+                    NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm.notify(NOTIFICATION_ID, nb.getNotification());
+                }
+                //Must ignored it.On some devices,the codes above still cannot work properly.
+            } catch (Throwable ignored) {
+            }
         }
 
         Intent broadcastIntent = new Intent(BROADCAST_ACTION)
@@ -160,7 +162,10 @@ public class Hook {
         context.sendBroadcast(broadcastIntent);
     }
 
-    //与上面唯一的区别是通知方式
+    /**
+     * @param view the view to be handled
+     * @throws PackageManager.NameNotFoundException when
+     */
     private void handleTouch(final View view) throws PackageManager.NameNotFoundException {
         final Context context = view.getContext();
         //增加红框
@@ -185,6 +190,7 @@ public class Hook {
         log(BlockModel.getInstanceByAll(view).toString());
         intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
         intent.putExtra("Dialog", true);
+        //TODO too much trying.
         try {
             NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
             nb.setAutoCancel(true);
@@ -204,18 +210,21 @@ public class Hook {
             Deal with Class Not Found thrown when creating NotificationCompat in [Exposed](https://github.com/android-hacker/exposed) Environment.
             But it's not supported in API 10 and below,let's TODO it.
             */
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                Notification.Builder nb = new Notification.Builder(context);
-                nb.setAutoCancel(true);
-                nb.setTicker(getString(R.string.captured, context));
-                nb.setSmallIcon(android.R.drawable.stat_sys_warning);
-                nb.setContentText(ViewUtils.getClassName(view.getClass()));
-                nb.setOngoing(false);
-                nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
-                nb.setContentTitle(getString(R.string.notification_title, context));
-                NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                nm.notify(NOTIFICATION_ID, nb.getNotification());
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    Notification.Builder nb = new Notification.Builder(context);
+                    nb.setAutoCancel(true);
+                    nb.setTicker(getString(R.string.captured, context));
+                    nb.setSmallIcon(android.R.drawable.stat_sys_warning);
+                    nb.setContentText(ViewUtils.getClassName(view.getClass()));
+                    nb.setOngoing(false);
+                    nb.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                    nb.setContentTitle(getString(R.string.notification_title, context));
+                    NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm.notify(NOTIFICATION_ID, nb.getNotification());
+                }
+                //Must ignored it.On some devices,the codes above still cannot work properly.
+            } catch (Throwable ignored) {
             }
         }
 
@@ -228,13 +237,19 @@ public class Hook {
         context.sendBroadcast(broadcastIntent);
     }
 
-    //给View加上bling bling的红边~~
+
+    /**
+     * 给View加上红边~~
+     *
+     * @param view the view to be bounded
+     */
     private static void addViewShape(final View view) {
         try {
             GradientDrawable gd = new GradientDrawable();
             gd.setStroke(4, Color.RED);
             final Drawable background = view.getBackground();
             view.setBackgroundDrawable(gd);
+            //Then recover the background.
             view.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -246,6 +261,10 @@ public class Hook {
         }
     }
 
+    /**
+     * @param pkgFilter the specified package name.
+     * @return a blocking list.
+     */
     private static ArrayList<BlockModel> readBlockList(String pkgFilter) {
         ArrayList<BlockModel> list = new ArrayList<>();
         ArrayList<String> lines = readPreferenceByLine(LIST_FILENAME);
@@ -262,14 +281,6 @@ public class Hook {
         return list;
     }
 
-    private static String readPreference(String filename) {
-        if (filename.equals(LIST_FILENAME)) {
-            //直接返回cache
-            return writeFileCache;
-        }
-        return xSP.getString(filename, "");
-    }
-
     /**
      * 正常的readfile,不做任何缓存代理
      */
@@ -284,6 +295,12 @@ public class Hook {
         return arrayList;
     }
 
+    /**
+     * @param length the array's length
+     * @param array  a zero-length array.
+     * @param <E>    type
+     * @return an array.
+     */
     @SafeVarargs
     private static <E> E[] newArray(int length, E... array) {
         return Arrays.copyOf(array, length);
@@ -295,9 +312,17 @@ public class Hook {
         }
     }
 
+    /**
+     * The main hooker.
+     *
+     * @param loadPackageParam the param of the package loaded.
+     * @throws Throwable Some exceptions.
+     */
     @Keep
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-
+        if (loadPackageParam == null) {
+            return;
+        }
         final ArrayList<BlockModel>[] mBlockList;
         mBlockList = newArray(1);
         xSP.reload();
@@ -462,7 +487,7 @@ public class Hook {
                 }
             });
 
-            final boolean finalSuperMode = superMode;
+            final boolean fsuperMode = superMode;
             final XC_MethodHook viewHooker = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -471,7 +496,7 @@ public class Hook {
                     v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                         @Override
                         public void onGlobalLayout() {
-                            if (finalSuperMode) {
+                            if (fsuperMode) {
                                 if (ViewBlocker.getInstance().isBlocked(mBlockList[0], v)) {
                                     v.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                                     ViewBlocker.getInstance().block(v);
@@ -511,9 +536,15 @@ public class Hook {
         }
     }
 
+
     //--------------------------------------------------------------
     //--------------------------------------------------------------
-    //Block包判断
+
+    /**
+     * @param arrayList the blocking list
+     * @param pkg       package name
+     * @return whether the app has blocking rules
+     */
     private boolean isBlockPackage(ArrayList<BlockModel> arrayList, String pkg) {
         final int len = arrayList.size();
         for (int i = 0; i < len; i++) {
@@ -525,6 +556,10 @@ public class Hook {
         return false;
     }
 
+    /**
+     * @param v A view.
+     * @return whether it's a listview.
+     */
     private boolean isAdapterView(Object v) {
         return v instanceof AdapterView;
     }
@@ -712,11 +747,11 @@ public class Hook {
         }
 
         /**
-         Be serious on time.
-         Be serious on time.
-         Be serious on time.
-         Think about it that will be invoked around 6,0000 times on starting.
-        */
+         * Be serious on time.
+         * Be serious on time.
+         * Be serious on time.
+         * Think about it that will be invoked around 6,0000 times on every time of starting.
+         */
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
             //log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
@@ -728,7 +763,6 @@ public class Hook {
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
             final String p = getViewPath(view);
-
             if (singleStr(p, '/')) {
                 return new Pair<>(false, -1);
             }
@@ -766,8 +800,8 @@ public class Hook {
             View v = (View) o;
             try {
                 v.setVisibility(View.GONE);
-                ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
-                if(layoutParams!=null) {
+                final ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
+                if (layoutParams != null) {
                     layoutParams.height = 0;
                     layoutParams.width = 0;
                     if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
@@ -787,7 +821,7 @@ public class Hook {
 
     }
 
-    static class DialogBlocker extends AbstractBlocker {
+    private static class DialogBlocker extends AbstractBlocker {
         private static DialogBlocker instance;
 
         public static DialogBlocker getInstance() {
@@ -845,21 +879,7 @@ public class Hook {
             log("净眼:Message --> RemoveView");
             final BlockModel model = DialogBlocker.getInstance().log(view);
             log("净眼:Removed View -->" + model.record);
-            //防止自残
-            if (!"".equals(model.record)) {
-                new AlertDialog.Builder(context)
-                        .setTitle("你确定要屏蔽这一项吗?")
-                        .setMessage("按\"屏蔽\"来屏蔽这个对话框。")
-                        .setPositiveButton("屏蔽", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                model.save();
-                                getContinueAskDialog(context).show();
-                            }
-                        })
-                        .setNegativeButton("好像不对", null)
-                        .show();
-            }
+            //todo no measures are taken here.
         }
     }
 

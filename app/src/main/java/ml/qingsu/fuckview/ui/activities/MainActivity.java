@@ -35,11 +35,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.Constant;
-import ml.qingsu.fuckview.base.BaseAppCompatActivity;
-import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.models.ViewModel;
+import ml.qingsu.fuckview.base.BaseAppCompatActivity;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.models.BlockModel;
+import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
@@ -47,8 +47,6 @@ import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.utils.ConvertUtils;
 import ml.qingsu.fuckview.utils.FirstRun;
-
-import static java.lang.System.out;
 
 /**
  * @author w568w
@@ -66,7 +64,7 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences settingsPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (settingsPreferences.getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
         }
@@ -88,7 +86,7 @@ public class MainActivity extends BaseAppCompatActivity {
             //else if there's no rule...
         } else if ("".equals(readPreferences(Constant.LIST_NAME))) {
             setFragmentWithoutBack(new SelectAppWizard());
-            if (!isModuleActive()&&!settingsPreferences.getBoolean("dont_show",false)) {
+            if (!isModuleActive() && !settingsPreferences.getBoolean("dont_show", false)) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.xposed_is_unabled)
                         .setMessage(R.string.enable_module)
@@ -97,7 +95,7 @@ public class MainActivity extends BaseAppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 settingsPreferences.edit()
-                                        .putBoolean("dont_show",true).apply();
+                                        .putBoolean("dont_show", true).apply();
                             }
                         })
                         .show();
@@ -141,8 +139,7 @@ public class MainActivity extends BaseAppCompatActivity {
     }
 
     private void checkAndCallPermission(String permission) {
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             try {
                 ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
             } catch (ActivityNotFoundException e) {

@@ -4,6 +4,7 @@ import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 /**
  * Moved by w568w on 18-2-4.
+ *
  * @author w568w
  */
 public class ViewModel extends BlockModel {
@@ -27,7 +28,7 @@ public class ViewModel extends BlockModel {
             id = spilted[0];
             path = spilted[1];
             position = spilted[2];
-        }catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
         }
     }

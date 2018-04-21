@@ -12,9 +12,9 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
-import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
 import ml.qingsu.fuckview.utils.wizard.BaseWizard;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 

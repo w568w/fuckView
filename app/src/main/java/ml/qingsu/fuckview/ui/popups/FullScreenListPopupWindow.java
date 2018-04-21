@@ -31,13 +31,13 @@ import ml.qingsu.fuckview.utils.dumper.ViewDumper;
  * Created by w568w on 2017-7-29.
  */
 
-class FullScreenListPopupWindow extends BasePopupWindow {
+public class FullScreenListPopupWindow extends BasePopupWindow {
     private ArrayList<ViewDumper.ViewItem> list;
     private ListViewCompat listView;
     private String pkg;
     private DumpViewerPopupView popupView;
 
-    FullScreenListPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, DumpViewerPopupView popupView) {
+    public FullScreenListPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, DumpViewerPopupView popupView) {
         super(activity);
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
         params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
@@ -120,7 +120,7 @@ class FullScreenListPopupWindow extends BasePopupWindow {
                                 if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                     ViewDumper.ViewItem item1 = list.get(position);
                                     Point p = item1.bounds;
-                                    MainActivity.appendPreferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), Constant.LIST_NAME);
+                                    MainActivity.appendPreferences("\n" + new ViewModel(pkg, " " + MainActivity.ALL_SPLIT + " " + MainActivity.ALL_SPLIT + p.x + "," + p.y + "$$", "", "*").toString(), Constant.LIST_NAME);
                                     Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
                                 }
                                 return true;
@@ -144,7 +144,7 @@ class FullScreenListPopupWindow extends BasePopupWindow {
         listView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode==KeyEvent.KEYCODE_BACK){
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
                     hide();
                     popupView.show();
                     return true;

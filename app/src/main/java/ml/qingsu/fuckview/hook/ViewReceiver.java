@@ -15,9 +15,10 @@ import static android.view.View.GONE;
  * @author w568w
  */
 
-public class ViewReceiver extends BaseActionBroadcastReceiver{
-    public static String ACTION="ilovefuckingtheleftboytilldeath";
+public class ViewReceiver extends BaseActionBroadcastReceiver {
+    public static String ACTION = "ilovefuckingtheleftboytilldeath";
     private View mView;
+
     @Override
     public String getAction() {
         return ACTION;
@@ -25,7 +26,7 @@ public class ViewReceiver extends BaseActionBroadcastReceiver{
 
     @Override
     public void onReceiving(Context context, Intent intent) {
-        if (mView != null&& ViewUtils.getViewPath(mView).equals(intent.getStringExtra("path"))) {
+        if (mView != null && ViewUtils.getViewPath(mView).equals(intent.getStringExtra("path"))) {
             mView.setVisibility(GONE);
         }
     }

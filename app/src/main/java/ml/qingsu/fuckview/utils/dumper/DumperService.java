@@ -16,6 +16,16 @@ public class DumperService extends AccessibilityService {
 
 
     @Override
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+
+    }
+
+    @Override
+    public void onInterrupt() {
+
+    }
+
+    @Override
     protected void onServiceConnected() {
         instance = this;
         super.onServiceConnected();
@@ -31,13 +41,4 @@ public class DumperService extends AccessibilityService {
 
     }
 
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-        //NOTHING
-    }
-
-    @Override
-    public void onInterrupt() {
-        //NOTHING
-    }
 }

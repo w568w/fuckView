@@ -12,7 +12,7 @@ import android.widget.TextView;
  */
 
 public final class ViewUtils {
-    public static String getClassName(Class<?> clz){
+    public static String getClassName(Class<?> clz) {
         final String name = clz.getName();
         final int dot = name.lastIndexOf('.');
         if (dot != -1) {
@@ -20,15 +20,16 @@ public final class ViewUtils {
         }
         return name;
     }
+
     public static String getViewPath(View v) {
         ViewParent viewParent = v.getParent();
         Object object = v;
-        StringBuilder path = new StringBuilder();
+        final StringBuilder path = new StringBuilder();
         while (viewParent != null) {
             if (viewParent instanceof ViewGroup) {
                 final int len = ((ViewGroup) viewParent).getChildCount();
                 for (int i = 0; i < len; i++) {
-                    View child = ((ViewGroup) viewParent).getChildAt(i);
+                    final View child = ((ViewGroup) viewParent).getChildAt(i);
                     if (child.equals(object)) {
                         path.append(i).append("|").append(getClassName(child.getClass())).append("/");
                     }
@@ -56,9 +57,9 @@ public final class ViewUtils {
             return ((TextView) view).getText().toString();
         }
         if (view instanceof ViewGroup) {
-            final int len=((ViewGroup) view).getChildCount();
+            final int len = ((ViewGroup) view).getChildCount();
             for (int i = 0; i < len; i++) {
-                View child = ((ViewGroup) view).getChildAt(i);
+                final View child = ((ViewGroup) view).getChildAt(i);
                 if (child instanceof TextView) {
                     return ((TextView) child).getText().toString().replace("\n", "");
                 }
@@ -71,7 +72,7 @@ public final class ViewUtils {
      * Also @see ml.qingsu.fuckview.ui.popups.DumpViewerPopupView#getAllText(View)
      */
     public static String getAllText(View view) {
-        StringBuilder allText = new StringBuilder();
+        final StringBuilder allText = new StringBuilder();
         if (view == null) {
             return "";
         }
@@ -79,11 +80,11 @@ public final class ViewUtils {
             return ((TextView) view).getText().toString();
         }
         if (view instanceof ViewGroup) {
-            final int len=((ViewGroup) view).getChildCount();
+            final int len = ((ViewGroup) view).getChildCount();
             for (int i = 0; i < len; i++) {
                 View child = ((ViewGroup) view).getChildAt(i);
                 if (child instanceof TextView) {
-                    if (!(allText.length() == 0)) {
+                    if (allText.length() != 0) {
                         allText.append(((TextView) child).getText().toString().replace("\n", "")).append("|");
                     }
                 }

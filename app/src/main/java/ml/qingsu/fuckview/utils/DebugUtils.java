@@ -27,7 +27,7 @@ public class DebugUtils {
     }
 
     /**
-     *Hook某个类的所有方法
+     * Hook某个类的所有方法
      */
     public static void hookEveryMethods(Class<?> clz, XC_MethodHook methodHook) {
         Method[] methods = clz.getDeclaredMethods();

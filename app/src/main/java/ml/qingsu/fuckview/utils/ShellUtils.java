@@ -37,6 +37,7 @@ public class ShellUtils {
     private ShellUtils() {
         throw new AssertionError();
     }
+
     public static void killProcess(String pkg) throws IOException {
         java.lang.Process process = Runtime.getRuntime().exec("su");
         OutputStream out = process.getOutputStream();
@@ -51,6 +52,7 @@ public class ShellUtils {
             e.printStackTrace();
         }
     }
+
     /**
      * check whether has root permission
      *

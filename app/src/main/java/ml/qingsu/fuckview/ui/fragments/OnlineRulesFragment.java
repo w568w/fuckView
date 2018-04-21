@@ -18,8 +18,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.OnlineRulesUtils;
 
@@ -33,6 +33,7 @@ public class OnlineRulesFragment extends Fragment {
     ArrayList<BlockModel> mRules;
     SwipeRefreshLayout mLayout;
     ProgressBar mProgressBar;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -40,14 +41,14 @@ public class OnlineRulesFragment extends Fragment {
 
         mInfo = (TextView) layout.findViewById(R.id.online_rules_info);
         mDownload = (Button) layout.findViewById(R.id.online_rules_download);
-        mProgressBar=(ProgressBar)layout.findViewById(R.id.online_rules_progressBar);
+        mProgressBar = (ProgressBar) layout.findViewById(R.id.online_rules_progressBar);
         mLayout = layout;
         mDownload.setEnabled(false);
 
         mDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRules==null) {
+                if (mRules == null) {
                     return;
                 }
                 mProgressBar.setMax(mRules.size());
@@ -118,7 +119,7 @@ public class OnlineRulesFragment extends Fragment {
         }
     }
 
-    private class FliterTask extends AsyncTask<ArrayList<BlockModel>,Integer,ArrayList<BlockModel>>{
+    private class FliterTask extends AsyncTask<ArrayList<BlockModel>, Integer, ArrayList<BlockModel>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -148,17 +149,17 @@ public class OnlineRulesFragment extends Fragment {
         @SafeVarargs
         @Override
         protected final ArrayList<BlockModel> doInBackground(ArrayList<BlockModel>... params) {
-            ArrayList<BlockModel> models=params[0];
-            ArrayList<BlockModel> flitered=new ArrayList<>();
-            ArrayList<BlockModel> originModels=MainActivity.read();
-            PackageManager packageManager=getActivity().getPackageManager();
+            ArrayList<BlockModel> models = params[0];
+            ArrayList<BlockModel> flitered = new ArrayList<>();
+            ArrayList<BlockModel> originModels = MainActivity.read();
+            PackageManager packageManager = getActivity().getPackageManager();
             for (int len = models.size(), i = 0; i < len; i++) {
                 publishProgress(i);
                 BlockModel blockModel = models.get(i);
                 try {
                     //去重&检查包名是否存在
                     packageManager.getApplicationInfo(blockModel.packageName, 0);
-                    if(!originModels.contains(blockModel)) {
+                    if (!originModels.contains(blockModel)) {
                         flitered.add(blockModel);
                     }
                 } catch (PackageManager.NameNotFoundException ignored) {

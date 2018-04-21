@@ -3,7 +3,6 @@ package ml.qingsu.fuckview.ui.popups;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
@@ -19,8 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
@@ -29,8 +26,8 @@ import ml.qingsu.fuckview.base.BasePopupWindow;
 import ml.qingsu.fuckview.hook.ViewReceiver;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.FirstRun;
+import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.dumper.ViewDumper;
 import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
 
@@ -68,7 +65,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
         LinearLayout layout = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.dump_viewer_view, null);
         mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
         mInfo = (TextView) layout.findViewById(R.id.dump_info);
-        mClosingProgress= (ProgressBar) layout.findViewById(R.id.dump_progress);
+        mClosingProgress = (ProgressBar) layout.findViewById(R.id.dump_progress);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
         if (isLayoutParsingEnabled) {
@@ -100,6 +97,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
                             mClosingProgress.setVisibility(View.GONE);
                             MainActivity.writePreferences("", Constant.PACKAGE_NAME_NAME);
                             appContext.unregisterReceiver(mReceiver);
+                            appContext.startActivity(new Intent(appContext, MainActivity.class));
                         }
                     });
                 } catch (IllegalArgumentException e) {
@@ -133,7 +131,8 @@ public class DumpViewerPopupView extends BasePopupWindow {
         });
         return layout;
     }
-    private void asyncStopProcess(final String pkgName, final Runnable callback){
+
+    private void asyncStopProcess(final String pkgName, final Runnable callback) {
         singleThreadPool.execute(new Runnable() {
             @Override
             public void run() {
@@ -141,14 +140,14 @@ public class DumpViewerPopupView extends BasePopupWindow {
                     ShellUtils.killProcess(pkgName);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-                finally {
+                } finally {
                     mInfo.post(callback);
                 }
 
             }
         });
     }
+
     @Override
     protected void onShow() {
         super.onShow();

@@ -47,8 +47,7 @@ public class InitInjector implements IXposedHookLoadPackage {
                 super.afterHookedMethod(param);
                 Context context = (Context) param.args[0];
                 if (context != null) {
-                    PackageManager manager = context.getPackageManager();
-                    List<PackageInfo> list = manager.getInstalledPackages(0);
+                    List<PackageInfo> list = context.getPackageManager().getInstalledPackages(0);
                     int size = list.size();
                     String pkgPath = null;
                     for (int i = 0; i < size; i++) {

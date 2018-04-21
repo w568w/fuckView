@@ -103,4 +103,5 @@
     <string name="module_active">Fuckview está ativo.</string>
     <string name="module_not_active">Fuckview não está ativo.</string>
     <string name="force_closing">Forçar fechamento ...</string>
+    <string name="start_app">Iniciar app</string>
 </resources>

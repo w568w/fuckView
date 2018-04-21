@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import ml.qingsu.fuckview.R;
 
 /**
- *
  * @author w568w
  * @date 2017-7-27
  */

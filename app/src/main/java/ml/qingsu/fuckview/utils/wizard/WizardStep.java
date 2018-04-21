@@ -11,7 +11,6 @@ public class WizardStep extends Fragment {
     protected Activity mCon;
 
 
-
     public WizardStep() {
         super();
     }

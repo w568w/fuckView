@@ -23,15 +23,16 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.utils.ShellUtils;
 
 import static ml.qingsu.fuckview.Constant.ENABLE_LOG_NAME;
+import static ml.qingsu.fuckview.Constant.ONLY_ONCE_NAME;
 import static ml.qingsu.fuckview.Constant.STANDARD_MODE_NAME;
 import static ml.qingsu.fuckview.Constant.SUPER_MODE_NAME;
-import static ml.qingsu.fuckview.Constant.ONLY_ONCE_NAME;
 
 public class PreferencesActivity extends PreferenceActivity {
     private int clickTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme",false)){
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
         }
         super.onCreate(savedInstanceState);
@@ -175,10 +176,10 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 finish();
-                Intent restart=new Intent(PreferencesActivity.this,MainActivity.class);
+                Intent restart = new Intent(PreferencesActivity.this, MainActivity.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                }else {
+                    restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                } else {
                     restart.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
                 startActivity(restart);

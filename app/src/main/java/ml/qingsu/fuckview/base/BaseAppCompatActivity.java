@@ -14,12 +14,12 @@ import com.tencent.bugly.crashreport.CrashReport;
  * @author w568w
  */
 
-public abstract class BaseAppCompatActivity extends AppCompatActivity{
+public abstract class BaseAppCompatActivity extends AppCompatActivity {
     @Override
     public void startActivity(Intent intent, @Nullable Bundle options) {
         try {
             super.startActivity(intent, options);
-        }catch (ActivityNotFoundException e){
+        } catch (ActivityNotFoundException e) {
             CrashReport.postCatchedException(e);
         }
     }

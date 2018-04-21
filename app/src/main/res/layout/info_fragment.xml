@@ -54,8 +54,8 @@
             android:includeFontPadding="false"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:text="  ID  "
             android:textColor="#fff"
+            android:text=" ID "
             android:textSize="16sp" />
 
         <TextView

@@ -101,7 +101,10 @@
     <string name="conf_enable_floating_window_des">[Unrecommended] Enable layout parsing in the floating window.</string>
     <string name="module_active">Fuckview is active.</string>
     <string name="module_not_active">Fuckview is not active.</string>
-    <string name="force_closing">Force Closing ...</string>
+    <string name="force_closing">Force Closing …</string>
     <string name="finish_guide">Finish</string>
     <string name="dont_show_again">Don\'t show again</string>
+    <string name="start_app">Start app</string>
+    <string name="checking">Self Checking…</string>
+    <string name="check_item_method_invoked">(For debuger)Whether hooks could be successful</string>
 </resources>

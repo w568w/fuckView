@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -39,9 +38,9 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import ml.qingsu.fuckview.Constant;
-import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 
@@ -204,6 +203,7 @@ public class MainFragment extends Fragment implements Searchable {
         menu.add(0, 1, Menu.NONE, R.string.delete_item);
         menu.add(0, 3, Menu.NONE, R.string.share);
         menu.add(0, 6, Menu.NONE, model.enable ? R.string.disable_item : R.string.enable_item);
+        menu.add(0, 7, Menu.NONE, R.string.start_app);
     }
 
     @Override
@@ -212,6 +212,7 @@ public class MainFragment extends Fragment implements Searchable {
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+
     }
 
     @Override
@@ -273,6 +274,14 @@ public class MainFragment extends Fragment implements Searchable {
                 models.set(menuInfo.position, model);
                 adapter.notifyDataSetChanged();
                 saveAll();
+                break;
+            case 7:
+                try {
+                    startActivity(pm.getLaunchIntentForPackage(model.packageName));
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), R.string.cant_start_app, Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
                 break;
             default:
                 break;

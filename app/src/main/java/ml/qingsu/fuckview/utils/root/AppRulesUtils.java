@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 
@@ -32,6 +31,7 @@ public class AppRulesUtils {
 
     /**
      * 保存配置文件
+     *
      * @param context context
      * @param config  配置字符串，一般直接存放 json 字符串
      * @return
@@ -69,6 +69,7 @@ public class AppRulesUtils {
 
     /**
      * 删除一个 App 规则
+     *
      * @param context  context
      * @param fileName 一个App一个文件, 使用包名
      * @return
@@ -157,8 +158,9 @@ public class AppRulesUtils {
 
 
     /**
-     *  todo 可以直接转成 对象
-     *  读取规则文件
+     * todo 可以直接转成 对象
+     * 读取规则文件
+     *
      * @return
      */
     public static String readRule(String fileName) {
@@ -197,8 +199,9 @@ public class AppRulesUtils {
 
 
     /**
-     *  修改文件权限
-     *  setFilePermissions(file, 0777, -1, -1);
+     * 修改文件权限
+     * setFilePermissions(file, 0777, -1, -1);
+     *
      * @param file
      * @param chmod
      * @param uid
@@ -225,8 +228,9 @@ public class AppRulesUtils {
     }
 
     /**
-     *  修改文件权限
-     *  setFilePermissions(path, 0777, -1, -1);
+     * 修改文件权限
+     * setFilePermissions(path, 0777, -1, -1);
+     *
      * @param path
      * @param chmod
      * @param uid

@@ -2,12 +2,12 @@
 <resources>
     <string name="app_name">净眼</string>
     <string name="des">干掉你不喜欢的View!</string>
-    <string name="service_des">用於淨眼的佈局解析等。</string>
+    <string name="service_des">用于淨眼的布局解析等。</string>
     <string name="xposed_is_unabled">模块未启用/更新</string>
     <string name="enable_module">请在Xposed Installer中启用我，然后软重启以激活!\n(有时可能是误判，请自行验证屏蔽是否正常)</string>
     <string name="OK">好</string>
     <string name="captured">已捕获</string>
-    <string name="notification_title">Online:%1$d regra \\n Local:%2$d regra</string>
+    <string name="notification_title">净眼(点击这里屏蔽)</string>
     <string name="no_file_ro_permission">emmm… 似乎你的手机上没有授权管理，请手动给予净眼文件读写权限！</string>
     <string name="delete_selections">删除选中项</string>
     <string name="share_selections">分享选中项</string>
@@ -105,4 +105,7 @@
     <string name="force_closing">强制停止中...</string>
     <string name="finish_guide">结束教程</string>
     <string name="dont_show_again">不再提示</string>
+    <string name="start_app">启动该应用</string>
+    <string name="checking">自检进行中,请给予必要权限...</string>
+    <string name="check_item_method_invoked">钩子是否能调用,Failed=模块可能无效</string>
 </resources>

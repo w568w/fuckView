@@ -91,20 +91,30 @@ public abstract class BaseWizard extends Fragment {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pager.arrowScroll(View.FOCUS_BACKWARD);
+                scrollToPrev();
             }
         });
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position < settings.fragments.length - 1) {
-                    pager.arrowScroll(View.FOCUS_FORWARD);
-                } else {
-                    onWizardComplete();
-                }
+                scrollToNext();
             }
         });
         return linearLayout;
+    }
+
+    public void scrollToNext() {
+        if (position < settings.fragments.length - 1) {
+            pager.arrowScroll(View.FOCUS_FORWARD);
+        } else {
+            onWizardComplete();
+        }
+    }
+
+    public void scrollToPrev() {
+        if (position > 0) {
+            pager.arrowScroll(View.FOCUS_BACKWARD);
+        }
     }
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {

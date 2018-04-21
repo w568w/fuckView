@@ -10,7 +10,6 @@ import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.models.ViewModel;
 
 /**
- *
  * @author w568w
  * @date 18-1-20
  */

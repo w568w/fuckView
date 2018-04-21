@@ -30,13 +30,13 @@ import ml.qingsu.fuckview.utils.dumper.ViewDumper;
  * Created by w568w on 2017-7-29.
  */
 
-class FullScreenPopupWindow extends BasePopupWindow {
+public class FullScreenPopupWindow extends BasePopupWindow {
     private ArrayList<ViewDumper.ViewItem> list;
     private AbsoluteLayout absoluteLayout;
     private String pkg;
     private DumpViewerPopupView popupView;
 
-    FullScreenPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, DumpViewerPopupView popupView) {
+    public FullScreenPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, DumpViewerPopupView popupView) {
         super(activity);
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
         params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
@@ -80,7 +80,7 @@ class FullScreenPopupWindow extends BasePopupWindow {
                             if (item.getTitle().equals(context.getString(R.string.popup_mark_it))) {
                                 ViewDumper.ViewItem item1 = (ViewDumper.ViewItem) view.getTag();
                                 Point p = item1.bounds;
-                                MainActivity.appendPreferences("\n" + new ViewModel(pkg, " "+MainActivity.ALL_SPLIT+" "+MainActivity.ALL_SPLIT+p.x + "," + p.y + "$$", "", "*").toString(), Constant.LIST_NAME);
+                                MainActivity.appendPreferences("\n" + new ViewModel(pkg, " " + MainActivity.ALL_SPLIT + " " + MainActivity.ALL_SPLIT + p.x + "," + p.y + "$$", "", "*").toString(), Constant.LIST_NAME);
                                 Toast.makeText(getActivity(), R.string.rule_saved, Toast.LENGTH_SHORT).show();
 
                             }
@@ -106,7 +106,7 @@ class FullScreenPopupWindow extends BasePopupWindow {
         absoluteLayout.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode==KeyEvent.KEYCODE_BACK){
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
                     hide();
                     popupView.show();
                     return true;
@@ -128,6 +128,7 @@ class FullScreenPopupWindow extends BasePopupWindow {
 
     /**
      * 上层View点击后会使下层接收不到事件，这里用了一种极其愚蠢的方法...
+     *
      * @param x x axis
      * @param y y axis
      * @return
