@@ -52,7 +52,6 @@ public class OnlineRulesFragment extends Fragment {
                     return;
                 }
                 mProgressBar.setMax(mRules.size());
-                //noinspection unchecked
                 new FliterTask().execute(mRules);
             }
         });
@@ -138,12 +137,12 @@ public class OnlineRulesFragment extends Fragment {
             super.onPostExecute(blockModels);
             mProgressBar.setVisibility(View.INVISIBLE);
 
-            //MainActivity.writePreferences("", MainActivity.LIST_NAME);
             for (BlockModel bm : blockModels) {
                 bm.save();
             }
             //Refresh Rules...
             mLayout.setRefreshing(true);
+            new RefreshTask().execute();
         }
 
         @SafeVarargs
@@ -156,6 +155,9 @@ public class OnlineRulesFragment extends Fragment {
             for (int len = models.size(), i = 0; i < len; i++) {
                 publishProgress(i);
                 BlockModel blockModel = models.get(i);
+                if(blockModel==null){
+                    continue;
+                }
                 try {
                     //去重&检查包名是否存在
                     packageManager.getApplicationInfo(blockModel.packageName, 0);
