@@ -84,7 +84,7 @@ public class MainFragment extends Fragment implements Searchable {
         pm = context.getPackageManager();
         FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.main_fragment, null);
         listView = (ListView) layout.findViewById(R.id.listView);
-        models = MainActivity.read();
+        models = BlockModel.readModel();
         try {
             Collections.sort(models, new Comparator<BlockModel>() {
                 @Override

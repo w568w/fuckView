@@ -243,28 +243,6 @@ public class MainActivity extends BaseAppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static ArrayList<BlockModel> read() {
-        ArrayList<BlockModel> list = new ArrayList<>();
-
-        ArrayList<String> lines = readPreferenceByLine(Constant.LIST_NAME);
-        for (String str : lines) {
-            BlockModel model = BlockModel.fromString(str);
-            if (model == null) {
-                continue;
-            }
-            if (model.record.contains(ALL_SPLIT)) {
-                model = ViewModel.fromString(str);
-            } else {
-                //轉換老版(0.8.5-)規則到新版
-                model = ViewModel.fromString(ConvertUtils.oldToNew(model).toString());
-            }
-            if (model != null) {
-                list.add(model);
-            }
-        }
-        return list;
-    }
-
     private void processFile() {
         final File oldFile = new File(getSDPath() + "/fuckview/" + Constant.LIST_NAME);
         if (oldFile.exists()) {

@@ -91,12 +91,13 @@ public class Step1 extends WizardStep implements Searchable {
                 }
                 break;
             case 2:
-                try {
-                    ShellUtils.killProcess(info.packageName);
-                    Toast.makeText(mCon, R.string.finish, Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ShellUtils.asyncStopProcess(info.packageName, new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mCon, R.string.finish, Toast.LENGTH_SHORT).show();
+                    }
+                }, mList);
+
                 break;
             default:
                 break;

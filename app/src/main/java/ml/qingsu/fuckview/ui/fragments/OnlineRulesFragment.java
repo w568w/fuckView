@@ -20,11 +20,12 @@ import java.util.Locale;
 
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.models.BlockModel;
-import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.utils.OnlineRulesUtils;
 
 /**
- * Created by w568w on 18-1-26.
+ *
+ * @author w568w
+ * @date 18-1-26
  */
 
 public class OnlineRulesFragment extends Fragment {
@@ -52,6 +53,7 @@ public class OnlineRulesFragment extends Fragment {
                     return;
                 }
                 mProgressBar.setMax(mRules.size());
+                //noinspection unchecked
                 new FliterTask().execute(mRules);
             }
         });
@@ -97,14 +99,17 @@ public class OnlineRulesFragment extends Fragment {
         @Override
         protected void onPostExecute(Object blockModels) {
             super.onPostExecute(blockModels);
+            //Fragment  OnlineRulesFragment not attached to Activity
+            if (!isVisible()) {
+                return;
+            }
             mLayout.setRefreshing(false);
             if (blockModels instanceof Exception) {
-
                 mInfo.setText(Log.getStackTraceString((Throwable) blockModels));
             } else if (blockModels instanceof ArrayList) {
                 mDownload.setEnabled(true);
                 mRules = (ArrayList<BlockModel>) blockModels;
-                mInfo.setText(String.format(Locale.getDefault(), getString(R.string.online_rules_info), mRules.size(), MainActivity.read().size()));
+                mInfo.setText(String.format(Locale.getDefault(), getString(R.string.online_rules_info), mRules.size(), BlockModel.readModel().size()));
             }
         }
 
@@ -150,7 +155,7 @@ public class OnlineRulesFragment extends Fragment {
         protected final ArrayList<BlockModel> doInBackground(ArrayList<BlockModel>... params) {
             ArrayList<BlockModel> models = params[0];
             ArrayList<BlockModel> flitered = new ArrayList<>();
-            ArrayList<BlockModel> originModels = MainActivity.read();
+            ArrayList<BlockModel> originModels = BlockModel.readModel();
             PackageManager packageManager = getActivity().getPackageManager();
             for (int len = models.size(), i = 0; i < len; i++) {
                 publishProgress(i);

@@ -624,10 +624,6 @@ public class Hook {
             return ViewBlocker.getInstance().log(view);
         }
 
-        private void save() {
-            throw new UnsupportedOperationException("Can not save in Hook class");
-        }
-
         @Override
         public String toString() {
             return String.format(Locale.CHINA, "%s@@@%s@@@%s@@@%s@@@%s", packageName, record, text, className, enable + "");

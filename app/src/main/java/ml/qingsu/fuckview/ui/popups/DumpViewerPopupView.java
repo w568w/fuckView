@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +29,8 @@ import ml.qingsu.fuckview.utils.FirstRun;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.dumper.ViewDumper;
 import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Created by w568w on 2017-7-12.
@@ -90,16 +91,17 @@ public class DumpViewerPopupView extends BasePopupWindow {
                 mInfo.setText(R.string.force_closing);
                 mClosingProgress.setVisibility(View.VISIBLE);
                 try {
-                    asyncStopProcess(mPackageName, new Runnable() {
+                    ShellUtils.asyncStopProcess(mPackageName, new Runnable() {
                         @Override
                         public void run() {
                             hide();
                             mClosingProgress.setVisibility(View.GONE);
                             MainActivity.writePreferences("", Constant.PACKAGE_NAME_NAME);
                             appContext.unregisterReceiver(mReceiver);
-                            appContext.startActivity(new Intent(appContext, MainActivity.class));
+                            //Calling startActivity() from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK flag.
+                            appContext.startActivity(new Intent(appContext, MainActivity.class).addFlags(FLAG_ACTIVITY_NEW_TASK));
                         }
-                    });
+                    }, mInfo);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }
@@ -132,21 +134,6 @@ public class DumpViewerPopupView extends BasePopupWindow {
         return layout;
     }
 
-    private void asyncStopProcess(final String pkgName, final Runnable callback) {
-        singleThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ShellUtils.killProcess(pkgName);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    mInfo.post(callback);
-                }
-
-            }
-        });
-    }
 
     @Override
     protected void onShow() {

@@ -1,13 +1,16 @@
 package ml.qingsu.fuckview.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.utils.ConvertUtils;
 
 /**
  * Moved by w568w on 18-2-4.
+ * @author w568w
  */
 public class BlockModel implements Serializable {
     public String record;
@@ -44,6 +47,28 @@ public class BlockModel implements Serializable {
             return new BlockModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
         }
         return null;
+    }
+
+    public static ArrayList<BlockModel> readModel() {
+        ArrayList<BlockModel> list = new ArrayList<>();
+
+        ArrayList<String> lines = MainActivity.readPreferenceByLine(Constant.LIST_NAME);
+        for (String str : lines) {
+            BlockModel model = fromString(str);
+            if (model == null) {
+                continue;
+            }
+            if (model.record.contains(MainActivity.ALL_SPLIT)) {
+                model = ViewModel.fromString(str);
+            } else {
+                //轉換老版(0.8.5-)規則到新版
+                model = ViewModel.fromString(ConvertUtils.oldToNew(model).toString());
+            }
+            if (model != null) {
+                list.add(model);
+            }
+        }
+        return list;
     }
 
 

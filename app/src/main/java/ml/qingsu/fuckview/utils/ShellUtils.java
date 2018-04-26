@@ -1,5 +1,7 @@
 package ml.qingsu.fuckview.utils;
 
+import android.view.View;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * ShellUtils
@@ -28,7 +32,7 @@ import java.util.List;
  * @modifier w568w 2017-6-21
  */
 public class ShellUtils {
-
+    private static ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
     public static final String COMMAND_SU = "su";
     public static final String COMMAND_SH = "sh";
     public static final String COMMAND_EXIT = "exit\n";
@@ -53,6 +57,23 @@ public class ShellUtils {
         }
     }
 
+    public static void asyncStopProcess(final String pkgName, final Runnable callback, final View runner) {
+        singleThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ShellUtils.killProcess(pkgName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (runner != null) {
+                        runner.post(callback);
+                    }
+                }
+
+            }
+        });
+    }
     /**
      * check whether has root permission
      *
