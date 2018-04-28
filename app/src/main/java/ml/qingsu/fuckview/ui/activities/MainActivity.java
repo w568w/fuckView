@@ -65,6 +65,7 @@ public class MainActivity extends BaseAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final SharedPreferences settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //Setting the theme
         if (settingsPreferences.getBoolean("theme", false)) {
             setTheme(R.style.DayTheme);
         }
@@ -118,14 +119,13 @@ public class MainActivity extends BaseAppCompatActivity {
     private void dealWithIntent() {
         writePreferences("", Constant.PACKAGE_NAME_NAME);
 
-        //此处详见Hook.java
-        //是否从通知栏里点过来
-        boolean isDialog = getIntent().getBooleanExtra("Dialog", false);
+        //Does the activity start from the notification bar?
+        boolean isFromNotification = getIntent().getBooleanExtra("Dialog", false);
         String cache = getIntent().getStringExtra("cache");
         if (cache == null) {
             return;
         }
-        if (isDialog) {
+        if (isFromNotification) {
             final ViewModel blockInfo = ViewModel.fromString(cache);
             if (blockInfo == null) {
                 return;
@@ -233,8 +233,6 @@ public class MainActivity extends BaseAppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //为啥不用switch呢？
-        //懒....
         if (item.getItemId() == R.id.action_about) {
             setFragment(new CheckerFragment());
         } else if (item.getItemId() == R.id.action_settings) {
@@ -246,6 +244,8 @@ public class MainActivity extends BaseAppCompatActivity {
     private void processFile() {
         final File oldFile = new File(getSDPath() + "/fuckview/" + Constant.LIST_NAME);
         if (oldFile.exists()) {
+            //Do not need to be translated
+            //because (I'm lazy and) the version 0.8.3.1 and below are never shown out of a Chinese App Market named CoolApk.
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -302,7 +302,7 @@ public class MainActivity extends BaseAppCompatActivity {
     }
 
     /**
-     * @return SD卡路径
+     * @return SD card Path (only when it's readable) or External Storage Path
      */
     @Nullable
     public static String getSDPath() {

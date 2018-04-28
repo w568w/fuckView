@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.support.annotation.Keep;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -34,12 +35,26 @@ public class InitInjector implements IXposedHookLoadPackage {
     }
 
     @Override
+    @Keep
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         //Moved (see Issue #3)
         if (PKG_NAME.equals(loadPackageParam.packageName)) {
-            XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
-                    VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
-            return;
+            try {
+                XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
+                        VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
+                return;
+                // FIXME: 18-4-28 this error is often reported for unknown reason.
+                /*
+                Reporter's log:
+                 W/System  ( 9297): ClassLoader referenced unknown path: /data/app/ml.qingsu.fuckview-1/lib/arm
+                 E/Xposed  ( 9297): java.lang.NoSuchMethodError: ml.qingsu.fuckview.ui.activities.MainActivity#isModuleActive()#exact
+                 E/Xposed  ( 9297): 	at de.robv.android.xposed.XposedHelpers.findMethodExact(XposedHelpers.java:344)
+                 E/Xposed  ( 9297): 	at de.robv.android.xposed.XposedHelpers.findAndHookMethod(XposedHelpers.java:185)
+                 E/Xposed  ( 9297): 	at ml.qingsu.fuckview.hook.InitInjector.handleLoadPackage(Unknown Source)
+                * */
+            }catch (NoSuchMethodError error){
+                error.printStackTrace();
+            }
         }
         XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
             @Override

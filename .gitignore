@@ -10,3 +10,5 @@
 /captures
 .externalNativeBuild
 .idea
+keystore/xd.keystore
+gradle.properties

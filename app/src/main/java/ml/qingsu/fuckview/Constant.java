@@ -22,7 +22,7 @@ public class Constant {
     public static final String ENABLE_LOG_NAME = "enable_log";
     public static final String PACKAGE_NAME_NAME = "package_name";
 
-    //DO not draw your attention to the codes below.
+    //DO not draw your attention to the codes below,which are useless, meaningless and not used anywhen.
 
     private static Object[] helperArray = new Object[1];
 

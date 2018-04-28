@@ -263,8 +263,7 @@ public class MainFragment extends Fragment implements Searchable {
                 deleteList.clear();
                 StringBuilder stringBuilder = new StringBuilder();
                 for (BlockModel model1 : shares) {
-                    stringBuilder.append(model1.toString());
-                    stringBuilder.append("\n");
+                    stringBuilder.append(model1.toString()).append("\n");
                 }
                 share(stringBuilder.toString());
                 adapter.notifyDataSetChanged();
@@ -346,10 +345,10 @@ public class MainFragment extends Fragment implements Searchable {
                 @Override
                 public void onClick(View view) {
                     boolean isChecked = contains(deleteList, i);
-                    if (!isChecked) {
-                        deleteList.add(i);
-                    } else {
+                    if (isChecked) {
                         deleteList.remove(Integer.valueOf(i));
+                    } else {
+                        deleteList.add(i);
                     }
                     getActivity().setTitle(deleteList.isEmpty() ? R.string.app_name : R.string.multi_select);
                 }
@@ -359,20 +358,21 @@ public class MainFragment extends Fragment implements Searchable {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));
             } catch (Exception e) {
-                //未找到该应用
+                //Application not found
                 icon.setImageResource(R.drawable.ic_launcher);
                 title.setText(bm.packageName);
             }
             //是否是经典模式
-            if ("".equals(bm.text)) {
+
+            if (bm.text.isEmpty()) {
                 type.setText(bm.className);
             } else {
-                type.setText(String.format(Locale.CHINA, "%s ---> %s", bm.className, bm.text));
+                type.setText(String.format( "%s ---> %s", bm.className, bm.text));
             }
             if (!bm.enable) {
                 view.setBackgroundColor(Color.GRAY);
             }
-            if (!"".equals(searchText) && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
+            if (!searchText.isEmpty() && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
                 view = new View(context);
                 view.setVisibility(View.GONE);
             }

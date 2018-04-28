@@ -12,7 +12,7 @@
     <string name="share_selections">Share Selections</string>
     <string name="confirm">Confirm?</string>
     <string name="cancel">Cancel</string>
-    <string name="no_share_app">No app which can share to.</string>
+    <string name="no_share_app">No app which the rule can be shared to.</string>
     <string name="select_app_tip">Select App (Force stop that app beforehand，otherwise Fuckview can\'t work properly.)</string>
     <string name="parse_view">Parse</string>
     <string name="prev_step">Prev</string>

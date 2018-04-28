@@ -10,6 +10,7 @@ import ml.qingsu.fuckview.utils.ConvertUtils;
 
 /**
  * Moved by w568w on 18-2-4.
+ *
  * @author w568w
  */
 public class BlockModel implements Serializable {
@@ -50,10 +51,12 @@ public class BlockModel implements Serializable {
     }
 
     public static ArrayList<BlockModel> readModel() {
-        ArrayList<BlockModel> list = new ArrayList<>();
+        final ArrayList<BlockModel> list = new ArrayList<>();
 
         ArrayList<String> lines = MainActivity.readPreferenceByLine(Constant.LIST_NAME);
-        for (String str : lines) {
+        final int len = lines.size();
+        for (int i = 0; i < len; i++) {
+            String str = lines.get(i);
             BlockModel model = fromString(str);
             if (model == null) {
                 continue;
