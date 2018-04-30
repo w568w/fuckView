@@ -31,7 +31,6 @@ public abstract class BasePopupWindow {
         this.appContext = activity.getApplicationContext();
         mWindowManager = (WindowManager) appContext.getSystemService(Context.WINDOW_SERVICE);
         params = new WindowManager.LayoutParams();
-        //params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         params.flags = FLAG_NOT_TOUCH_MODAL;
         params.format = PixelFormat.TRANSLUCENT;

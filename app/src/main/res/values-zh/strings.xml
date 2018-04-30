@@ -28,7 +28,7 @@
     <string name="finish">我们开始吧</string>
     <string name="step1_title">欢迎</string>
     <string name="welcome_word">嗨！\n你是否在一些app中见过\"精品推荐\"\"现在安装\"或者\"充值VIP\"?你是否对它们感到厌倦?\n净眼正是设计用来解决这些问题的,你将能够屏蔽它们,让它们彻底消失!\n现在，可能你想看看快速教程?:)</string>
-    <string name="welcome_i_want_a_guide">是的,我要看看教程!</string>
+    <string name="welcome_i_want_a_guide">是的,我要看看教程!(英文)</string>
     <string name="welcome_pass_guide">不看!</string>
     <string name="conf_super_mode_name">超强模式</string>
     <string name="conf_super_mode_des">打开后可能导致误杀和卡顿，但对于广告有奇效</string>
@@ -108,4 +108,8 @@
     <string name="start_app">启动该应用</string>
     <string name="checking">自检进行中,请给予必要权限...</string>
     <string name="check_item_method_invoked">钩子是否能调用,Failed=模块可能无效</string>
+    <string name="ask_for_rating">感觉用起来还行? 为什么不给这个用着32M内存，5寸显示屏和一代奔腾CPU的古董电脑的可怜的开发者一个好评呢?</string>
+    <string name="thats_okay">好吧...</string>
+    <string name="fuck">滚</string>
+    <string name="feel_bad">开发者哭晕在厕所...</string>
 </resources>

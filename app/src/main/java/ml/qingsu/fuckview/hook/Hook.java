@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -34,9 +35,11 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
+import static ml.qingsu.fuckview.Constant.Ad.GOOGLE_AD;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
 import static ml.qingsu.fuckview.utils.ViewUtils.getText;
@@ -703,7 +706,6 @@ public class Hook {
             Pair<Boolean, Integer> pair = isBlock(arrayList, o);
             if (onlyOnce && pair.second != null && pair.second >= 0) {
                 BlockModel blockModel = arrayList.remove((int) pair.second);
-
                 Hook.log("净眼:删除规则 -->" + blockModel);
             }
             return pair.first;
@@ -752,9 +754,19 @@ public class Hook {
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
             //log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
 //            log("list  --> "+arrayList);
+
             View view = (View) o;
+
             final String className = ViewUtils.getClassName(view.getClass());
             final int id = view.getId();
+            try {
+                if ("FrameLayout".equals(className) && view.getResources().getResourceName(id).contains(Constant.Ad.GOOGLE_AD)) {
+                    Hook.log("净眼:fuck a Google Ads Container!");
+                    return new Pair<>(true, -1);
+                }
+            } catch (Resources.NotFoundException ignored) {
+
+            }
             final String strId = id + "";
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
@@ -871,7 +883,6 @@ public class Hook {
                 return;
             }
             View view = (View) param.args[0];
-            final Context context = view.getContext();
             log("净眼:Message --> RemoveView");
             final BlockModel model = DialogBlocker.getInstance().log(view);
             log("净眼:Removed View -->" + model.record);

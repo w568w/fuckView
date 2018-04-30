@@ -107,4 +107,8 @@
     <string name="start_app">Start app</string>
     <string name="checking">Self Checking…</string>
     <string name="check_item_method_invoked">(For debuger)Whether hooks could be successful</string>
+    <string name="fuck">SHUT UP</string>
+    <string name="thats_okay">All Right...</string>
+    <string name="ask_for_rating">Feeling good?Why not give a star to this app for the poor developer who\'s using a old 5-inch computer with 32M memory and Pentium I CPU?</string>
+    <string name="feel_bad">The developer feels very bad...</string>
 </resources>

@@ -18,6 +18,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.Constant;
 
 import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
+import static ml.qingsu.fuckview.Constant.HOOK_CLASS;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
 
@@ -63,18 +64,18 @@ public class InitInjector implements IXposedHookLoadPackage {
                 Context context = (Context) param.args[0];
                 if (context != null) {
                     List<PackageInfo> list = context.getPackageManager().getInstalledPackages(0);
-                    int size = list.size();
+                    final int size = list.size();
                     String pkgPath = null;
                     for (int i = 0; i < size; i++) {
                         PackageInfo info = list.get(i);
-                        if (Constant.PKG_NAME.equals(info.packageName)) {
+                        if (PKG_NAME.equals(info.packageName)) {
                             pkgPath = info.applicationInfo.sourceDir;
                             break;
                         }
                     }
                     if (pkgPath != null) {
                         PathClassLoader loader = new PathClassLoader(pkgPath, ClassLoader.getSystemClassLoader());
-                        Class<?> hookerClz = Class.forName(Constant.PKG_NAME + ".hook.Hook", true, loader);
+                        Class<?> hookerClz = Class.forName(HOOK_CLASS, true, loader);
                         Object hooker = hookerClz.newInstance();
                         Method handleLoadPackage = hookerClz.getDeclaredMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
                         handleLoadPackage.invoke(hooker, loadPackageParam);

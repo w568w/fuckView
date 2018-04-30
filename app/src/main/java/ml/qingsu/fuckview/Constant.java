@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 public class Constant {
     public static final String PKG_NAME = "ml.qingsu.fuckview";
+    public static final String COOLAPK_MARKET_PKG_NAME = "com.coolapk.market";
     public static final String ACTIVITY_NAME = "ml.qingsu.fuckview.ui.activities.MainActivity";
     public static final String VAILD_METHOD = "isModuleActive";
 
@@ -22,8 +23,15 @@ public class Constant {
     public static final String ENABLE_LOG_NAME = "enable_log";
     public static final String PACKAGE_NAME_NAME = "package_name";
 
+    public static final String HOOK_CLASS = PKG_NAME + ".hook.Hook";
+    public static final String KEY_DONT_SHOW_ACTIVE_DIALOG = "dont_show_active";
+    public static final String KEY_DONT_SHOW_RATE_DIALOG = "dont_show_star";
+    public static final String KEY_THEME = "theme";
     //DO not draw your attention to the codes below,which are useless, meaningless and not used anywhen.
 
+    public static final class Ad{
+        public static final String GOOGLE_AD="ad_container";
+    }
     private static Object[] helperArray = new Object[1];
 
     /**

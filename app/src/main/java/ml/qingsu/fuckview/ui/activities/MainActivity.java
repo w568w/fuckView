@@ -38,46 +38,53 @@ import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseAppCompatActivity;
 import ml.qingsu.fuckview.implement.Searchable;
-import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
-import ml.qingsu.fuckview.utils.ConvertUtils;
+import ml.qingsu.fuckview.ui.popups.GuidePopupWindow;
 import ml.qingsu.fuckview.utils.FirstRun;
+
+import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
+import static ml.qingsu.fuckview.Constant.KEY_DONT_SHOW_RATE_DIALOG;
+import static ml.qingsu.fuckview.Constant.KEY_THEME;
 
 /**
  * @author w568w
  */
 public class MainActivity extends BaseAppCompatActivity {
+
     public boolean shouldShowFAQ = false;
 
     private static final int REQUEST_PERMISSION = 0x123;
     private static final int REQUEST_NEW_FRAGMENT = 0x124;
     public static final String ALL_SPLIT = "~~~";
     private static SharedPreferences sSharedPreferences;
+    private SharedPreferences mSettings;
     public Fragment currentFragment;
 
     @SuppressLint("WorldReadableFiles")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences settingsPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         //Setting the theme
-        if (settingsPreferences.getBoolean("theme", false)) {
+        if (mSettings.getBoolean(KEY_THEME, false)) {
             setTheme(R.style.DayTheme);
         }
         setContentView(R.layout.activity_main);
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 Toast.makeText(this, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse(String.format("package:%s", getPackageName()))));
             }
         }
+
+
         sSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
 
         dealWithIntent();
@@ -87,33 +94,39 @@ public class MainActivity extends BaseAppCompatActivity {
             //else if there's no rule...
         } else if ("".equals(readPreferences(Constant.LIST_NAME))) {
             setFragmentWithoutBack(new SelectAppWizard());
-            if (!isModuleActive() && !settingsPreferences.getBoolean("dont_show", false)) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.xposed_is_unabled)
-                        .setMessage(R.string.enable_module)
-                        .setPositiveButton(R.string.OK, null)
-                        .setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                settingsPreferences.edit()
-                                        .putBoolean("dont_show", true).apply();
-                            }
-                        })
-                        .show();
-            }
+            checkModuleActivated();
             //else we go to the main fragment...
         } else {
             setFragmentWithoutBack(new MainFragment());
-            if (!isModuleActive()) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.xposed_is_unabled)
-                        .setMessage(R.string.enable_module)
-                        .setPositiveButton(R.string.OK, null)
-                        .show();
+            if (isModuleActive()) {
+                giveMeFive();
+            } else {
+                checkModuleActivated();
             }
         }
+        //startGuide();
+    }
 
+    private void startGuide() {
 
+        new GuidePopupWindow(this).show();
+    }
+
+    private void checkModuleActivated() {
+        if (!isModuleActive() && !mSettings.getBoolean(Constant.KEY_DONT_SHOW_ACTIVE_DIALOG, false)) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.xposed_is_unabled)
+                    .setMessage(R.string.enable_module)
+                    .setPositiveButton(R.string.OK, null)
+                    .setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mSettings.edit()
+                                    .putBoolean(Constant.KEY_DONT_SHOW_ACTIVE_DIALOG, true).apply();
+                        }
+                    })
+                    .show();
+        }
     }
 
     private void dealWithIntent() {
@@ -136,6 +149,42 @@ public class MainActivity extends BaseAppCompatActivity {
             appendPreferences(cache, Constant.LIST_NAME);
         }
         Toast.makeText(this, R.string.rule_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    private void giveMeFive() {
+
+        if (!mSettings.getBoolean(KEY_DONT_SHOW_RATE_DIALOG, false)) {
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setMessage(R.string.ask_for_rating)
+                    .setPositiveButton(R.string.thats_okay, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Only published in CoolApk Market, Github and Xposed until now
+                            if (hasPackage(COOLAPK_MARKET_PKG_NAME)) {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName())));
+                            } else {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/w568w/fuckView")));
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.fuck, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, R.string.feel_bad, Toast.LENGTH_LONG).show();
+                            mSettings.edit().putBoolean(KEY_DONT_SHOW_RATE_DIALOG, true).apply();
+                        }
+                    }).show();
+        }
+    }
+
+    private boolean hasPackage(String packageName) {
+        try {
+            getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     private void checkAndCallPermission(String permission) {
@@ -245,7 +294,7 @@ public class MainActivity extends BaseAppCompatActivity {
         final File oldFile = new File(getSDPath() + "/fuckview/" + Constant.LIST_NAME);
         if (oldFile.exists()) {
             //Do not need to be translated
-            //because (I'm lazy and) the version 0.8.3.1 and below are never shown out of a Chinese App Market named CoolApk.
+            //because (I'm lazy and) the version 0.8.3.1 and below can never be got out of a Chinese App Market named CoolApk.
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

@@ -106,6 +106,7 @@ public abstract class BaseWizard extends Fragment {
     public void scrollToNext() {
         if (position < settings.fragments.length - 1) {
             pager.arrowScroll(View.FOCUS_FORWARD);
+            position++;
         } else {
             onWizardComplete();
         }
@@ -114,6 +115,24 @@ public abstract class BaseWizard extends Fragment {
     public void scrollToPrev() {
         if (position > 0) {
             pager.arrowScroll(View.FOCUS_BACKWARD);
+            position--;
+        }
+    }
+
+    public void scrollTo(int page) {
+        int orgPosition = page - position;
+        if (page >= settings.fragments.length) {
+            return;
+        }
+        if (orgPosition >= 0) {
+            for (int i = 0; i < orgPosition; i++) {
+                pager.arrowScroll(View.FOCUS_FORWARD);
+            }
+        } else {
+            orgPosition = -orgPosition;
+            for (int i = 0; i < orgPosition; i++) {
+                pager.arrowScroll(View.FOCUS_BACKWARD);
+            }
         }
     }
 

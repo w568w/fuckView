@@ -15,14 +15,6 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
-    signingConfigs {
-        releaseConfig {
-            storeFile file("../keystore/xd.keystore")
-            storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
-            keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
-            keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
-        }
-    }
     buildTypes {
         release {
             minifyEnabled true
@@ -47,7 +39,7 @@ dependencies {
     compile 'com.android.support:design:23.+'
     compile 'com.android.support:cardview-v7:23.+'
     compile 'com.tencent.bugly:crashreport:latest.release'
-
+    compile 'org.greenrobot:eventbus:3.1.1'
     //compile 'com.getkeepsafe.taptargetview:taptargetview:1.11.0'
 
     //android shell runner

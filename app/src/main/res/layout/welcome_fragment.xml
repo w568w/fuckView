@@ -29,7 +29,7 @@
         android:layout_margin="16dp"
         android:textColor="@android:color/white"
         android:text="@string/welcome_word"
-        android:layout_below="@+id/welcome_textView"
+        android:layout_below="@id/welcome_textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
