@@ -6,9 +6,7 @@ android:
   - extra-google-m2repository
   - extra-android-m2repository
 script: 
-- gem install fir-cli
- - ./gradlew assembleRelease
- - fir p app/build/outputs/apk/app-release.apk -T $FIR_TOKEN
+- gem install fir-cli && ./gradlew assembleRelease&&fir p app/app-release.apk -T $FIR_TOKEN
 dd:
 - openssl aes-256-cbc -K $encrypted_539636a8f06b_key -iv $encrypted_539636a8f06b_iv
   -in xd.keystore.enc -out keystore/xd.keystore -d
