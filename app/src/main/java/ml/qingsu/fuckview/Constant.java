@@ -31,6 +31,10 @@ public class Constant {
 
     public static final class Ad{
         public static final String GOOGLE_AD="ad_container";
+        public static final String GOOGLE_AD_LAYOUT_TYPE="FrameLayout";
+
+        public static final String COOLAPK_AD="banner_view";
+        public static final String COOLAPK_AD_LAYOUT_TYPE="Banner";
     }
     private static Object[] helperArray = new Object[1];
 

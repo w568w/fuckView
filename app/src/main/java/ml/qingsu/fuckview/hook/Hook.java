@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -39,10 +38,14 @@ import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
-import static ml.qingsu.fuckview.Constant.Ad.GOOGLE_AD;
+import static ml.qingsu.fuckview.Constant.Ad.COOLAPK_AD;
+import static ml.qingsu.fuckview.Constant.Ad.COOLAPK_AD_LAYOUT_TYPE;
+import static ml.qingsu.fuckview.Constant.Ad.GOOGLE_AD_LAYOUT_TYPE;
+import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
 import static ml.qingsu.fuckview.utils.ViewUtils.getText;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewId;
 import static ml.qingsu.fuckview.utils.ViewUtils.getViewPath;
 import static ml.qingsu.fuckview.utils.ViewUtils.getViewPosition;
 
@@ -712,7 +715,17 @@ public class Hook {
         }
     }
 
-    static class ViewBlocker extends AbstractBlocker {
+    static abstract class AbstractViewBlocker {
+        final void treatOrBlock(View view, String id, String className) {
+            if (shouldBlock(view, id, className)) {
+                ViewBlocker.getInstance().block(view);
+            }
+        }
+
+        protected abstract boolean shouldBlock(View view, String id, String className);
+    }
+
+    private static class ViewBlocker extends AbstractBlocker {
         private static ViewBlocker instance;
 
         static ViewBlocker getInstance() {
@@ -752,21 +765,16 @@ public class Hook {
          */
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
-            //log("new View-->" + getAllText((View) o) + "|" + getViewPath((View) o));
-//            log("list  --> "+arrayList);
-
-            View view = (View) o;
+            final View view = (View) o;
 
             final String className = ViewUtils.getClassName(view.getClass());
             final int id = view.getId();
-            try {
-                if ("FrameLayout".equals(className) && view.getResources().getResourceName(id).contains(Constant.Ad.GOOGLE_AD)) {
-                    Hook.log("净眼:fuck a Google Ads Container!");
-                    return new Pair<>(true, -1);
-                }
-            } catch (Resources.NotFoundException ignored) {
+            final String ids = getViewId(view);
 
-            }
+            //Block
+            GoogleBlocker.getInstance().treatOrBlock(view, ids, className);
+            CoolapkBlocker.getInstance().treatOrBlock(view, ids, className);
+
             final String strId = id + "";
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
@@ -832,7 +840,7 @@ public class Hook {
     private static class DialogBlocker extends AbstractBlocker {
         private static DialogBlocker instance;
 
-        public static DialogBlocker getInstance() {
+        static DialogBlocker getInstance() {
             if (instance == null) {
                 instance = new DialogBlocker();
             }
@@ -847,7 +855,6 @@ public class Hook {
 
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> arrayList, Object o) {
-            Hook.log("add View-->" + getAllText((View) o));
             return isBlockDialog(arrayList, (View) o);
         }
 
@@ -873,6 +880,50 @@ public class Hook {
             return new Pair<>(false, -1);
         }
 
+    }
+
+    private static class CoolapkBlocker extends AbstractViewBlocker {
+        private static CoolapkBlocker instance;
+
+        static CoolapkBlocker getInstance() {
+            if (instance == null) {
+                instance = new CoolapkBlocker();
+            }
+            return instance;
+        }
+
+        @Override
+        protected boolean shouldBlock(View view, String id, String className) {
+            if (!COOLAPK_MARKET_PKG_NAME.equals(view.getContext().getPackageName())) {
+                return false;
+            }
+            if (COOLAPK_AD_LAYOUT_TYPE.equals(className) &&
+                    id.contains(COOLAPK_AD)) {
+                return true;
+            }
+            //todo more rules
+            return false;
+        }
+    }
+
+    private static class GoogleBlocker extends AbstractViewBlocker {
+        private static GoogleBlocker instance;
+
+        static GoogleBlocker getInstance() {
+            if (instance == null) {
+                instance = new GoogleBlocker();
+            }
+
+            return instance;
+        }
+
+        @Override
+        protected boolean shouldBlock(View view, String id, String className) {
+            if (GOOGLE_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.GOOGLE_AD)) {
+                return true;
+            }
+            return false;
+        }
     }
 
     private class WindowHooker extends XC_MethodHook {

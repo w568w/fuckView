@@ -1,5 +1,6 @@
 package ml.qingsu.fuckview.utils;
 
+import android.content.res.Resources;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -20,7 +21,13 @@ public final class ViewUtils {
         }
         return name;
     }
-
+    public static String getViewId(View view){
+        try {
+            return view.getResources().getResourceName(view.getId());
+        }catch (Resources.NotFoundException e){
+            return "";
+        }
+    }
     public static String getViewPath(View v) {
         ViewParent viewParent = v.getParent();
         Object object = v;
