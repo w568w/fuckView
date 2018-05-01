@@ -15,16 +15,12 @@ import android.widget.TextView;
 public final class ViewUtils {
     public static String getClassName(Class<?> clz) {
         final String name = clz.getName();
-        final int dot = name.lastIndexOf('.');
-        if (dot != -1) {
-            return name.substring(dot + 1);
-        }
-        return name;
+        return name.substring(name.lastIndexOf('.') + 1);
     }
     public static String getViewId(View view){
         try {
             return view.getResources().getResourceName(view.getId());
-        }catch (Resources.NotFoundException e){
+        }catch (Exception e){
             return "";
         }
     }
@@ -52,8 +48,7 @@ public final class ViewUtils {
     public static String getViewPosition(View view) {
         int[] loc = new int[2];
         view.getLocationInWindow(loc);
-        StringBuilder location = new StringBuilder().append(loc[0]).append(',').append(loc[1]).append("$$");
-        return location.toString();
+        return new StringBuilder().append(loc[0]).append(',').append(loc[1]).append("$$").toString();
     }
 
     public static String getText(View view) {
