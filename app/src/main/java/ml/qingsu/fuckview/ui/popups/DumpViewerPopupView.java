@@ -207,8 +207,10 @@ public class DumpViewerPopupView extends BasePopupWindow {
             int height = intent.getIntExtra("height", 0);
             int width = intent.getIntExtra("width", 0);
             ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
-            mInfo.setTag(viewModel);
-            mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
+            if (viewModel != null) {
+                mInfo.setTag(viewModel);
+                mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
+            }
         }
     }
 }
