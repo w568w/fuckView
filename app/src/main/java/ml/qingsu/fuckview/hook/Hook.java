@@ -30,18 +30,17 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.hook.blocker.CoolapkBlocker;
+import ml.qingsu.fuckview.hook.blocker.GoogleBlocker;
+import ml.qingsu.fuckview.hook.blocker.ShareThroughBlocker;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
-import static ml.qingsu.fuckview.Constant.Ad.COOLAPK_AD;
-import static ml.qingsu.fuckview.Constant.Ad.COOLAPK_AD_LAYOUT_TYPE;
-import static ml.qingsu.fuckview.Constant.Ad.GOOGLE_AD_LAYOUT_TYPE;
-import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
 import static ml.qingsu.fuckview.utils.ViewUtils.getText;
@@ -419,6 +418,7 @@ public class Hook {
             }
             log("净眼:hook -->setClickable");
             XposedHelpers.findAndHookMethod(View.class, "setClickable", boolean.class, new BooleanSetterHooker(true));
+            XposedHelpers.findAndHookMethod(View.class, "isClickable", XC_MethodReplacement.returnConstant(true));
             log("净眼:hook -->setLongClickable");
             XposedHelpers.findAndHookMethod(View.class, "setLongClickable", boolean.class, new BooleanSetterHooker(true));
             log("净眼:hook -->View<init>");
@@ -615,7 +615,7 @@ public class Hook {
             this.enable = enable;
         }
 
-        protected static BlockModel fromString(String text) {
+        public static BlockModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
                 return new BlockModel(var[0], var[1], var[2], var[3]);
@@ -671,7 +671,7 @@ public class Hook {
             return position;
         }
 
-        protected static BlockModel fromString(String text) {
+        public static BlockModel fromString(String text) {
             String[] var = text.split("@@@");
             if (var.length == 4) {
                 return new ViewModel(var[0], var[1], var[2], var[3]);
@@ -715,20 +715,10 @@ public class Hook {
         }
     }
 
-    static abstract class AbstractViewBlocker {
-        final void treatOrBlock(View view, String id, String className) {
-            if (shouldBlock(view, id, className)) {
-                ViewBlocker.getInstance().block(view);
-            }
-        }
-
-        protected abstract boolean shouldBlock(View view, String id, String className);
-    }
-
-    private static class ViewBlocker extends AbstractBlocker {
+    public static class ViewBlocker extends AbstractBlocker {
         private static ViewBlocker instance;
 
-        static ViewBlocker getInstance() {
+        public static ViewBlocker getInstance() {
             if (instance == null) {
                 instance = new ViewBlocker();
             }
@@ -774,6 +764,7 @@ public class Hook {
             //Block
             GoogleBlocker.getInstance().treatOrBlock(view, ids, className);
             CoolapkBlocker.getInstance().treatOrBlock(view, ids, className);
+            ShareThroughBlocker.getInstance().treatOrBlock(view, ids, className);
 
             final String strId = id + "";
             final int len = mBlockList.size();
@@ -882,49 +873,6 @@ public class Hook {
 
     }
 
-    private static class CoolapkBlocker extends AbstractViewBlocker {
-        private static CoolapkBlocker instance;
-
-        static CoolapkBlocker getInstance() {
-            if (instance == null) {
-                instance = new CoolapkBlocker();
-            }
-            return instance;
-        }
-
-        @Override
-        protected boolean shouldBlock(View view, String id, String className) {
-            if (!COOLAPK_MARKET_PKG_NAME.equals(view.getContext().getPackageName())) {
-                return false;
-            }
-            if (COOLAPK_AD_LAYOUT_TYPE.equals(className) &&
-                    id.contains(COOLAPK_AD)) {
-                return true;
-            }
-            //todo more rules
-            return false;
-        }
-    }
-
-    private static class GoogleBlocker extends AbstractViewBlocker {
-        private static GoogleBlocker instance;
-
-        static GoogleBlocker getInstance() {
-            if (instance == null) {
-                instance = new GoogleBlocker();
-            }
-
-            return instance;
-        }
-
-        @Override
-        protected boolean shouldBlock(View view, String id, String className) {
-            if (GOOGLE_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.GOOGLE_AD)) {
-                return true;
-            }
-            return false;
-        }
-    }
 
     private class WindowHooker extends XC_MethodHook {
         @Override

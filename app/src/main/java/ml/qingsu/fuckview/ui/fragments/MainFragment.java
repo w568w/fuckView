@@ -8,13 +8,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.AutoTransition;
+import android.transition.Explode;
+import android.transition.Fade;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -79,7 +85,7 @@ public class MainFragment extends Fragment implements Searchable {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         pm = context.getPackageManager();
         FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.main_fragment, null);
@@ -134,19 +140,28 @@ public class MainFragment extends Fragment implements Searchable {
                 if (context instanceof MainActivity) {
                     ((MainActivity) context).setFragment(infoFragment);
                 }
+                ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                //TODO Does not work but I don't know how to fix it.
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    //Set animation
+//                    infoFragment.setSharedElementEnterTransition(new InfoTransition());
+//                    infoFragment.setEnterTransition(new Fade());
+//                    setExitTransition(new Fade());
+//                    infoFragment.setSharedElementReturnTransition(new InfoTransition());
+//
+//                    transaction.addSharedElement(iconView, "icon");
+//                }
+
+                transaction
+                        .replace(R.id.fl, infoFragment)
+                        .commit();
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            /* 标记是否滑动 */
             boolean scrollFlag = false;
-            /* 标记第一次进入，因为第一次进来lastVisibleItemPosition默认为0， */
             boolean isFirst = true;
-            /*
-            此时如果listview的第一个显示的条目不是第一个（下表为0），则往下滑也会出现firstVisibleItem>lastVisibleItemPosition的情况
-            所以第一次进入时不做操作，第二次进来已经给lastVisibleItemPosition赋值，就可以判断了
-            */
-
-            /* 标记上次的显示位置 */
 
             int lastVisibleItemPosition;
 
@@ -339,6 +354,7 @@ public class MainFragment extends Fragment implements Searchable {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             TextView title = (TextView) view.findViewById(R.id.app_name);
             TextView type = (TextView) view.findViewById(R.id.class_name);
+            ViewCompat.setTransitionName(icon, String.valueOf(i) + "_image");
             final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkbox);
             checkbox.setChecked(contains(deleteList, i));
             checkbox.setOnClickListener(new View.OnClickListener() {
@@ -367,7 +383,7 @@ public class MainFragment extends Fragment implements Searchable {
             if (bm.text.isEmpty()) {
                 type.setText(bm.className);
             } else {
-                type.setText(String.format( "%s ---> %s", bm.className, bm.text));
+                type.setText(String.format("%s ---> %s", bm.className, bm.text));
             }
             if (!bm.enable) {
                 view.setBackgroundColor(Color.GRAY);

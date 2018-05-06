@@ -51,7 +51,6 @@ public class DumpViewerPopupView extends BasePopupWindow {
     private ProgressBar mClosingProgress;
     private TextView mInfo;
     private HookBrocastReceiver mReceiver;
-    private ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
 
     public DumpViewerPopupView(Activity activity, String pkg) {
         super(activity);
@@ -141,11 +140,6 @@ public class DumpViewerPopupView extends BasePopupWindow {
         mReceiver.registerReceiver(appContext);
     }
 
-    @Override
-    protected void onHide() {
-        super.onHide();
-
-    }
 
     @Override
     protected int getGravity() {

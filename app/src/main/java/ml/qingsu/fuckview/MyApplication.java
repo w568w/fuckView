@@ -19,6 +19,7 @@ public class MyApplication extends Application {
     // 暂时关闭，按需修改
     private boolean isOpenSharedFile = false;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,6 +30,6 @@ public class MyApplication extends Application {
             AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
         }
 
-        CrashReport.initCrashReport(getApplicationContext(), "cfccfa2c50", false);
+        CrashReport.initCrashReport(getApplicationContext(), Constant.BUGLY_KEY, false);
     }
 }
