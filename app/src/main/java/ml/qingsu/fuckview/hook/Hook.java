@@ -417,7 +417,7 @@ public class Hook {
                 });
             }
             log("净眼:hook -->setClickable");
-            XposedHelpers.findAndHookMethod(View.class, "setClickable", boolean.class, new BooleanSetterHooker(true));
+            //XposedHelpers.findAndHookMethod(View.class, "setClickable", boolean.class, new BooleanSetterHooker(true));
             XposedHelpers.findAndHookMethod(View.class, "isClickable", XC_MethodReplacement.returnConstant(true));
             log("净眼:hook -->setLongClickable");
             XposedHelpers.findAndHookMethod(View.class, "setLongClickable", boolean.class, new BooleanSetterHooker(true));
