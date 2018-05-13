@@ -26,6 +26,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +39,9 @@ import java.util.concurrent.Executors;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.ListFilter;
 import ml.qingsu.fuckview.implement.Searchable;
+import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.Lists;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
@@ -95,6 +99,7 @@ public class Step1 extends WizardStep implements Searchable {
                     @Override
                     public void run() {
                         Toast.makeText(mCon, R.string.finish, Toast.LENGTH_SHORT).show();
+                        EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.STARTING_APP.ordinal()));
                     }
                 }, mList);
 
@@ -293,6 +298,7 @@ public class Step1 extends WizardStep implements Searchable {
                                 Toast.makeText(act, getString(R.string.dont_mark_myself), Toast.LENGTH_SHORT).show();
                             }
                             aa.notifyDataSetChanged();
+                            EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.FORCE_STOP.ordinal()));
                         }
                     });
                     mSelectPosition = 0;

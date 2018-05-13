@@ -12,4 +12,11 @@
         <item name="floating_action_button_color">#80cbc4</item>
         <item name="floating_action_button_ripple_color">#009688</item>
     </style>
+    <style name="OnePixelActivityStyle" parent="Theme.AppCompat">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoDisplay">false</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
 </resources>

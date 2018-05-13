@@ -16,6 +16,8 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 
+import static ml.qingsu.fuckview.Constant.XPOSED_INSTALLER_PKG_NAME;
+
 /**
  * Created by w568w on 18-1-6.
  */
@@ -31,6 +33,17 @@ public class WelcomeFragment extends Fragment {
                 try {
                     getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://w568.wodemo.net/entry/467891")));
                 } catch (ActivityNotFoundException a) {
+                    a.printStackTrace();
+                    Toast.makeText(getActivity(), getString(R.string.unsupport_of_package), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        layout.findViewById(R.id.welcome_xposed).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    getActivity().startActivity(new Intent(getActivity().getPackageManager().getLaunchIntentForPackage(XPOSED_INSTALLER_PKG_NAME)));
+                } catch (Throwable a) {
                     a.printStackTrace();
                     Toast.makeText(getActivity(), getString(R.string.unsupport_of_package), Toast.LENGTH_SHORT).show();
                 }

@@ -6,7 +6,7 @@ package ml.qingsu.fuckview.models;
  * For EventBus
  *
  * @author w568w
- * @see ml.qingsu.fuckview.ui.fragments.guide.GuideFragment
+ * @see ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast
  */
 
 public class PageEvent {

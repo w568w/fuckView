@@ -54,6 +54,31 @@
             android:title="@string/conf_system_app_name" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/conf_other">
+
+        <Preference
+            android:key="log"
+            android:summary="@string/conf_bug_des"
+            android:title="@string/conf_bug_name" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="theme"
+            android:summary="@string/conf_theme_des"
+            android:title="@string/conf_theme_name" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="enable_log"
+            android:summary="@string/conf_enable_log_des"
+            android:title="@string/conf_enable_log_name" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="keep_alive"
+            android:summary="@string/conf_keep_alive_des"
+            android:title="@string/conf_keep_alive_name"
+            />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/conf_about">
 
         <Preference
@@ -81,23 +106,4 @@
             android:summary="@string/conf_qq_group_des"
             android:title="@string/conf_qq_group_name" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/conf_other">
-
-        <Preference
-            android:key="log"
-            android:summary="@string/conf_bug_des"
-            android:title="@string/conf_bug_name" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="theme"
-            android:summary="@string/conf_theme_des"
-            android:title="@string/conf_theme_name" />
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="enable_log"
-            android:summary="@string/conf_enable_log_des"
-            android:title="@string/conf_enable_log_name" />
-    </PreferenceCategory>
-
-
 </PreferenceScreen>

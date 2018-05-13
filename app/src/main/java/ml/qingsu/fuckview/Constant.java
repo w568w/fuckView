@@ -15,6 +15,7 @@ public class Constant {
 
     public static final String PKG_NAME = "ml.qingsu.fuckview";
     public static final String COOLAPK_MARKET_PKG_NAME = "com.coolapk.market";
+    public static final String XPOSED_INSTALLER_PKG_NAME="de.robv.android.xposed.installer";
     public static final String ACTIVITY_NAME = "ml.qingsu.fuckview.ui.activities.MainActivity";
     public static final String VAILD_METHOD = "isModuleActive";
 
@@ -28,6 +29,7 @@ public class Constant {
     public static final String HOOK_CLASS = PKG_NAME + ".hook.Hook";
     public static final String KEY_DONT_SHOW_ACTIVE_DIALOG = "dont_show_active";
     public static final String KEY_DONT_SHOW_RATE_DIALOG = "dont_show_star";
+
     public static final String KEY_THEME = "theme";
 
 

@@ -107,4 +107,6 @@
     <string name="start_app">Start app</string>
     <string name="checking">Self Checking...</string>
     <string name="check_item_method_invoked">(For debuger)Whether hooks can be successful</string>
+    <string name="conf_keep_alive_name">Keep Alive</string>
+    <string name="welcome_to_xposed">Open Xposed Installer</string>
 </resources>

@@ -2,6 +2,7 @@ package ml.qingsu.fuckview;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 
 import com.tencent.bugly.crashreport.CrashReport;
 
@@ -23,7 +24,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         // 设置文件夹权限，让其他 App 可以读取
         if (isOpenSharedFile) {
             AppRulesUtils.setFilePermissions(getApplicationInfo().dataDir, 0757, -1, -1);

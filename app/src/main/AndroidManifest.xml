@@ -37,7 +37,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.PreferencesActivity" />
-
+        <activity android:name=".ui.activities.OnePixelActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|navigation|keyboard"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:finishOnTaskLaunch="false"
+            android:launchMode="singleInstance"/>
         <service
             android:name=".utils.dumper.DumperService"
             android:enabled="true"

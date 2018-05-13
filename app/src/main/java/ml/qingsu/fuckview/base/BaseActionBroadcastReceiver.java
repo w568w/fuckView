@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.view.Choreographer;
 
 /**
  * Created by w568w on 18-3-1.
@@ -30,8 +31,7 @@ public abstract class BaseActionBroadcastReceiver extends BroadcastReceiver {
     public final void onReceive(Context context, Intent intent) {
         if (getAction().equals(intent.getAction())) {
             onReceiving(context, intent);
+
         }
-
     }
-
 }

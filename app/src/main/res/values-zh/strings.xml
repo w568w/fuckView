@@ -27,7 +27,7 @@
     <string name="unsupport_of_package">抱歉,您的设备不支持此选项</string>
     <string name="finish">我们开始吧</string>
     <string name="step1_title">欢迎</string>
-    <string name="welcome_word">嗨！\n你是否在一些app中见过\"精品推荐\"\"现在安装\"或者\"充值VIP\"?你是否对它们感到厌倦?\n净眼正是设计用来解决这些问题的,你将能够屏蔽它们,让它们彻底消失!\n现在，可能你想看看快速教程?:)</string>
+    <string name="welcome_word">嗨！\n你是否在一些app中见过\"精品推荐\"\"现在安装\"或者\"充值VIP\"?你是否对它们感到厌倦?\n净眼正是设计用来解决这些问题的,你将能够屏蔽它们,让它们彻底消失!\nz</string>
     <string name="welcome_i_want_a_guide">是的,我要看看教程!(英文)</string>
     <string name="welcome_pass_guide">不看!</string>
     <string name="conf_super_mode_name">超强模式</string>
@@ -112,4 +112,7 @@
     <string name="thats_okay">好吧...</string>
     <string name="fuck">滚</string>
     <string name="feel_bad">开发者哭晕在厕所...</string>
+    <string name="conf_keep_alive_name">尽力保活</string>
+    <string name="conf_keep_alive_des">尽力保证应用在标记时存活，避免悬浮窗异常消失(需要给予自启权限)</string>
+    <string name="welcome_to_xposed">打开Xposed Installer</string>
 </resources>

@@ -111,4 +111,6 @@
     <string name="thats_okay">All Right...</string>
     <string name="ask_for_rating">Feeling good?Why not give a star to this app for the poor developer who\'s using a old 5-inch computer with 32M memory and Pentium I CPU?</string>
     <string name="feel_bad">The developer feels very bad...</string>
+    <string name="conf_keep_alive_name">Keep Alive</string>
+    <string name="welcome_to_xposed">Open Xposed Installer</string>
 </resources>

@@ -19,6 +19,7 @@ import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
+import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.wizard.BaseWizard;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
@@ -78,7 +79,7 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
             Toast.makeText(mCon, R.string.start_mark_toast, Toast.LENGTH_SHORT).show();
             new DumpViewerPopupView(mCon, Step1.sSelected.packageName).show();
             mCon.finish();
-            EventBus.getDefault().post(new PageEvent(2));
+            EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.APP_STARTED.ordinal()));
         } catch (WindowManager.BadTokenException | SecurityException e) {
             Toast.makeText(mCon, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
             e.printStackTrace();

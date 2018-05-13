@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="guide">
+        <item>欢迎使用！请选择一个要标记的应用。</item>
+        <item>长按应用，选择"强制停止"（并给予Root权限）</item>
+        <item>点击"开始标记",启动应用吧!</item>
+        <item>等待应用启动完成，随意点击一个你要标记的控件。</item>
+        <item>选好了吗？点击下面的[点击保存规则]。</item>
+        <item>如果感觉还行，就点击"结束屏蔽"，返回净眼吧。</item>
+    </array>
+</resources>

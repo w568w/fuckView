@@ -63,8 +63,12 @@ public abstract class BasePopupWindow {
             return;
         }
         isShown = true;
-        mWindowManager.addView(view, params);
-        onShow();
+        try {
+            mWindowManager.addView(view, params);
+            onShow();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void onHide() {

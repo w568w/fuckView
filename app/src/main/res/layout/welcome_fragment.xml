@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/welcome_image_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:padding="8dp"
@@ -42,13 +42,21 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
+    <Button
+        android:id="@+id/welcome_xposed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome_to_xposed"
+        android:layout_below="@id/welcome_guide"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
     <Button
         android:id="@+id/welcome_pass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/welcome_pass_guide"
-        android:layout_below="@id/welcome_guide"
+        android:layout_below="@id/welcome_xposed"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />

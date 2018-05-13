@@ -14,6 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,8 +25,10 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseActionBroadcastReceiver;
 import ml.qingsu.fuckview.base.BasePopupWindow;
 import ml.qingsu.fuckview.hook.ViewReceiver;
+import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
+import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.dumper.ViewDumper;
@@ -99,6 +103,8 @@ public class DumpViewerPopupView extends BasePopupWindow {
                             appContext.unregisterReceiver(mReceiver);
                             //Calling startActivity() from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK flag.
                             appContext.startActivity(new Intent(appContext, MainActivity.class).addFlags(FLAG_ACTIVITY_NEW_TASK));
+
+                            EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.HIDE.ordinal()));
                         }
                     }, mInfo);
                 } catch (IllegalArgumentException e) {
@@ -124,7 +130,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
                     mInfo.setText("");
-
+                    EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.MARKED.ordinal()));
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -204,6 +210,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
             if (viewModel != null) {
                 mInfo.setTag(viewModel);
                 mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
+                EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.CLICKED.ordinal()));
             }
         }
     }

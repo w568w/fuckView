@@ -6,11 +6,13 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -39,14 +41,16 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseAppCompatActivity;
 import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.models.ViewModel;
+import ml.qingsu.fuckview.receiver.BootCompleteReceiver;
 import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
-import ml.qingsu.fuckview.ui.popups.GuidePopupWindow;
+import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
 
+import static android.os.Build.VERSION.SDK;
 import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.KEY_DONT_SHOW_RATE_DIALOG;
 import static ml.qingsu.fuckview.Constant.KEY_THEME;
@@ -57,7 +61,7 @@ import static ml.qingsu.fuckview.Constant.KEY_THEME;
 public class MainActivity extends BaseAppCompatActivity {
 
     public boolean shouldShowFAQ = false;
-
+    private boolean hasShownGuide = false;
     private static final int REQUEST_PERMISSION = 0x123;
     private static final int REQUEST_NEW_FRAGMENT = 0x124;
     public static final String ALL_SPLIT = "~~~";
@@ -88,6 +92,7 @@ public class MainActivity extends BaseAppCompatActivity {
         sSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
 
         dealWithIntent();
+        keepAlive();
         //If it is the first time to run...
         if (FirstRun.isFirstRun(this, "app")) {
             setFragmentWithoutBack(new WelcomeFragment());
@@ -104,12 +109,22 @@ public class MainActivity extends BaseAppCompatActivity {
                 checkModuleActivated();
             }
         }
-        //startGuide();
+    }
+
+    private void keepAlive() {
+        if (mSettings.getBoolean("keep_alive", true)) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(new BootCompleteReceiver(), filter);
+
+        }
+
     }
 
     private void startGuide() {
 
-        new GuidePopupWindow(this).show();
+        new GuidePopupToast(this).show();
     }
 
     private void checkModuleActivated() {
@@ -187,23 +202,33 @@ public class MainActivity extends BaseAppCompatActivity {
         }
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && !hasShownGuide) {
+            //startGuide();
+            hasShownGuide = true;
+        }
+    }
+
     private void checkAndCallPermission(String permission) {
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-            try {
-                ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(this, R.string.no_file_ro_permission, Toast.LENGTH_SHORT).show();
-            }
-        } else {
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             //Process old-style rules
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     getWindow().getDecorView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     processFile();
+
                 }
             });
+        } else {
+            try {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, REQUEST_PERMISSION);
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(this, R.string.no_file_ro_permission, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
