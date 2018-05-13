@@ -29,7 +29,7 @@ import static ml.qingsu.fuckview.Constant.SUPER_MODE_NAME;
 
 public class PreferencesActivity extends PreferenceActivity {
     private int clickTime = 0;
-
+    public static final int RESULT_GUIDE=0x100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("theme", false)) {
@@ -142,7 +142,8 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://w568.wodemo.net/entry/467891")));
+                    setResult(RESULT_GUIDE);
+                    finish();
                 } catch (ActivityNotFoundException a) {
                     a.printStackTrace();
                     Toast.makeText(PreferencesActivity.this, getString(R.string.unsupport_of_package), Toast.LENGTH_SHORT).show();

@@ -54,6 +54,7 @@ import static android.os.Build.VERSION.SDK;
 import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.KEY_DONT_SHOW_RATE_DIALOG;
 import static ml.qingsu.fuckview.Constant.KEY_THEME;
+import static ml.qingsu.fuckview.ui.activities.PreferencesActivity.RESULT_GUIDE;
 
 /**
  * @author w568w
@@ -117,7 +118,6 @@ public class MainActivity extends BaseAppCompatActivity {
             filter.addAction(Intent.ACTION_SCREEN_ON);
             filter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(new BootCompleteReceiver(), filter);
-
         }
 
     }
@@ -252,6 +252,8 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_OK) {
             setFragment(new OnlineRulesFragment());
+        }else if(requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_GUIDE){
+            startGuide();
         }
     }
 
