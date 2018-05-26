@@ -71,7 +71,7 @@ public final class ViewUtils {
     }
 
     /**
-     * Also @see ml.qingsu.fuckview.ui.popups.DumpViewerPopupView#getAllText(View)
+     * Also @see ml.qingsu.fuckview.ui.popups.FloatingPopupView#getAllText(View)
      */
     public static String getAllText(View view) {
         final StringBuilder allText = new StringBuilder();

@@ -46,6 +46,9 @@ public class ViewModel extends BlockModel {
     }
 
     public static ViewModel fromString(String text) {
+        if (text == null || !text.contains("@@@")) {
+            return null;
+        }
         String[] var = text.split("@@@");
         if (var.length == 4) {
             return new ViewModel(var[0], var[1], var[2], var[3]);

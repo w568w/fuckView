@@ -18,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +31,7 @@ import dalvik.system.PathClassLoader;
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.ui.popups.DumpViewerPopupView;
+import ml.qingsu.fuckview.ui.popups.FloatingPopupView;
 import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.dumper.DumperService;
 
@@ -142,9 +141,9 @@ public class CheckerFragment extends Fragment {
 
     private boolean canShowFloatingWindow() {
         try {
-            DumpViewerPopupView dumpViewerPopupView = new DumpViewerPopupView(getActivity(), "");
-            dumpViewerPopupView.show();
-            dumpViewerPopupView.hide();
+            FloatingPopupView floatingPopupView = new FloatingPopupView(getActivity(), "");
+            floatingPopupView.show();
+            floatingPopupView.hide();
             return true;
         } catch (Throwable t) {
             return false;

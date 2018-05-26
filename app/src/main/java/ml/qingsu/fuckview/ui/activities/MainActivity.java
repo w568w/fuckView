@@ -252,7 +252,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_OK) {
             setFragment(new OnlineRulesFragment());
-        }else if(requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_GUIDE){
+        } else if (requestCode == REQUEST_NEW_FRAGMENT && resultCode == RESULT_GUIDE) {
             startGuide();
         }
     }
@@ -321,7 +321,7 @@ public class MainActivity extends BaseAppCompatActivity {
         final File oldFile = new File(getSDPath() + "/fuckview/" + Constant.LIST_NAME);
         if (oldFile.exists()) {
             //Do not need to be translated
-            //because (I'm lazy and) the version 0.8.3.1 and below can never be got out of a Chinese App Market named CoolApk.
+            //because (I'm lazy and) the version 0.8.3.1 and below can never be downloaded out of a Chinese App Market named CoolApk.
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("检测到您使用过版本0.8.3.1之前的净眼，是否要更新规则位置？")
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

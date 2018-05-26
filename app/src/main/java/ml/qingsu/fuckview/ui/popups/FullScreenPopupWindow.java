@@ -34,9 +34,9 @@ public class FullScreenPopupWindow extends BasePopupWindow {
     private ArrayList<ViewDumper.ViewItem> list;
     private AbsoluteLayout absoluteLayout;
     private String pkg;
-    private DumpViewerPopupView popupView;
+    private FloatingPopupView popupView;
 
-    public FullScreenPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, DumpViewerPopupView popupView) {
+    public FullScreenPopupWindow(Activity activity, ArrayList<ViewDumper.ViewItem> list, String pkg, FloatingPopupView popupView) {
         super(activity);
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
         params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;

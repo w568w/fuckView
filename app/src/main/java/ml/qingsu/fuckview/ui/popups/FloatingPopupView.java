@@ -17,8 +17,6 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
@@ -42,7 +40,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * @author w568w
  */
 
-public class DumpViewerPopupView extends BasePopupWindow {
+public class FloatingPopupView extends BasePopupWindow {
 
 
     private ArrayList<ViewDumper.ViewItem> mList;
@@ -56,7 +54,7 @@ public class DumpViewerPopupView extends BasePopupWindow {
     private TextView mInfo;
     private HookBrocastReceiver mReceiver;
 
-    public DumpViewerPopupView(Activity activity, String pkg) {
+    public FloatingPopupView(Activity activity, String pkg) {
         super(activity);
         mPackageName = pkg;
         isNotList = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("no_list", true);
@@ -182,12 +180,12 @@ public class DumpViewerPopupView extends BasePopupWindow {
 
 
             if (isNotList) {
-                mFullScreenPopupWindow = new FullScreenPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
+                mFullScreenPopupWindow = new FullScreenPopupWindow(getActivity(), mList, mPackageName, FloatingPopupView.this);
             } else {
                 if (FirstRun.isFirstRun(appContext, "list_popup")) {
                     Toast.makeText(appContext, R.string.mark_tip, Toast.LENGTH_LONG).show();
                 }
-                mFullScreenPopupWindow = new FullScreenListPopupWindow(getActivity(), mList, mPackageName, DumpViewerPopupView.this);
+                mFullScreenPopupWindow = new FullScreenListPopupWindow(getActivity(), mList, mPackageName, FloatingPopupView.this);
             }
             mFullScreenPopupWindow.show();
             hide();
