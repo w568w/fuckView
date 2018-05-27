@@ -17,7 +17,7 @@
         android:layout_marginTop="16sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="54sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         android:text="酷安头条净化"
         />
