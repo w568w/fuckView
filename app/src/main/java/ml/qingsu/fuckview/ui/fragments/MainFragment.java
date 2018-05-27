@@ -90,6 +90,8 @@ public class MainFragment extends Fragment implements Searchable {
         pm = context.getPackageManager();
         FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.main_fragment, null);
         listView = (ListView) layout.findViewById(R.id.listView);
+        TextView noItem= (TextView) layout.findViewById(R.id.no_item);
+        noItem.setVisibility(View.GONE);
         models = BlockModel.readModel();
         try {
             Collections.sort(models, new Comparator<BlockModel>() {
@@ -106,7 +108,7 @@ public class MainFragment extends Fragment implements Searchable {
                 }
             });
         } catch (IllegalArgumentException e) {
-            //So we will not sort them,OK?
+            //So we do not sort them,OK?
             e.printStackTrace();
         }
         adapter = new AppAdapter();
@@ -188,6 +190,11 @@ public class MainFragment extends Fragment implements Searchable {
 
             }
         });
+        //If there's no rule...
+        if(models.isEmpty()){
+            listView.setVisibility(View.GONE);
+            noItem.setVisibility(View.VISIBLE);
+        }
         return layout;
     }
 

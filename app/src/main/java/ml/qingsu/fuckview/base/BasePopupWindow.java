@@ -39,7 +39,14 @@ public abstract class BasePopupWindow {
         params.gravity = getGravity();
         view = onCreateView(appContext);
     }
-
+    public void setX(int x){
+        params.x=x;
+        updateLayout();
+    }
+    public void setY(int y){
+        params.y=y;
+        updateLayout();
+    }
     public void setFocusable(boolean focusable) {
         params.flags = focusable ? FLAG_NOT_TOUCH_MODAL : FLAG_NOT_FOCUSABLE | FLAG_NOT_TOUCH_MODAL;
         try {

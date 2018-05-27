@@ -11,7 +11,7 @@ import de.psdev.licensesdialog.licenses.License;
  */
 
 public class GnuAfferoGeneralPublicLicense30 extends License {
-    private static final String LICENSE="This program is free software: you can redistribute it and/or modify\n" +
+    private static final String LICENSE = "This program is free software: you can redistribute it and/or modify\n" +
             " it under the terms of the GNU Affero General Public License as\n" +
             " published by the Free Software Foundation, either version 3 of the\n" +
             " License, or (at your option) any later version.\n" +
@@ -23,6 +23,7 @@ public class GnuAfferoGeneralPublicLicense30 extends License {
             "\n" +
             " You should have received a copy of the GNU Affero General Public License\n" +
             " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
+
     @Override
     public String getName() {
         return "GNU Affero General Public License 3.0";

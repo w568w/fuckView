@@ -39,6 +39,9 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.hook.blocker.CoolapkBlocker;
 import ml.qingsu.fuckview.hook.blocker.GoogleBlocker;
 import ml.qingsu.fuckview.hook.blocker.ShareThroughBlocker;
+import ml.qingsu.fuckview.models.BlockModel;
+import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
+import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
@@ -112,7 +115,7 @@ public class Hook {
         //设置Intent
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
+        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view).toString());
         intent.putExtra("Dialog", true);
         //Fix: NullPointerE in VAEXposed.
         //VAEXposed throws a exception with chain styles.
@@ -192,8 +195,8 @@ public class Hook {
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //看！奇巧淫技x2！
-        log(BlockModel.getInstanceByAll(view).toString());
-        intent.putExtra("cache", "\n" + BlockModel.getInstanceByAll(view));
+        log(ViewBlocker.getInstance().log(view).toString());
+        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view).toString());
         intent.putExtra("Dialog", true);
         //TODO too much trying.
         try {
@@ -277,7 +280,11 @@ public class Hook {
 
             BlockModel model = BlockModel.fromString(line);
             if (model.record.contains(ALL_SPLIT)) {
-                model = ViewModel.fromString(line);
+                if (CoolApkHeadlineModel.isInstance(line)) {
+                    model = CoolApkHeadlineModel.fromString(line);
+                } else if (ViewModel.isInstance(line)) {
+                    model = ViewModel.fromString(line);
+                }
             }
             if (model != null && model.packageName.equals(pkgFilter)) {
                 list.add(model);
@@ -311,7 +318,7 @@ public class Hook {
         return Arrays.copyOf(array, length);
     }
 
-    private static void log(String text) {
+    public static void log(String text) {
         if (enableLog) {
             XposedBridge.log(text);
         }
@@ -586,103 +593,6 @@ public class Hook {
         return null;
     }
 
-    private static class BlockModel {
-        String record;
-        private String packageName;
-
-        public String getText() {
-            return text;
-        }
-
-        private String text;
-        private String className;
-        private boolean enable;
-
-
-        private BlockModel(String packageName, String record, String text, String className) {
-            this.packageName = packageName;
-            this.record = record;
-            this.text = text;
-            this.className = className;
-            enable = true;
-        }
-
-        private BlockModel(String packageName, String record, String text, String className, boolean enable) {
-            this.packageName = packageName;
-            this.record = record;
-            this.text = text;
-            this.className = className;
-            this.enable = enable;
-        }
-
-        public static BlockModel fromString(String text) {
-            String[] var = text.split("@@@");
-            if (var.length == 4) {
-                return new BlockModel(var[0], var[1], var[2], var[3]);
-            }
-            if (var.length == 5) {
-                return new BlockModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
-            }
-            return null;
-        }
-
-        private static BlockModel getInstanceByAll(View view) {
-            return ViewBlocker.getInstance().log(view);
-        }
-
-        @Override
-        public String toString() {
-            return String.format(Locale.CHINA, "%s@@@%s@@@%s@@@%s@@@%s", packageName, record, text, className, enable + "");
-        }
-
-    }
-
-    private static class ViewModel extends BlockModel {
-        private String id;
-        private String path;
-        private String position;
-
-        private ViewModel(String packageName, String record, String text, String className) {
-            super(packageName, record, text, className);
-            prepare();
-        }
-
-        private ViewModel(String packageName, String record, String text, String className, boolean enable) {
-            super(packageName, record, text, className, enable);
-            prepare();
-        }
-
-        private void prepare() {
-            String[] spilted = record.split(ALL_SPLIT);
-            id = spilted[0];
-            path = spilted[1];
-            position = spilted[2];
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getPosition() {
-            return position;
-        }
-
-        public static BlockModel fromString(String text) {
-            String[] var = text.split("@@@");
-            if (var.length == 4) {
-                return new ViewModel(var[0], var[1], var[2], var[3]);
-            }
-            if (var.length == 5) {
-                return new ViewModel(var[0], var[1], var[2], var[3], Boolean.valueOf(var[4]));
-            }
-            return null;
-        }
-    }
-
     static abstract class AbstractBlocker {
 
 
@@ -761,6 +671,7 @@ public class Hook {
             final int id = view.getId();
             final String ids = getViewId(view);
 
+            CoolapkBlocker.getInstance().setList(mBlockList);
             //Block
             GoogleBlocker.getInstance().treatOrBlock(view, ids, className);
             CoolapkBlocker.getInstance().treatOrBlock(view, ids, className);
@@ -791,7 +702,7 @@ public class Hook {
                     if (postion.equals(((ViewModel) model).getPosition())) {
                         successTimes += 2;
                     }
-                    if (model.getText().length() != 0 && model.getText().equals(getText(view))) {
+                    if (model.text.length() != 0 && model.text.equals(getText(view))) {
                         ++successTimes;
                     }
                     if (successTimes >= 2) {

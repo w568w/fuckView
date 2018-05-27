@@ -37,12 +37,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.PreferencesActivity" />
-        <activity android:name=".ui.activities.OnePixelActivity"
+        <activity
+            android:name=".ui.activities.OnePixelActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|navigation|keyboard"
             android:excludeFromRecents="true"
             android:exported="false"
             android:finishOnTaskLaunch="false"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance" />
+
         <service
             android:name=".utils.dumper.DumperService"
             android:enabled="true"
@@ -52,11 +54,13 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/service" />
         </service>
 
+        <activity android:name=".ui.activities.ExperimentActivity"></activity>
     </application>
 
 </manifest>

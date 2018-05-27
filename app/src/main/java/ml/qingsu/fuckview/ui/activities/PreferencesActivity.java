@@ -25,6 +25,7 @@ import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.utils.GnuAfferoGeneralPublicLicense30;
 import ml.qingsu.fuckview.utils.ShellUtils;
 
@@ -115,6 +116,13 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         findPreference("version").setSummary(getVersionName(this));
+        findPreference("version").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                startActivity(new Intent(PreferencesActivity.this,ExperimentActivity.class));
+                return false;
+            }
+        });
         findPreference("pay").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

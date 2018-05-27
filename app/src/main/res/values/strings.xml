@@ -113,4 +113,6 @@
     <string name="feel_bad">The developer feels very bad...</string>
     <string name="conf_keep_alive_name">Keep Alive</string>
     <string name="welcome_to_xposed">Open Xposed Installer</string>
+    <string name="no_item">Nothing here,keep calm.</string>
+    <string name="fuckview_lab">FuckView Lab</string>
 </resources>

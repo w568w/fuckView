@@ -18,6 +18,7 @@ public class Constant {
     public static final String XPOSED_INSTALLER_PKG_NAME="de.robv.android.xposed.installer";
     public static final String ACTIVITY_NAME = "ml.qingsu.fuckview.ui.activities.MainActivity";
     public static final String VAILD_METHOD = "isModuleActive";
+    public static final String VIRTUAL_COOLAPK_CLASSNAME="coolapk";
 
     public static final String LIST_NAME = "block_list";
     public static final String SUPER_MODE_NAME = "super_mode";

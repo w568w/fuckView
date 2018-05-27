@@ -109,4 +109,6 @@
     <string name="check_item_method_invoked">(For debuger)Whether hooks can be successful</string>
     <string name="conf_keep_alive_name">Keep Alive</string>
     <string name="welcome_to_xposed">Open Xposed Installer</string>
+    <string name="no_item">Nothing here,keep calm.</string>
+    <string name="fuckview_lab">FuckView Lab</string>
 </resources>

@@ -1,9 +1,10 @@
 package ml.qingsu.fuckview.utils;
 
-import android.content.res.Resources;
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 /**
@@ -23,6 +24,9 @@ public final class ViewUtils {
         }catch (Exception e){
             return "";
         }
+    }
+    public static int getId(String ids, Context context){
+        return context.getResources().getIdentifier(ids,"id",context.getPackageName());
     }
     public static String getViewPath(View v) {
         ViewParent viewParent = v.getParent();
@@ -97,5 +101,16 @@ public final class ViewUtils {
         }
         return allText.toString();
     }
-
+    public interface OnFinishLoadListener {
+        void onFinishedLoad(View view);
+    }
+    public static void setOnFinishLoadListener(final View view, final OnFinishLoadListener listener){
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                listener.onFinishedLoad(view);
+                view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            }
+        });
+    }
 }

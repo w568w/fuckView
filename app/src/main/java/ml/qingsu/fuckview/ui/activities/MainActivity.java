@@ -98,10 +98,6 @@ public class MainActivity extends BaseAppCompatActivity {
         if (FirstRun.isFirstRun(this, "app")) {
             setFragmentWithoutBack(new WelcomeFragment());
             //else if there's no rule...
-        } else if ("".equals(readPreferences(Constant.LIST_NAME))) {
-            setFragmentWithoutBack(new SelectAppWizard());
-            checkModuleActivated();
-            //else we go to the main fragment...
         } else {
             setFragmentWithoutBack(new MainFragment());
             if (isModuleActive()) {

@@ -23,7 +23,6 @@ import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.utils.OnlineRulesUtils;
 
 /**
- *
  * @author w568w
  * @date 18-1-26
  */
@@ -160,7 +159,7 @@ public class OnlineRulesFragment extends Fragment {
             for (int len = models.size(), i = 0; i < len; i++) {
                 publishProgress(i);
                 BlockModel blockModel = models.get(i);
-                if(blockModel==null){
+                if (blockModel == null) {
                     continue;
                 }
                 try {

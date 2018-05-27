@@ -115,4 +115,6 @@
     <string name="conf_keep_alive_name">尽力保活</string>
     <string name="conf_keep_alive_des">尽力保证应用在标记时存活，避免悬浮窗异常消失(需要给予自启权限)</string>
     <string name="welcome_to_xposed">打开Xposed Installer</string>
+    <string name="no_item">这里空空荡荡的</string>
+    <string name="fuckview_lab">净眼实验室</string>
 </resources>
