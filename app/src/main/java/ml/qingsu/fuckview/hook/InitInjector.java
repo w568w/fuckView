@@ -4,8 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.Keep;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -28,6 +31,7 @@ import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
  * So we do not need to reboot,but it'll run slowlier.
  *
  * @author w568w
+ * @author shuihuadx
  */
 
 public class InitInjector implements IXposedHookLoadPackage {
@@ -44,7 +48,7 @@ public class InitInjector implements IXposedHookLoadPackage {
                 XposedHelpers.findAndHookMethod(ACTIVITY_NAME, loadPackageParam.classLoader,
                         VAILD_METHOD, XC_MethodReplacement.returnConstant(true));
                 return;
-                // FIXME: 18-4-28 this error is often reported for unknown reason.
+                // FIXME: 18-4-28 this error is often reported for some unknown reasons.
                 /*
                 Reporter's log:
                  W/System  ( 9297): ClassLoader referenced unknown path: /data/app/ml.qingsu.fuckview-1/lib/arm
@@ -53,7 +57,7 @@ public class InitInjector implements IXposedHookLoadPackage {
                  E/Xposed  ( 9297): 	at de.robv.android.xposed.XposedHelpers.findAndHookMethod(XposedHelpers.java:185)
                  E/Xposed  ( 9297): 	at ml.qingsu.fuckview.hook.InitInjector.handleLoadPackage(Unknown Source)
                 * */
-            }catch (NoSuchMethodError error){
+            } catch (NoSuchMethodError error) {
                 error.printStackTrace();
             }
         }
@@ -63,25 +67,50 @@ public class InitInjector implements IXposedHookLoadPackage {
                 super.afterHookedMethod(param);
                 Context context = (Context) param.args[0];
                 if (context != null) {
-                    List<PackageInfo> list = context.getPackageManager().getInstalledPackages(0);
-                    final int size = list.size();
-                    String pkgPath = null;
-                    for (int i = 0; i < size; i++) {
-                        PackageInfo info = list.get(i);
-                        if (PKG_NAME.equals(info.packageName)) {
-                            pkgPath = info.applicationInfo.sourceDir;
-                            break;
-                        }
-                    }
-                    if (pkgPath != null) {
-                        PathClassLoader loader = new PathClassLoader(pkgPath, ClassLoader.getSystemClassLoader());
-                        Class<?> hookerClz = Class.forName(HOOK_CLASS, true, loader);
-                        Object hooker = hookerClz.newInstance();
-                        Method handleLoadPackage = hookerClz.getDeclaredMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
-                        handleLoadPackage.invoke(hooker, loadPackageParam);
+                    loadPackageParam.classLoader = context.getClassLoader();
+                    try {
+                        invokeHandleHookMethod(context, Constant.PKG_NAME, Constant.HOOK_CLASS, "handleLoadPackage", loadPackageParam);
+                    } catch (Throwable error) {
+                        error.printStackTrace();
                     }
                 }
             }
         });
     }
+
+    private void invokeHandleHookMethod(Context context, String modulePackageName, String handleHookClass, String handleHookMethod, XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+        //原来的两种方式不是很好,改用这种新的方式
+        File apkFile = findApkFile(context, modulePackageName);
+        if (apkFile == null) {
+            new RuntimeException("寻找模块apk失败").printStackTrace();
+        }
+        //加载指定的hook逻辑处理类，并调用它的handleHook方法
+        PathClassLoader pathClassLoader = new PathClassLoader(apkFile.getAbsolutePath(), ClassLoader.getSystemClassLoader());
+        Class<?> cls = Class.forName(handleHookClass, true, pathClassLoader);
+        Object instance = cls.newInstance();
+        Method method = cls.getDeclaredMethod(handleHookMethod, XC_LoadPackage.LoadPackageParam.class);
+        method.invoke(instance, loadPackageParam);
+    }
+
+    /**
+     * 根据包名构建目标Context,并调用getPackageCodePath()来定位apk
+     *
+     * @param context           context参数
+     * @param modulePackageName 当前模块包名
+     * @return return apk file
+     */
+    private File findApkFile(Context context, String modulePackageName) {
+        if (context == null) {
+            return null;
+        }
+        try {
+            Context moudleContext = context.createPackageContext(modulePackageName, Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+            String apkPath = moudleContext.getPackageCodePath();
+            return new File(apkPath);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
