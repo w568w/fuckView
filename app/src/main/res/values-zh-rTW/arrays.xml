@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="guide">
+        <item>歡迎使用！請選擇一個要標記的程式。</item>
+        <item>長按程式，選擇「強制停止」（並給予Root權限）</item>
+        <item>輕觸「開始標記」,啟動程式吧!</item>
+        <item>等待程式啟動完成，隨意輕觸一個你要標記的控制項。</item>
+        <item>選好了嗎？輕觸下面的[輕觸儲存規則]。</item>
+        <item>如果感覺還行，就輕觸「結束屏蔽」，返回淨眼吧。</item>
+    </array>
+</resources>
