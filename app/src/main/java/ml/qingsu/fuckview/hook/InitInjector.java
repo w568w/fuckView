@@ -21,6 +21,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.Constant;
 
 import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
+import static ml.qingsu.fuckview.Constant.ENTRY_CLASS;
 import static ml.qingsu.fuckview.Constant.HOOK_CLASS;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.Constant.VAILD_METHOD;

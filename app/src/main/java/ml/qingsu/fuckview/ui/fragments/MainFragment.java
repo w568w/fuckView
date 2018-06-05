@@ -307,6 +307,7 @@ public class MainFragment extends Fragment implements Searchable {
             default:
                 break;
         }
+        refreshTitle();
         return super.onContextItemSelected(item);
     }
 
@@ -373,7 +374,7 @@ public class MainFragment extends Fragment implements Searchable {
                     } else {
                         deleteList.add(i);
                     }
-                    getActivity().setTitle(deleteList.isEmpty() ? R.string.app_name : R.string.multi_select);
+                    refreshTitle();
                 }
             });
             BlockModel bm = models.get(i);
@@ -402,5 +403,8 @@ public class MainFragment extends Fragment implements Searchable {
             return view;
         }
 
+    }
+    private void refreshTitle(){
+        getActivity().setTitle(deleteList.isEmpty() ? R.string.app_name : R.string.multi_select);
     }
 }

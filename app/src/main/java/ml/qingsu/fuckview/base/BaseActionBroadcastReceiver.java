@@ -24,6 +24,7 @@ public abstract class BaseActionBroadcastReceiver extends BroadcastReceiver {
     public static BaseActionBroadcastReceiver createAndRegisterReceiver(Class<? extends BaseActionBroadcastReceiver> clz, Context context) throws IllegalAccessException, InstantiationException {
         BaseActionBroadcastReceiver broadcastReceiver = clz.newInstance();
         broadcastReceiver.registerReceiver(context);
+
         return broadcastReceiver;
     }
 

@@ -3,6 +3,7 @@ package ml.qingsu.fuckview.ui.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +13,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -46,11 +47,9 @@ import ml.qingsu.fuckview.ui.fragments.CheckerFragment;
 import ml.qingsu.fuckview.ui.fragments.MainFragment;
 import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
-import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
 
-import static android.os.Build.VERSION.SDK;
 import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.KEY_DONT_SHOW_RATE_DIALOG;
 import static ml.qingsu.fuckview.Constant.KEY_THEME;
@@ -69,6 +68,10 @@ public class MainActivity extends BaseAppCompatActivity {
     private static SharedPreferences sSharedPreferences;
     private SharedPreferences mSettings;
     public Fragment currentFragment;
+
+    public static boolean isModuleActive() {
+        return false;
+    }
 
     @SuppressLint("WorldReadableFiles")
     @Override
@@ -205,6 +208,9 @@ public class MainActivity extends BaseAppCompatActivity {
             //startGuide();
             hasShownGuide = true;
         }
+        if(hasFocus){
+
+        }
     }
 
     private void checkAndCallPermission(String permission) {
@@ -307,6 +313,7 @@ public class MainActivity extends BaseAppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_about) {
             setFragment(new CheckerFragment());
+            //Debug.stopMethodTracing();
         } else if (item.getItemId() == R.id.action_settings) {
             startActivityForResult(new Intent(this, PreferencesActivity.class), REQUEST_NEW_FRAGMENT);
         }
@@ -419,6 +426,15 @@ public class MainActivity extends BaseAppCompatActivity {
         return sSharedPreferences.getString(filename, "");
     }
 
+    private void changeIcon(String activityPath) {
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(getComponentName(),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        pm.setComponentEnabledSetting(new ComponentName(this, activityPath),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+    }
+
     public static ArrayList<String> readPreferenceByLine(String filename) {
         String data = readPreferences(filename);
         ArrayList<String> arrayList = new ArrayList<>();
@@ -428,10 +444,6 @@ public class MainActivity extends BaseAppCompatActivity {
             }
         }
         return arrayList;
-    }
-
-    public static boolean isModuleActive() {
-        return false;
     }
 
 }

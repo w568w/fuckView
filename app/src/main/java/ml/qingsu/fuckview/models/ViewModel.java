@@ -28,8 +28,7 @@ public class ViewModel extends BlockModel {
             id = spilted[0];
             path = spilted[1];
             position = spilted[2];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException ignored) {
         }
     }
 

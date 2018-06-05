@@ -2,43 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:padding="16dp"
     android:layout_height="match_parent"
-    tools:context="ml.qingsu.fuckview.ui.activities.ExperimentActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="ml.qingsu.fuckview.ui.activities.ExperimentActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
         android:text="这里包括了一些净眼行将完整支持，但暂未公测的功能。"
-        />
+        android:textSize="18sp" />
+
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="32sp"
-        android:textStyle="bold"
         android:text="酷安头条净化"
-        />
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:paddingTop="8dp"
         android:text="在下面输入你要屏蔽的头条关键词，\n然后点击保存。强制停止酷安后生效。"
-        />
+        android:textSize="18sp" />
+
     <EditText
         android:id="@+id/lab_word"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="32sp"
         android:hint="如:王者荣耀"
-        />
+        android:textSize="32sp" />
+
     <Button
         android:id="@+id/lab_save"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:text="保存 !"
-        />
+        android:text="保存 !" />
 </LinearLayout>

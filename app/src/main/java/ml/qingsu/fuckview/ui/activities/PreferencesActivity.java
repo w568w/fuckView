@@ -37,6 +37,7 @@ import static ml.qingsu.fuckview.Constant.SUPER_MODE_NAME;
 public class PreferencesActivity extends PreferenceActivity {
     private int clickTime = 0;
     public static final int RESULT_GUIDE = 0x100;
+    private int versionClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +120,11 @@ public class PreferencesActivity extends PreferenceActivity {
         findPreference("version").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                startActivity(new Intent(PreferencesActivity.this,ExperimentActivity.class));
+                versionClickTime++;
+                if (versionClickTime > 5) {
+                    versionClickTime = 0;
+                    startActivity(new Intent(PreferencesActivity.this, ExperimentActivity.class));
+                }
                 return false;
             }
         });
