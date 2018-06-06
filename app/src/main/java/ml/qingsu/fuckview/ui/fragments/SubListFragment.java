@@ -53,14 +53,14 @@ public class SubListFragment extends Fragment implements Searchable{
     private Activity context;
     ArrayList<BlockModel> models;
     private AppAdapter adapter;
-    PackageManager pm;
+    PackageManager packageManager;
     private ArrayList<Integer> deleteList = new ArrayList<>();
     String searchText = "";
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getActivity();
-        pm = context.getPackageManager();
+        packageManager = context.getPackageManager();
         FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.main_fragment, null);
         listView = (ListView) layout.findViewById(R.id.listView);
         TextView noItem = (TextView) layout.findViewById(R.id.no_item);
@@ -73,14 +73,14 @@ public class SubListFragment extends Fragment implements Searchable{
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SelectAppWizard tw = new SelectAppWizard();
+                SelectAppWizard wizard = new SelectAppWizard();
                 Bundle bundle = new Bundle();
                 if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("system_app", false)) {
                     bundle.putBoolean("sys", true);
                 }
-                tw.setArguments(bundle);
+                wizard.setArguments(bundle);
                 if (context instanceof MainActivity) {
-                    ((MainActivity) context).setFragment(tw);
+                    ((MainActivity) context).setFragment(wizard);
                 }
             }
         });
@@ -230,7 +230,7 @@ public class SubListFragment extends Fragment implements Searchable{
                 break;
             case 7:
                 try {
-                    startActivity(pm.getLaunchIntentForPackage(model.packageName));
+                    startActivity(packageManager.getLaunchIntentForPackage(model.packageName));
                 } catch (Exception e) {
                     Toast.makeText(getActivity(), R.string.cant_start_app, Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
@@ -317,8 +317,8 @@ public class SubListFragment extends Fragment implements Searchable{
             });
             BlockModel bm = models.get(i);
             try {
-                icon.setImageDrawable(getAppIcon(pm, bm.packageName));
-                title.setText(getAppTitle(pm, bm.packageName));
+                icon.setImageDrawable(getAppIcon(packageManager, bm.packageName));
+                title.setText(getAppTitle(packageManager, bm.packageName));
             } catch (Exception e) {
                 //Application not found
                 icon.setImageResource(R.drawable.ic_launcher);

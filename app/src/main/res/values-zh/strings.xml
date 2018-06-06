@@ -117,4 +117,5 @@
     <string name="welcome_to_xposed">打开Xposed Installer</string>
     <string name="no_item">这里空空荡荡的</string>
     <string name="fuckview_lab">净眼实验室</string>
+    <string name="rules">%1$d 条规则</string>
 </resources>

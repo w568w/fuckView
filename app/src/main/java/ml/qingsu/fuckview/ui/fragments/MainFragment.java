@@ -291,11 +291,13 @@ public class MainFragment extends Fragment implements Searchable {
             }
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             TextView title = (TextView) view.findViewById(R.id.app_name);
+            TextView type = (TextView) view.findViewById(R.id.class_name);
             view.findViewById(R.id.checkbox).setVisibility(View.GONE);
             BlockModel bm = models.get(i).get(0);
             try {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));
+                type.setText(String.format(getString(R.string.rules),models.get(i).size()));
             } catch (Exception e) {
                 //Application not found
                 title.setText(bm.packageName);
