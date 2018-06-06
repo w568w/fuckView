@@ -1,6 +1,7 @@
 package ml.qingsu.fuckview.ui.fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -37,11 +40,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
@@ -52,16 +57,16 @@ import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 
 /**
  * By w568w on 2017-7-6.
+ * @author w568w
  */
 
 public class MainFragment extends Fragment implements Searchable {
     private AppAdapter adapter;
     private Activity context;
     PackageManager pm;
-    ArrayList<BlockModel> models;
+    public static ArrayList<ArrayList<BlockModel>> models = new ArrayList<>();
     ListView listView;
     String searchText = "";
-    private ArrayList<Integer> deleteList = new ArrayList<>();
 
     public static String getAppTitle(PackageManager pm, String packageName) {
         try {
@@ -83,6 +88,28 @@ public class MainFragment extends Fragment implements Searchable {
         return new BitmapDrawable();
     }
 
+    private ArrayList<ArrayList<BlockModel>> fold(ArrayList<BlockModel> flatList) {
+        String pkgname = "";
+        ArrayList<BlockModel> currentList = null;
+        ArrayList<ArrayList<BlockModel>> list = new ArrayList<>();
+        for (int i = 0, len = flatList.size(); i < len; i++) {
+            BlockModel model = flatList.get(i);
+            if (pkgname.equals(model.packageName)) {
+                currentList.add(model);
+            } else {
+                if (currentList == null) {
+                    currentList = new ArrayList<>();
+                } else {
+                    list.add((ArrayList<BlockModel>) currentList.clone());
+                    currentList.clear();
+                }
+                currentList.add(model);
+            }
+            pkgname = model.packageName;
+        }
+        return list;
+    }
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -90,30 +117,63 @@ public class MainFragment extends Fragment implements Searchable {
         pm = context.getPackageManager();
         FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.main_fragment, null);
         listView = (ListView) layout.findViewById(R.id.listView);
-        TextView noItem= (TextView) layout.findViewById(R.id.no_item);
+        final TextView noItem = (TextView) layout.findViewById(R.id.no_item);
         noItem.setVisibility(View.GONE);
-        models = BlockModel.readModel();
-        try {
-            Collections.sort(models, new Comparator<BlockModel>() {
-                @Override
-                public int compare(BlockModel blockModel, BlockModel t1) {
-                    String s1 = getAppTitle(pm, blockModel.packageName);
-                    String s2 = getAppTitle(pm, t1.packageName);
-                    //JDK7: RFE: 6804124
-                    //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
-                    if (s1.equals(s2)) {
-                        return 0;
-                    }
-                    return Collator.getInstance(Locale.CHINA).compare(s1, s2);
+
+        final android.app.AlertDialog progressDialog = new ProgressDialog.Builder(context)
+                .setMessage(R.string.loading).setCancelable(false).show();
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                final ArrayList<BlockModel> arrayList = BlockModel.readModel();
+                try {
+                    Collections.sort(arrayList, new Comparator<BlockModel>() {
+                        @Override
+                        public int compare(BlockModel blockModel, BlockModel t1) {
+                            String s1 = blockModel.packageName;
+                            String s2 = t1.packageName;
+                            //JDK7: RFE: 6804124
+                            //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
+                            if (s1.equals(s2)) {
+                                return 0;
+                            }
+                            return Collator.getInstance(Locale.CHINA).compare(s1, s2);
+                        }
+                    });
+                    models = fold(arrayList);
+                    Collections.sort(models, new Comparator<ArrayList<BlockModel>>() {
+                        @Override
+                        public int compare(ArrayList<BlockModel> lhs, ArrayList<BlockModel> rhs) {
+                            String s1 = getAppTitle(pm, lhs.get(0).packageName);
+                            String s2 = getAppTitle(pm, rhs.get(0).packageName);
+                            //JDK7: RFE: 6804124
+                            //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
+                            if (s1.equals(s2)) {
+                                return 0;
+                            }
+                            return Collator.getInstance(Locale.CHINA).compare(s1, s2);
+                        }
+                    });
+                } catch (IllegalArgumentException e) {
+                    //So we do not sort them,OK?
+                    e.printStackTrace();
                 }
-            });
-        } catch (IllegalArgumentException e) {
-            //So we do not sort them,OK?
-            e.printStackTrace();
-        }
-        adapter = new AppAdapter();
-        listView.setAdapter(adapter);
-        registerForContextMenu(listView);
+                adapter = new AppAdapter();
+                listView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //If there's no rule...
+                        if (models.isEmpty()) {
+                            listView.setVisibility(View.GONE);
+                            noItem.setVisibility(View.VISIBLE);
+                        } else {
+                            listView.setAdapter(adapter);
+                        }
+                        progressDialog.dismiss();
+                    }
+                });
+            }
+        });
         final FloatingActionButton button = (FloatingActionButton) layout.findViewById(R.id.fab);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,33 +192,13 @@ public class MainFragment extends Fragment implements Searchable {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BlockModel model = models.get(i);
                 Bundle bundle = new Bundle();
-                bundle.putString("pkg", model.packageName);
-                bundle.putString("record", model.record);
-                bundle.putString("className", model.className);
-                InfoFragment infoFragment = new InfoFragment();
-                infoFragment.setArguments(bundle);
+                bundle.putInt("index", i);
+                SubListFragment subListFragment = new SubListFragment();
+                subListFragment.setArguments(bundle);
                 if (context instanceof MainActivity) {
-                    ((MainActivity) context).setFragment(infoFragment);
+                    ((MainActivity) context).setFragment(subListFragment);
                 }
-                ImageView iconView = (ImageView) view.findViewById(R.id.icon);
-
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                //TODO Does not work but I don't know how to fix it.
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                    //Set animation
-//                    infoFragment.setSharedElementEnterTransition(new InfoTransition());
-//                    infoFragment.setEnterTransition(new Fade());
-//                    setExitTransition(new Fade());
-//                    infoFragment.setSharedElementReturnTransition(new InfoTransition());
-//
-//                    transaction.addSharedElement(iconView, "icon");
-//                }
-
-                transaction
-                        .replace(R.id.fl, infoFragment)
-                        .commit();
             }
         });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -190,11 +230,7 @@ public class MainFragment extends Fragment implements Searchable {
 
             }
         });
-        //If there's no rule...
-        if(models.isEmpty()){
-            listView.setVisibility(View.GONE);
-            noItem.setVisibility(View.VISIBLE);
-        }
+
         return layout;
     }
 
@@ -212,21 +248,6 @@ public class MainFragment extends Fragment implements Searchable {
         }
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        BlockModel model = models.get(info.position);
-        if (deleteList.size() > 0) {
-            menu.add(0, 4, Menu.NONE, R.string.delete_selections);
-            menu.add(0, 5, Menu.NONE, R.string.share_selections);
-            return;
-        }
-        menu.add(0, 1, Menu.NONE, R.string.delete_item);
-        menu.add(0, 3, Menu.NONE, R.string.share);
-        menu.add(0, 6, Menu.NONE, model.enable ? R.string.disable_item : R.string.enable_item);
-        menu.add(0, 7, Menu.NONE, R.string.start_app);
-    }
 
     @Override
     public void setSearchText(String text) {
@@ -237,97 +258,6 @@ public class MainFragment extends Fragment implements Searchable {
 
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        final BlockModel model = models.get(menuInfo.position);
-        switch (item.getItemId()) {
-            case 1:
-                models.remove(menuInfo.position);
-                adapter.notifyDataSetChanged();
-                saveAll();
-                break;
-            case 2:
-                new AlertDialog.Builder(context)
-                        .setTitle(R.string.confirm)
-                        .setMessage("是否要将此项设为不按类名定位？\n这样可能会解决一些无法屏蔽的问题，但是也会增加一些误伤的几率。\n\n注意:此操作不可逆!")
-                        .setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                model.className = "*";
-                                models.set(menuInfo.position, model);
-                                adapter.notifyDataSetChanged();
-                                saveAll();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-                break;
-            case 3:
-                share(model.toString());
-                break;
-            case 4:
-                ArrayList<BlockModel> arrayList = new ArrayList<>();
-                for (Integer postion : deleteList) {
-                    arrayList.add(models.get(postion));
-                }
-                models.removeAll(arrayList);
-                deleteList.clear();
-                adapter.notifyDataSetChanged();
-
-                saveAll();
-                break;
-            case 5:
-                ArrayList<BlockModel> shares = new ArrayList<>();
-                for (Integer postion : deleteList) {
-                    shares.add(models.get(postion));
-                }
-                deleteList.clear();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (BlockModel model1 : shares) {
-                    stringBuilder.append(model1.toString()).append("\n");
-                }
-                share(stringBuilder.toString());
-                adapter.notifyDataSetChanged();
-                break;
-            case 6:
-                model.enable = !model.enable;
-                models.set(menuInfo.position, model);
-                adapter.notifyDataSetChanged();
-                saveAll();
-                break;
-            case 7:
-                try {
-                    startActivity(pm.getLaunchIntentForPackage(model.packageName));
-                } catch (Exception e) {
-                    Toast.makeText(getActivity(), R.string.cant_start_app, Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                break;
-        }
-        refreshTitle();
-        return super.onContextItemSelected(item);
-    }
-
-    private void share(String text) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        intent.setType("text/plain");
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, R.string.no_share_app, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void saveAll() {
-        MainActivity.writePreferences("", Constant.LIST_NAME);
-        for (BlockModel bm : models) {
-            bm.save();
-        }
-    }
 
     private class AppAdapter extends BaseAdapter {
         @Override
@@ -361,40 +291,14 @@ public class MainFragment extends Fragment implements Searchable {
             }
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             TextView title = (TextView) view.findViewById(R.id.app_name);
-            TextView type = (TextView) view.findViewById(R.id.class_name);
-            ViewCompat.setTransitionName(icon, String.valueOf(i) + "_image");
-            final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkbox);
-            checkbox.setChecked(contains(deleteList, i));
-            checkbox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    boolean isChecked = contains(deleteList, i);
-                    if (isChecked) {
-                        deleteList.remove(Integer.valueOf(i));
-                    } else {
-                        deleteList.add(i);
-                    }
-                    refreshTitle();
-                }
-            });
-            BlockModel bm = models.get(i);
+            view.findViewById(R.id.checkbox).setVisibility(View.GONE);
+            BlockModel bm = models.get(i).get(0);
             try {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));
             } catch (Exception e) {
                 //Application not found
-                icon.setImageResource(R.drawable.ic_launcher);
                 title.setText(bm.packageName);
-            }
-            //是否是经典模式
-
-            if (bm.text.isEmpty()) {
-                type.setText(bm.className);
-            } else {
-                type.setText(String.format("%s ---> %s", bm.className, bm.text));
-            }
-            if (!bm.enable) {
-                view.setBackgroundColor(Color.GRAY);
             }
             if (!searchText.isEmpty() && !title.getText().toString().toLowerCase().contains(searchText.toLowerCase())) {
                 view = new View(context);
@@ -403,8 +307,5 @@ public class MainFragment extends Fragment implements Searchable {
             return view;
         }
 
-    }
-    private void refreshTitle(){
-        getActivity().setTitle(deleteList.isEmpty() ? R.string.app_name : R.string.multi_select);
     }
 }

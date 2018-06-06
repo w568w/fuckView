@@ -13,8 +13,8 @@ import de.psdev.licensesdialog.licenses.License;
 public class GnuAfferoGeneralPublicLicense30 extends License {
     private static final String LICENSE = "This program is free software: you can redistribute it and/or modify\n" +
             " it under the terms of the GNU Affero General Public License as\n" +
-            " published by the Free Software Foundation, either version 3 of the\n" +
-            " License, or (at your option) any later version.\n" +
+            " published by the Free Software Foundation version 3 of the\n" +
+            " License.\n" +
             "\n" +
             " This program is distributed in the hope that it will be useful,\n" +
             " but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
