@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,11 +24,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -49,6 +55,8 @@ import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
+import ml.qingsu.fuckview.utils.ReflectionUtils;
+import ml.qingsu.fuckview.utils.ViewUtils;
 
 import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
 import static ml.qingsu.fuckview.Constant.KEY_DONT_SHOW_RATE_DIALOG;
@@ -73,16 +81,21 @@ public class MainActivity extends BaseAppCompatActivity {
         return false;
     }
 
+    public static boolean isDayTheme(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_THEME, false);
+    }
+
     @SuppressLint("WorldReadableFiles")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         //Setting the theme
-        if (mSettings.getBoolean(KEY_THEME, false)) {
+        if (isDayTheme(this)) {
             setTheme(R.style.DayTheme);
         }
         setContentView(R.layout.activity_main);
+
         checkAndCallPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
@@ -116,7 +129,11 @@ public class MainActivity extends BaseAppCompatActivity {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_SCREEN_ON);
             filter.addAction(Intent.ACTION_SCREEN_OFF);
-            registerReceiver(new BootCompleteReceiver(), filter);
+            try {
+                registerReceiver(new BootCompleteReceiver(), filter);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -208,8 +225,10 @@ public class MainActivity extends BaseAppCompatActivity {
             //startGuide();
             hasShownGuide = true;
         }
-        if(hasFocus){
-
+        if (hasFocus) {
+            if (mSettings.getBoolean(KEY_THEME, false)) {
+                ViewUtils.setActionBarTextColor(this, Color.WHITE);
+            }
         }
     }
 

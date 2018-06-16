@@ -10,6 +10,8 @@ import android.widget.Toast;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 
+import static ml.qingsu.fuckview.ui.activities.MainActivity.isDayTheme;
+
 /**
  * @author w568w
  */
@@ -18,6 +20,9 @@ public class ExperimentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (isDayTheme(this)) {
+            setTheme(R.style.DayTheme);
+        }
         setContentView(R.layout.activity_experiment);
         setTitle(R.string.fuckview_lab);
         findViewById(R.id.lab_save).setOnClickListener(new View.OnClickListener() {

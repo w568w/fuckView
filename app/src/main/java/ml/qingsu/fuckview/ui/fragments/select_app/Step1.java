@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageStats;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,7 +45,9 @@ import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.Lists;
+import ml.qingsu.fuckview.utils.PackageUtils;
 import ml.qingsu.fuckview.utils.ShellUtils;
+import ml.qingsu.fuckview.utils.ViewUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
 /**
@@ -129,6 +133,7 @@ public class Step1 extends WizardStep implements Searchable {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
+            PackageUtils.initLists(getContext());
             singleThreadPool.execute(new LoadTask());
         }
     }
@@ -156,9 +161,11 @@ public class Step1 extends WizardStep implements Searchable {
 
     private class AppAdapter extends BaseAdapter {
         private List<AppInfo> mAppList;
+        private int primaryColor;
 
         AppAdapter(List<AppInfo> a) {
             mAppList = a;
+            primaryColor = ViewUtils.getColor(getActivity(), android.R.attr.textColorPrimary);
         }
 
         public void setList(List<AppInfo> a) {
@@ -199,11 +206,16 @@ public class Step1 extends WizardStep implements Searchable {
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
-            viewHolder.name.setText("    " + mAppList.get(i).appName);
-            viewHolder.icon.setImageDrawable(mAppList.get(i).appIcon);
+            AppInfo ai = mAppList.get(i);
+            if (PackageUtils.isRunning(ai.packageName)) {
+                viewHolder.name.setTextColor(Color.RED);
+            } else {
+                viewHolder.name.setTextColor(primaryColor);
+            }
+            viewHolder.name.setText("    " + ai.appName);
+            viewHolder.icon.setImageDrawable(ai.appIcon);
             if (mSelectPosition == i) {
                 viewHolder.select.setChecked(true);
-
             } else {
                 viewHolder.select.setChecked(false);
             }

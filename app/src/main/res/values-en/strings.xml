@@ -111,4 +111,13 @@
     <string name="welcome_to_xposed">Open Xposed Installer</string>
     <string name="no_item">Nothing here,keep calm.</string>
     <string name="fuckview_lab">FuckView Lab</string>
+    <string name="fuck">SHUT UP</string>
+    <string name="rules">%1$d rule(s)</string>
+    <string name="save">Save</string>
+    <string name="thats_okay">All Right…</string>
+    <string name="loading">Loading…</string>
+    <string name="feel_bad">The developer feels very bad…</string>
+    <string name="conf_keep_alive_des">Try to keep the module alive when marking in order to prevent the floating window from being killed.</string>
+    <string name="conf_icon_name">App Icon</string>
+    <string name="conf_icon_des">Choose an icon</string>
 </resources>

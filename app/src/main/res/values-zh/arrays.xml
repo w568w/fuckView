@@ -8,4 +8,8 @@
         <item>选好了吗？点击下面的[点击保存规则]。</item>
         <item>如果感觉还行，就点击"结束屏蔽"，返回净眼吧。</item>
     </array>
+    <array name="icon">
+        <item>原图标</item>
+        <item>新图标</item>
+    </array>
 </resources>

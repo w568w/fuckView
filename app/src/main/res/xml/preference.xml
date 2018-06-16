@@ -66,6 +66,13 @@
             android:key="theme"
             android:summary="@string/conf_theme_des"
             android:title="@string/conf_theme_name" />
+        <ListPreference
+            android:defaultValue="@string/conf_icon_def"
+            android:entries="@array/icon"
+            android:entryValues="@array/icon_values"
+            android:key="icon"
+            android:summary="@string/conf_icon_des"
+            android:title="@string/conf_icon_name" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="enable_log"
@@ -75,8 +82,7 @@
             android:defaultValue="true"
             android:key="keep_alive"
             android:summary="@string/conf_keep_alive_des"
-            android:title="@string/conf_keep_alive_name"
-            />
+            android:title="@string/conf_keep_alive_name" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/conf_about">

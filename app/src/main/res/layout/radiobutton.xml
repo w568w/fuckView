@@ -1,41 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="56dp"
     android:padding="8dp">
 
 
+
+
+    <LinearLayout
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/icon"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/icon_view" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView"
+                android:textSize="16sp"
+                android:text="ssss"
+                android:layout_marginLeft="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"/>
+
+            <!--<TextView-->
+                <!--android:id="@+id/class_name"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textSize="14sp" />-->
+        </LinearLayout>
+
+    </LinearLayout>
     <RadioButton
         android:id="@+id/radioButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
         android:checked="false"
         android:clickable="false"
         android:focusable="false"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <ImageView
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/icon"
-        android:layout_toRightOf="@id/radioButton"
-        android:id="@+id/icon_view" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:textSize="16sp"
-        android:text="ssss"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:textStyle="bold"
-        android:layout_toRightOf="@id/icon_view"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentRight="true" />
 </RelativeLayout>

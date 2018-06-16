@@ -3,4 +3,13 @@
     <array name="guide">
         <item>ss</item>
     </array>
+    <array name="icon">
+        <item>Old icon</item>
+        <item>New icon</item>
+    </array>
+    <string-array name="icon_values">
+        <item>old</item>
+        <item>new</item>
+    </string-array>
 </resources>
+

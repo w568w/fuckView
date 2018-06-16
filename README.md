@@ -1,4 +1,5 @@
 # fuckView
+![FUCKVIEW](icon.png)
 [![Build Status](https://travis-ci.org/w568w/fuckView.svg?branch=master)](https://travis-ci.org/w568w/fuckView)
   
 An Android xposed moudle which can block anything you want to block in any app,just like super AdBlocker.  

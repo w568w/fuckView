@@ -118,4 +118,8 @@
     <string name="no_item">这里空空荡荡的</string>
     <string name="fuckview_lab">净眼实验室</string>
     <string name="rules">%1$d 条规则</string>
+    <string name="save">保存</string>
+    <string name="conf_icon_des">切换应用图标</string>
+    <string name="conf_icon_name">应用图标</string>
+    <string name="loading">加载中...</string>
 </resources>

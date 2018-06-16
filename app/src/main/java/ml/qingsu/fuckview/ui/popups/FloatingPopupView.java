@@ -48,17 +48,22 @@ public class FloatingPopupView extends BasePopupWindow {
     private int mGravity = Gravity.TOP;
     private BasePopupWindow mFullScreenPopupWindow;
     private boolean isNotList;
-    private boolean isLayoutParsingEnabled;
     private Button mRefresh;
     private ProgressBar mClosingProgress;
     private TextView mInfo;
     private HookBrocastReceiver mReceiver;
+    private Button mSave;
 
     public FloatingPopupView(Activity activity, String pkg) {
         super(activity);
         mPackageName = pkg;
         isNotList = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("no_list", true);
-        isLayoutParsingEnabled = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_layout_parse", false);
+        boolean isLayoutParsingEnabled = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_layout_parse", false);
+        if (isLayoutParsingEnabled) {
+            mRefresh.setVisibility(View.VISIBLE);
+        } else {
+            mRefresh.setVisibility(View.GONE);
+        }
         mReceiver = new HookBrocastReceiver();
     }
 
@@ -68,13 +73,10 @@ public class FloatingPopupView extends BasePopupWindow {
         mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
         mInfo = (TextView) layout.findViewById(R.id.dump_info);
         mClosingProgress = (ProgressBar) layout.findViewById(R.id.dump_progress);
+        mSave = (Button) layout.findViewById(R.id.dump_save);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
-        if (isLayoutParsingEnabled) {
-            mRefresh.setVisibility(View.VISIBLE);
-        } else {
-            mRefresh.setVisibility(View.GONE);
-        }
+
         setFocusable(false);
         mRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +119,7 @@ public class FloatingPopupView extends BasePopupWindow {
                 updateLayout();
             }
         });
-        mInfo.setOnClickListener(new View.OnClickListener() {
+        mSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -128,6 +130,7 @@ public class FloatingPopupView extends BasePopupWindow {
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
                     mInfo.setText("");
+                    mSave.setVisibility(View.GONE);
                     EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.MARKED.ordinal()));
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
@@ -202,12 +205,11 @@ public class FloatingPopupView extends BasePopupWindow {
 
         @Override
         public void onReceiving(Context context, Intent intent) {
-            int height = intent.getIntExtra("height", 0);
-            int width = intent.getIntExtra("width", 0);
             ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
             if (viewModel != null) {
                 mInfo.setTag(viewModel);
-                mInfo.setText(context.getString(R.string.click_to_save) + " " + viewModel.getPath());
+                mInfo.setText(viewModel.className);
+                mSave.setVisibility(View.VISIBLE);
                 EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.CLICKED.ordinal()));
             }
         }

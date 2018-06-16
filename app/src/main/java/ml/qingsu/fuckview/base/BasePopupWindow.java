@@ -19,7 +19,7 @@ public abstract class BasePopupWindow {
     protected Context appContext;
     private WindowManager mWindowManager = null;
     protected WindowManager.LayoutParams params;
-    private final View view;
+    private View view;
     private boolean isShown = false;
 
     protected abstract View onCreateView(Context context);

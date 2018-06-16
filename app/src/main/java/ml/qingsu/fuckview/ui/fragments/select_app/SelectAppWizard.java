@@ -20,6 +20,7 @@ import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.FloatingPopupView;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
+import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.wizard.BaseWizard;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
@@ -72,7 +73,19 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
                 .edit().putString(Constant.PACKAGE_NAME_NAME, Step1.sSelected.packageName).commit();
         //等待數據寫入完成
         SystemClock.sleep(100);
-
+        ShellUtils.asyncStopProcess(Step1.sSelected.packageName, new Runnable() {
+            @Override
+            public void run() {
+                mCon.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity();
+                    }
+                });
+            }
+        },null);
+    }
+    private void startActivity(){
         PackageManager pm = mCon.getPackageManager();
         try {
             mCon.startActivity(pm.getLaunchIntentForPackage(Step1.sSelected.packageName));
@@ -92,7 +105,6 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
             CrashReport.postCatchedException(e);
         }
     }
-
     @Override
     public void setSearchText(String text) {
         if (step1 != null) {

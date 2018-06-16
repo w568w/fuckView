@@ -1,6 +1,8 @@
 package ml.qingsu.fuckview.ui.activities;
 
+import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,8 +31,12 @@ import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.utils.GnuAfferoGeneralPublicLicense30;
 import ml.qingsu.fuckview.utils.ShellUtils;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+import static android.content.pm.PackageManager.DONT_KILL_APP;
 import static ml.qingsu.fuckview.Constant.ENABLE_LOG_NAME;
 import static ml.qingsu.fuckview.Constant.ONLY_ONCE_NAME;
+import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.Constant.STANDARD_MODE_NAME;
 import static ml.qingsu.fuckview.Constant.SUPER_MODE_NAME;
 
@@ -211,6 +217,19 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
                 startActivity(restart);
                 return false;
+            }
+        });
+        findPreference("icon").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                PackageManager pm = getPackageManager();
+                boolean usingOld = "old".equals(newValue);
+                pm.setComponentEnabledSetting(new ComponentName(getBaseContext(), PKG_NAME + ".ui.activities.MainActivity")
+                        , usingOld ? COMPONENT_ENABLED_STATE_DISABLED : COMPONENT_ENABLED_STATE_ENABLED, DONT_KILL_APP);
+                pm.setComponentEnabledSetting(new ComponentName(getBaseContext(), PKG_NAME + ".ui.activities.MainActivityOldIcon")
+                        , usingOld ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED, DONT_KILL_APP);
+
+                return true;
             }
         });
         findPreference("enable_log").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

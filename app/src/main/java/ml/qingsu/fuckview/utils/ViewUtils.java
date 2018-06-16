@@ -1,6 +1,8 @@
 package ml.qingsu.fuckview.utils;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -117,5 +119,25 @@ public final class ViewUtils {
                 view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             }
         });
+    }
+
+    public static int getColor(Context context, int attrId) {
+        TypedArray typedArray = context.obtainStyledAttributes(new int[]{attrId});
+        int accentColor = typedArray.getColor(0, 0xFF000000);
+        // don't forget the resource recycling
+        typedArray.recycle();
+        return accentColor;
+    }
+
+    public static void setActionBarTextColor(AppCompatActivity activity,int color){
+        try {
+            Object actionbar=ReflectionUtils.getField(activity.getDelegate(),"mActionBar");
+            View actionBarContent= (View) ReflectionUtils.getField(actionbar,"mContainerView");
+            View actionBarView= (View) ReflectionUtils.getField(actionBarContent,"mActionBarView");
+            TextView textView= (TextView) ReflectionUtils.getField(actionBarView,"mTitleTextView");
+            textView.setTextColor(color);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }

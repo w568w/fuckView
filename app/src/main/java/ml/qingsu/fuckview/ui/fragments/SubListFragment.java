@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
@@ -325,7 +326,6 @@ public class SubListFragment extends Fragment implements Searchable{
                 title.setText(bm.packageName);
             }
             //是否是经典模式
-
             if (bm.text.isEmpty()) {
                 type.setText(bm.className);
             } else {

@@ -1,5 +1,6 @@
 package ml.qingsu.fuckview.ui.fragments;
 
+import android.app.usage.UsageStatsManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 /**
- *
  * @author w568w
  * @date 2017-7-7
  */
@@ -44,7 +44,7 @@ public class InfoFragment extends Fragment {
         String ids = getArguments().getString("record");
         String classNames = getArguments().getString("className");
 
-        ViewCompat.setTransitionName(icon,"icon");
+        ViewCompat.setTransitionName(icon, "icon");
         appName.setText(MainFragment.getAppTitle(pm, pkg));
         packageName.setText(pkg);
         className.setText(classNames);

@@ -68,12 +68,15 @@ public class ShellUtils {
                 } finally {
                     if (runner != null) {
                         runner.post(callback);
+                    }else{
+                        callback.run();
                     }
                 }
 
             }
         });
     }
+
     /**
      * check whether has root permission
      *

@@ -34,12 +34,31 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/dump_info"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:clickable="true" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/dump_save"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:drawableLeft="@drawable/save"
+            android:text="@string/save" />
+
+        <TextView
+            android:id="@+id/dump_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="4dp"
+            android:layout_toLeftOf="@id/dump_save"
+            android:clickable="true" />
+    </RelativeLayout>
+
 
     <ProgressBar
         android:id="@+id/dump_progress"

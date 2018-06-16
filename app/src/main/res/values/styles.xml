@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
@@ -8,9 +8,15 @@
     </style>
 
     <style name="DayTheme" parent="Theme.AppCompat.Light">
-        <item name="android:textColorPrimary">#000</item>
-        <item name="floating_action_button_color">#80cbc4</item>
-        <item name="floating_action_button_ripple_color">#009688</item>
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="colorAccent">#03A9F4</item>
+        <item name="android:textColorPrimaryDisableOnly">@android:color/white</item>
+        <item name="android:divider">#BDBDBD</item>
+        <item name="android:textColorSecondary">#757575</item>
+        <item name="floating_action_button_color">#2196F3</item>
+        <item name="floating_action_button_ripple_color">#2196F3</item>
     </style>
     <style name="OnePixelActivityStyle" parent="Theme.AppCompat">
         <item name="android:windowBackground">@android:color/transparent</item>
