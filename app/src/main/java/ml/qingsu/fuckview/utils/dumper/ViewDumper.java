@@ -134,25 +134,25 @@ public class ViewDumper {
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private synchronized static ViewItem nodeInfoToViewItem(@Nullable AccessibilityNodeInfo node, int depth) {
-        ViewItem vi = new ViewItem();
+        ViewItem viewItem = new ViewItem();
 
 
-        vi.id = id++;
-        vi.level = depth;
-        ViewItem v = getLastTopLevelNode(itemList, depth - 1);
-        vi.parentId = (v == null ? NO_PARENT : v.id);
+        viewItem.id = id++;
+        viewItem.level = depth;
+        ViewItem topLevelNode = getLastTopLevelNode(itemList, depth - 1);
+        viewItem.parentId = (topLevelNode == null ? NO_PARENT : topLevelNode.id);
         if (node == null) {
-            return vi;
+            return viewItem;
         }
         Rect rect = new Rect();
         node.getBoundsInScreen(rect);
-        vi.bounds = new Point(rect.left, rect.top);
-        vi.wh = new Point(rect.width(), rect.height());
-        vi.simpleClassName = node.getClassName().toString();
-        if (vi.simpleClassName.contains(".")) {
-            vi.simpleClassName = vi.simpleClassName.substring(vi.simpleClassName.lastIndexOf("."));
+        viewItem.bounds = new Point(rect.left, rect.top);
+        viewItem.wh = new Point(rect.width(), rect.height());
+        viewItem.simpleClassName = node.getClassName().toString();
+        if (viewItem.simpleClassName.contains(".")) {
+            viewItem.simpleClassName = viewItem.simpleClassName.substring(viewItem.simpleClassName.lastIndexOf("."));
         }
-        return vi;
+        return viewItem;
     }
 
     private static int id = 0;

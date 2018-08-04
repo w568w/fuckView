@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.TransactionTooLargeException;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
@@ -244,7 +245,13 @@ public class Step1 extends WizardStep implements Searchable {
             final Context act = mCon;
             mAppList = new ArrayList<>();
             PackageManager pm = act.getPackageManager();
-            List<PackageInfo> packages = pm.getInstalledPackages(0);
+            List<PackageInfo> packages = null;
+            try {
+                //Fix #5122
+                packages=pm.getInstalledPackages(0);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             if (packages == null || packages.size() == 0) {
                 mCon.runOnUiThread(new Runnable() {
                     @Override

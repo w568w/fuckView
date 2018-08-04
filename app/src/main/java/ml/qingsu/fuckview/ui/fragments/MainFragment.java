@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.AutoTransition;
 import android.transition.Explode;
 import android.transition.Fade;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,6 +93,9 @@ public class MainFragment extends Fragment implements Searchable {
         String pkgname = "";
         ArrayList<BlockModel> currentList = null;
         ArrayList<ArrayList<BlockModel>> list = new ArrayList<>();
+        if(flatList.size()==0){
+            return list;
+        }
         for (int i = 0, len = flatList.size(); i < len; i++) {
             BlockModel model = flatList.get(i);
             if (pkgname.equals(model.packageName)) {
@@ -106,6 +110,9 @@ public class MainFragment extends Fragment implements Searchable {
                 currentList.add(model);
             }
             pkgname = model.packageName;
+        }
+        if(!currentList.isEmpty()){
+            list.add((ArrayList<BlockModel>) currentList.clone());
         }
         return list;
     }
@@ -122,44 +129,49 @@ public class MainFragment extends Fragment implements Searchable {
 
         final android.app.AlertDialog progressDialog = new ProgressDialog.Builder(context)
                 .setMessage(R.string.loading).setCancelable(false).show();
+        Log.d("A","Showed!");
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
+
                 final ArrayList<BlockModel> arrayList = BlockModel.readModel();
-                try {
-                    Collections.sort(arrayList, new Comparator<BlockModel>() {
-                        @Override
-                        public int compare(BlockModel blockModel, BlockModel t1) {
-                            String s1 = blockModel.packageName;
-                            String s2 = t1.packageName;
-                            //JDK7: RFE: 6804124
-                            //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
-                            if (s1.equals(s2)) {
-                                return 0;
+                Log.d("A","Readed!");
+                if(!arrayList.isEmpty()) {
+                    try {
+                        Collections.sort(arrayList, new Comparator<BlockModel>() {
+                            @Override
+                            public int compare(BlockModel blockModel, BlockModel t1) {
+                                String s1 = blockModel.packageName;
+                                String s2 = t1.packageName;
+                                //JDK7: RFE: 6804124
+                                //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
+                                if (s1.equals(s2)) {
+                                    return 0;
+                                }
+                                return Collator.getInstance(Locale.CHINA).compare(s1, s2);
                             }
-                            return Collator.getInstance(Locale.CHINA).compare(s1, s2);
-                        }
-                    });
-                    models = fold(arrayList);
-                    Collections.sort(models, new Comparator<ArrayList<BlockModel>>() {
-                        @Override
-                        public int compare(ArrayList<BlockModel> lhs, ArrayList<BlockModel> rhs) {
-                            String s1 = getAppTitle(pm, lhs.get(0).packageName);
-                            String s2 = getAppTitle(pm, rhs.get(0).packageName);
-                            //JDK7: RFE: 6804124
-                            //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
-                            if (s1.equals(s2)) {
-                                return 0;
+                        });
+                        models = fold(arrayList);
+                        Collections.sort(models, new Comparator<ArrayList<BlockModel>>() {
+                            @Override
+                            public int compare(ArrayList<BlockModel> lhs, ArrayList<BlockModel> rhs) {
+                                String s1 = getAppTitle(pm, lhs.get(0).packageName);
+                                String s2 = getAppTitle(pm, rhs.get(0).packageName);
+                                //JDK7: RFE: 6804124
+                                //Synopsis: Updated sort behavior for Arrays and Collections may throw an IllegalArgumentException
+                                if (s1.equals(s2)) {
+                                    return 0;
+                                }
+                                return Collator.getInstance(Locale.CHINA).compare(s1, s2);
                             }
-                            return Collator.getInstance(Locale.CHINA).compare(s1, s2);
-                        }
-                    });
-                } catch (IllegalArgumentException e) {
-                    //So we do not sort them,OK?
-                    e.printStackTrace();
+                        });
+                    } catch (IllegalArgumentException e) {
+                        //So we do not sort them,OK?
+                        e.printStackTrace();
+                    }
                 }
                 adapter = new AppAdapter();
-                listView.post(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         //If there's no rule...
@@ -170,6 +182,7 @@ public class MainFragment extends Fragment implements Searchable {
                             listView.setAdapter(adapter);
                         }
                         progressDialog.dismiss();
+                        Log.d("A","DIsmissed!");
                     }
                 });
             }

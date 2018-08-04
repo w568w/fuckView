@@ -139,14 +139,16 @@ public class OnlineRulesFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<BlockModel> blockModels) {
             super.onPostExecute(blockModels);
-            mProgressBar.setVisibility(View.INVISIBLE);
+            if(isVisible()) {
+                mProgressBar.setVisibility(View.INVISIBLE);
 
-            for (BlockModel bm : blockModels) {
-                bm.save();
+                for (BlockModel bm : blockModels) {
+                    bm.save();
+                }
+                //Refresh Rules...
+                mLayout.setRefreshing(true);
+                new RefreshTask().execute();
             }
-            //Refresh Rules...
-            mLayout.setRefreshing(true);
-            new RefreshTask().execute();
         }
 
         @SafeVarargs

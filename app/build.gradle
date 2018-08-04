@@ -3,14 +3,14 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
     }
-    compileSdkVersion 23
-    buildToolsVersion '25.0.3'
+    compileSdkVersion rootProject.ext.compileVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "ml.qingsu.fuckview"
-        minSdkVersion 10
-        targetSdkVersion 23
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.compileVersion
         versionCode 25
-        versionName "0.9.3 experimental"
+        versionName "0.9.3.1 experimental"
     }
     //Do not check whether the translation has been completed or not when building APK,please?
     lintOptions {
@@ -44,9 +44,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:23+'
+    compile 'com.android.support:design:23+'
+    compile 'com.android.support:cardview-v7:23+'
     compile 'com.tencent.bugly:crashreport:latest.release'
     compile 'org.greenrobot:eventbus:3.1.1'
     provided 'de.robv.android.xposed:api:53'

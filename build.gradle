@@ -8,7 +8,11 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.3.3'
     }
 }
-
+ext{
+    buildToolsVersion="25.0.3"
+    compileVersion=23
+    minSdk=10
+}
 allprojects {
     repositories {
         jcenter()

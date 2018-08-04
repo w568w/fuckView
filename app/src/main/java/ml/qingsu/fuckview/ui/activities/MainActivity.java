@@ -28,6 +28,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,6 +79,9 @@ public class MainActivity extends BaseAppCompatActivity {
     public Fragment currentFragment;
 
     public static boolean isModuleActive() {
+        Log.d("asklmx","asduiwhledlweeejkdwa");
+        Log.d("asdewrde","asdufewfwefiwhledlweeejkdwa");
+        Log.i("asjsixask","iufwehuiidw");
         return false;
     }
 

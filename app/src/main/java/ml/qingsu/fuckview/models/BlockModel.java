@@ -55,6 +55,9 @@ public class BlockModel implements Serializable {
 
         ArrayList<String> lines = MainActivity.readPreferenceByLine(Constant.LIST_NAME);
         final int len = lines.size();
+        if(len==0){
+            return list;
+        }
         for (int i = 0; i < len; i++) {
             String str = lines.get(i);
             BlockModel model = fromString(str);
