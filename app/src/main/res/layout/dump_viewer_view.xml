@@ -44,9 +44,9 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:layout_alignParentRight="true"
             android:drawableLeft="@drawable/save"
+            android:visibility="gone"
             android:text="@string/save" />
 
         <TextView

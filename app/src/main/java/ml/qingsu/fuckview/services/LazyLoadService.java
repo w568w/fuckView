@@ -12,6 +12,9 @@ import ml.qingsu.fuckview.Constant;
 import static ml.qingsu.fuckview.Constant.ACTION_LAZY_LOAD_SERVICE;
 
 
+/**
+ * @author w568w
+ */
 public class LazyLoadService extends IntentService {
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
