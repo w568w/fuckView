@@ -8,4 +8,8 @@
         <item>選好了嗎？輕觸下面的[輕觸儲存規則]。</item>
         <item>如果感覺還行，就輕觸「結束屏蔽」，返回淨眼吧。</item>
     </array>
+    <array name="icon">
+        <item>原圖示</item>
+        <item>新圖示</item>
+    </array>
 </resources>
