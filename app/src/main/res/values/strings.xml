@@ -122,5 +122,5 @@
     <string name="conf_icon_des">Choose an icon</string>
     <string name="conf_icon_def" translatable="false">new</string>
     <string name="conf_keep_alive_des">Try to keep the module alive when marking in order to prevent the floating window from being killed.</string>
-    <string name="no_alipay">It seems that you have not installed Alipay…\nDo you want to get my Alipay account's address?</string>
+    <string name="no_alipay">It seems that you have not installed Alipay…\nDo you want to get my Alipay account\'s address?</string>
 </resources>
