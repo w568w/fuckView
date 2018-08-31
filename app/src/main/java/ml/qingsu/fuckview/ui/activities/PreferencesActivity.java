@@ -1,7 +1,8 @@
 package ml.qingsu.fuckview.ui.activities;
 
-import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,18 +19,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.widget.Toast;
 
+import com.jrummyapps.android.shell.Shell;
+
 import java.util.Locale;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
-import de.psdev.licensesdialog.licenses.GnuGeneralPublicLicense30;
 import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
+import ml.qingsu.checkxposed.util.AlipayDonate;
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.utils.GnuAfferoGeneralPublicLicense30;
-import ml.qingsu.fuckview.utils.ShellUtils;
 
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
@@ -127,7 +128,7 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 versionClickTime++;
-                if (versionClickTime > 5) {
+                if (versionClickTime >= 5) {
                     versionClickTime = 0;
                     startActivity(new Intent(PreferencesActivity.this, ExperimentActivity.class));
                 }
@@ -137,7 +138,25 @@ public class PreferencesActivity extends PreferenceActivity {
         findPreference("pay").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Toast.makeText(PreferencesActivity.this, R.string.no_donate, Toast.LENGTH_SHORT).show();
+                if (!AlipayDonate.startAlipayClient(PreferencesActivity.this, "a6x06490c5kpcbnsr84hr23")) {
+                    new AlertDialog.Builder(PreferencesActivity.this)
+                            .setMessage(R.string.no_alipay)
+                            .setNegativeButton(R.string.no, null)
+                            .setPositiveButton(R.string.thats_okay, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, "1278297578@qq.com"));
+                                    } else {
+                                        android.text.ClipboardManager clipboardManager = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                        clipboardManager.setText("1278297578@qq.com");
+                                    }
+                                }
+                            })
+                            .show();
+                }
                 return false;
             }
         });
@@ -242,11 +261,11 @@ public class PreferencesActivity extends PreferenceActivity {
     }
 
     private String getLogcatInfo() {
-        return ShellUtils.execCommand("logcat -d -v time", false, true).successMsg;
+        return Shell.SU.run("logcat -d -v time").getStdout();
     }
 
     private String getXposedLogInfo() {
-        return ShellUtils.execCommand("cat /data/data/de.robv.android.xposed.installer/log/error.log", false, true).successMsg;
+        return Shell.SU.run("cat /data/data/de.robv.android.xposed.installer/log/error.log").getStdout();
     }
 
     private String getPhoneInfo() {

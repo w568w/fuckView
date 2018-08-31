@@ -122,4 +122,5 @@
     <string name="conf_icon_des">切换应用图标</string>
     <string name="conf_icon_name">应用图标</string>
     <string name="loading">加载中...</string>
+    <string name="no_alipay">看起来您并没有安装支付宝客户端…\n需要将我的支付宝帐号复制到您的剪贴板吗？</string>
 </resources>

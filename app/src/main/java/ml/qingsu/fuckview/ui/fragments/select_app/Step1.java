@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageStats;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.TransactionTooLargeException;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
@@ -31,7 +29,6 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -47,7 +44,6 @@ import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.Lists;
 import ml.qingsu.fuckview.utils.PackageUtils;
-import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.ViewUtils;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
@@ -100,7 +96,7 @@ public class Step1 extends WizardStep implements Searchable {
                 }
                 break;
             case 2:
-                ShellUtils.asyncStopProcess(info.packageName, new Runnable() {
+                PackageUtils.asyncStopProcess(info.packageName, new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(mCon, R.string.finish, Toast.LENGTH_SHORT).show();

@@ -106,6 +106,7 @@ public class MainActivity extends BaseAppCompatActivity {
                 Toast.makeText(this, R.string.cant_open_popup, Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse(String.format("package:%s", getPackageName()))));
+                finish();
             }
         }
 

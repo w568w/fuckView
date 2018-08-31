@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Xml;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.jrummyapps.android.shell.Shell;
+
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
@@ -17,7 +19,6 @@ import java.util.Collections;
 import java.util.Locale;
 
 import ml.qingsu.fuckview.ui.activities.MainActivity;
-import ml.qingsu.fuckview.utils.ShellUtils;
 
 /**
  * Created by w568w on 2017-7-12.
@@ -46,7 +47,7 @@ public class ViewDumper {
 //        if (f.exists()) f.delete();
 
 
-        ShellUtils.execCommand("uiautomator dump /mnt/sdcard/dump.xml", true, false);
+        Shell.SU.run("uiautomator dump /mnt/sdcard/dump.xml");
         String xml = MainActivity.readFile("dump.xml").replace("\n", "");
         ArrayList<ViewItem> itemList = new ArrayList<>();
         ViewItem temp;

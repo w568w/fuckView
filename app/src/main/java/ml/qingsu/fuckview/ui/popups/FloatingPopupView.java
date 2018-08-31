@@ -28,7 +28,7 @@ import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
-import ml.qingsu.fuckview.utils.ShellUtils;
+import ml.qingsu.fuckview.utils.PackageUtils;
 import ml.qingsu.fuckview.utils.dumper.ViewDumper;
 import ml.qingsu.fuckview.utils.dumper.ViewDumperProxy;
 
@@ -94,7 +94,7 @@ public class FloatingPopupView extends BasePopupWindow {
                 mInfo.setText(R.string.force_closing);
                 mClosingProgress.setVisibility(View.VISIBLE);
                 try {
-                    ShellUtils.asyncStopProcess(mPackageName, new Runnable() {
+                    PackageUtils.asyncStopProcess(mPackageName, new Runnable() {
                         @Override
                         public void run() {
                             hide();

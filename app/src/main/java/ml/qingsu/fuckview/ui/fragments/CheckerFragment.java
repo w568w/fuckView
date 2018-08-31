@@ -22,6 +22,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jrummyapps.android.shell.Shell;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +35,6 @@ import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.FloatingPopupView;
-import ml.qingsu.fuckview.utils.ShellUtils;
 import ml.qingsu.fuckview.utils.dumper.DumperService;
 
 /**
@@ -99,7 +100,7 @@ public class CheckerFragment extends Fragment {
 
                 row = new HashMap<>(2);
                 row.put("item", getString(R.string.check_item_root));
-                row.put("status", bool2Str(ShellUtils.checkRootPermission()));
+                row.put("status", bool2Str(Shell.SU.available()));
                 dataList.add(row);
                 mCheckerList.post(new Runnable() {
                     @Override
