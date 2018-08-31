@@ -2,46 +2,27 @@ package ml.qingsu.fuckview.ui.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.AutoTransition;
-import android.transition.Explode;
-import android.transition.Fade;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +30,6 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 
-import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.implement.Searchable;
 import ml.qingsu.fuckview.models.BlockModel;
@@ -58,16 +38,17 @@ import ml.qingsu.fuckview.ui.fragments.select_app.SelectAppWizard;
 
 /**
  * By w568w on 2017-7-6.
+ *
  * @author w568w
  */
 
 public class MainFragment extends Fragment implements Searchable {
     private AppAdapter adapter;
     private Activity context;
-    PackageManager pm;
+    private PackageManager pm;
     public static ArrayList<ArrayList<BlockModel>> models = new ArrayList<>();
-    ListView listView;
-    String searchText = "";
+    private ListView listView;
+    private String searchText = "";
 
     public static String getAppTitle(PackageManager pm, String packageName) {
         try {
@@ -93,7 +74,7 @@ public class MainFragment extends Fragment implements Searchable {
         String pkgname = "";
         ArrayList<BlockModel> currentList = null;
         ArrayList<ArrayList<BlockModel>> list = new ArrayList<>();
-        if(flatList.size()==0){
+        if (flatList.size() == 0) {
             return list;
         }
         for (int i = 0, len = flatList.size(); i < len; i++) {
@@ -111,7 +92,7 @@ public class MainFragment extends Fragment implements Searchable {
             }
             pkgname = model.packageName;
         }
-        if(!currentList.isEmpty()){
+        if (!currentList.isEmpty()) {
             list.add((ArrayList<BlockModel>) currentList.clone());
         }
         return list;
@@ -129,14 +110,14 @@ public class MainFragment extends Fragment implements Searchable {
 
         final android.app.AlertDialog progressDialog = new ProgressDialog.Builder(context)
                 .setMessage(R.string.loading).setCancelable(false).show();
-        Log.d("A","Showed!");
+        Log.d("A", "Showed!");
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
 
                 final ArrayList<BlockModel> arrayList = BlockModel.readModel();
-                Log.d("A","Readed!");
-                if(!arrayList.isEmpty()) {
+                Log.d("A", "Readed!");
+                if (!arrayList.isEmpty()) {
                     try {
                         Collections.sort(arrayList, new Comparator<BlockModel>() {
                             @Override
@@ -182,7 +163,7 @@ public class MainFragment extends Fragment implements Searchable {
                             listView.setAdapter(adapter);
                         }
                         progressDialog.dismiss();
-                        Log.d("A","DIsmissed!");
+                        Log.d("A", "DIsmissed!");
                     }
                 });
             }
@@ -310,7 +291,7 @@ public class MainFragment extends Fragment implements Searchable {
             try {
                 icon.setImageDrawable(getAppIcon(pm, bm.packageName));
                 title.setText(getAppTitle(pm, bm.packageName));
-                type.setText(String.format(getString(R.string.rules),models.get(i).size()));
+                type.setText(String.format(getString(R.string.rules), models.get(i).size()));
             } catch (Exception e) {
                 //Application not found
                 title.setText(bm.packageName);

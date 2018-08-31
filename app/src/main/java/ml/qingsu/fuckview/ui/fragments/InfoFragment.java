@@ -1,13 +1,10 @@
 package ml.qingsu.fuckview.ui.fragments;
 
-import android.app.usage.UsageStatsManager;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
-import android.transition.AutoTransition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

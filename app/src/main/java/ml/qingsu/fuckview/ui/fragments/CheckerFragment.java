@@ -48,7 +48,8 @@ public class CheckerFragment extends Fragment {
     FrameLayout mStatusContainer;
     ImageView mStatusIcon;
     TextView mStatusText;
-    ArrayList<AlertDialog> dialogs=new ArrayList<>();
+    ArrayList<AlertDialog> dialogs = new ArrayList<>();
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,11 +72,13 @@ public class CheckerFragment extends Fragment {
         fillCheckerList();
         fillErrorList();
     }
-    private void dismiss(){
+
+    private void dismiss() {
         for (AlertDialog dialog : dialogs) {
             dialog.dismiss();
         }
     }
+
     private void fillCheckerList() {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
@@ -160,7 +163,7 @@ public class CheckerFragment extends Fragment {
             return true;
         } catch (RuntimeException t) {
             return true;
-        }catch (Throwable t){
+        } catch (Throwable t) {
             return false;
         }
     }

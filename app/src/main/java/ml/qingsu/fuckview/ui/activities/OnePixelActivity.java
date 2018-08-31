@@ -1,6 +1,5 @@
 package ml.qingsu.fuckview.ui.activities;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;

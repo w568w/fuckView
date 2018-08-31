@@ -25,7 +25,6 @@ import ml.qingsu.fuckview.utils.wizard.BaseWizard;
 import ml.qingsu.fuckview.utils.wizard.WizardStep;
 
 /**
- *
  * @author w568w
  * @date 17-6-18
  */
@@ -43,9 +42,6 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
         return new Settings(getResources().getString(R.string.prev_step), getResources().getString(R.string.next_step), getResources().getString(R.string.start_mark), new WizardStep[]{step1});
     }
 
-    public SelectAppWizard() {
-        super();
-    }
 
     @Override
     public void onResume() {
@@ -83,9 +79,10 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
                     }
                 });
             }
-        },null);
+        }, null);
     }
-    private void startActivity(){
+
+    private void startActivity() {
         PackageManager pm = mCon.getPackageManager();
         try {
             mCon.startActivity(pm.getLaunchIntentForPackage(Step1.sSelected.packageName));
@@ -105,6 +102,7 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
             CrashReport.postCatchedException(e);
         }
     }
+
     @Override
     public void setSearchText(String text) {
         if (step1 != null) {

@@ -2,11 +2,6 @@ package ml.qingsu.fuckview;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Debug;
-
-import com.tencent.bugly.crashreport.CrashReport;
 
 import ml.qingsu.fuckview.services.LazyLoadService;
 import ml.qingsu.fuckview.utils.root.AppRulesUtils;

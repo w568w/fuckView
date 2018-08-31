@@ -4,7 +4,6 @@ import android.view.View;
 
 import ml.qingsu.fuckview.Constant;
 
-import static ml.qingsu.fuckview.Constant.Ad.GOOGLE_AD_LAYOUT_TYPE;
 import static ml.qingsu.fuckview.Constant.Ad.SHARE_THROUGH_AD_LAYOUT_TYPE;
 
 /**
@@ -23,11 +22,9 @@ public class ShareThroughBlocker extends AbstractViewBlocker {
 
         return instance;
     }
+
     @Override
     public boolean shouldBlock(View view, String id, String className) {
-        if (SHARE_THROUGH_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.SHARE_THROUGH_AD)) {
-            return true;
-        }
-        return false;
+        return SHARE_THROUGH_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.SHARE_THROUGH_AD);
     }
 }

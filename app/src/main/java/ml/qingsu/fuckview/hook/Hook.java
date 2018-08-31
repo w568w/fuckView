@@ -27,10 +27,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -615,7 +613,7 @@ public class Hook {
          */
         public abstract void block(Object o);
 
-        final boolean isBlocked(ArrayList<BlockModel> arrayList, Object o) {
+        public final boolean isBlocked(ArrayList<BlockModel> arrayList, Object o) {
             Pair<Boolean, Integer> pair = isBlock(arrayList, o);
             if (onlyOnce && pair.second != null && pair.second >= 0) {
                 BlockModel blockModel = arrayList.remove((int) pair.second);
@@ -717,7 +715,6 @@ public class Hook {
         public void block(Object o) {
             View v = (View) o;
             try {
-                v.setVisibility(View.GONE);
                 final ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
                 if (layoutParams != null) {
                     layoutParams.height = 0;
@@ -731,7 +728,7 @@ public class Hook {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     v.setAlpha(0f);
                 }
-
+                v.setVisibility(View.GONE);
             } catch (Throwable t) {
                 t.printStackTrace();
             }

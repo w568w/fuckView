@@ -18,7 +18,6 @@ import static ml.qingsu.fuckview.Constant.ACTION_LAZY_LOAD_SERVICE;
 public class LazyLoadService extends IntentService {
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
      */
     public LazyLoadService() {
         super("LazyLoadService");
@@ -33,7 +32,8 @@ public class LazyLoadService extends IntentService {
             }
         }
     }
-    public static void start(Context c){
-        c.startService(new Intent(c,LazyLoadService.class));
+
+    public static void start(Context c) {
+        c.startService(new Intent(c, LazyLoadService.class));
     }
 }

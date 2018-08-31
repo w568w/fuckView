@@ -11,15 +11,15 @@ import java.lang.reflect.Method;
  */
 
 public class Constant {
-    public static final String BUGLY_KEY="cfccfa2c50";
+    public static final String BUGLY_KEY = "cfccfa2c50";
 
     public static final String PKG_NAME = "ml.qingsu.fuckview";
     public static final String COOLAPK_MARKET_PKG_NAME = "com.coolapk.market";
-    public static final String XPOSED_INSTALLER_PKG_NAME="de.robv.android.xposed.installer";
+    public static final String XPOSED_INSTALLER_PKG_NAME = "de.robv.android.xposed.installer";
     public static final String ACTIVITY_NAME = "ml.qingsu.fuckview.ui.activities.MainActivity";
     public static final String ENTRY_CLASS = "ml.qingsu.fuckview.hook.InitInjector";
     public static final String VAILD_METHOD = "isModuleActive";
-    public static final String VIRTUAL_COOLAPK_CLASSNAME="coolapk";
+    public static final String VIRTUAL_COOLAPK_CLASSNAME = "coolapk";
 
     public static final String LIST_NAME = "block_list";
     public static final String SUPER_MODE_NAME = "super_mode";
@@ -34,16 +34,17 @@ public class Constant {
 
     public static final String KEY_THEME = "theme";
 
-    public static final String ACTION_LAZY_LOAD_SERVICE="lazyload";
-    public static final class Ad{
-        public static final String GOOGLE_AD="ad_container";
-        public static final String GOOGLE_AD_LAYOUT_TYPE="FrameLayout";
+    public static final String ACTION_LAZY_LOAD_SERVICE = "lazyload";
 
-        public static final String COOLAPK_AD="banner_view";
-        public static final String COOLAPK_AD_LAYOUT_TYPE="Banner";
+    public static final class Ad {
+        public static final String GOOGLE_AD = "ad_container";
+        public static final String GOOGLE_AD_LAYOUT_TYPE = "FrameLayout";
 
-        public static final String SHARE_THROUGH_AD="sharethrough_ad";
-        public static final String SHARE_THROUGH_AD_LAYOUT_TYPE="BasicAdView";
+        public static final String COOLAPK_AD = "banner_view";
+        public static final String COOLAPK_AD_LAYOUT_TYPE = "Banner";
+
+        public static final String SHARE_THROUGH_AD = "sharethrough_ad";
+        public static final String SHARE_THROUGH_AD_LAYOUT_TYPE = "BasicAdView";
     }
 
     //DO not draw your attention to the codes below,which are useless, meaningless and not used anywhen.

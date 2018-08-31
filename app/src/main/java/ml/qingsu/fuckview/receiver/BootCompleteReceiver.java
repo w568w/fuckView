@@ -16,9 +16,9 @@ import ml.qingsu.fuckview.ui.activities.OnePixelActivity;
 public class BootCompleteReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+        if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
             OnePixelActivity.startFuck(context.getApplicationContext());
-        } else if(intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
+        } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             OnePixelActivity.killFuck();
         }
     }

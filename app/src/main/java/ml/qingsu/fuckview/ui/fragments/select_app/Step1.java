@@ -244,8 +244,8 @@ public class Step1 extends WizardStep implements Searchable {
             List<PackageInfo> packages = null;
             try {
                 //Fix #5122
-                packages=pm.getInstalledPackages(0);
-            }catch (Exception e){
+                packages = pm.getInstalledPackages(0);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             if (packages == null || packages.size() == 0) {

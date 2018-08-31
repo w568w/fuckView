@@ -95,8 +95,9 @@ public final class ViewUtils {
             for (int i = 0; i < len; i++) {
                 View child = ((ViewGroup) view).getChildAt(i);
                 if (child instanceof TextView) {
-                    if (allText.length() != 0) {
-                        allText.append(((TextView) child).getText().toString().replace("\n", "")).append("|");
+                    String text = ((TextView) child).getText().toString().replace("\n", "");
+                    if (text.length() > 0) {
+                        allText.append(text).append("|");
                     }
                 }
                 if (child instanceof ViewGroup) {
@@ -108,6 +109,9 @@ public final class ViewUtils {
     }
 
     public interface OnFinishLoadListener {
+        /**
+         * @param view the view finishing load
+         */
         void onFinishedLoad(View view);
     }
 
@@ -129,12 +133,12 @@ public final class ViewUtils {
         return accentColor;
     }
 
-    public static void setActionBarTextColor(AppCompatActivity activity,int color){
+    public static void setActionBarTextColor(AppCompatActivity activity, int color) {
         try {
-            Object actionbar=ReflectionUtils.getField(activity.getDelegate(),"mActionBar");
-            View actionBarContent= (View) ReflectionUtils.getField(actionbar,"mContainerView");
-            View actionBarView= (View) ReflectionUtils.getField(actionBarContent,"mActionBarView");
-            TextView textView= (TextView) ReflectionUtils.getField(actionBarView,"mTitleTextView");
+            Object actionbar = ReflectionUtils.getField(activity.getDelegate(), "mActionBar");
+            View actionBarContent = (View) ReflectionUtils.getField(actionbar, "mContainerView");
+            View actionBarView = (View) ReflectionUtils.getField(actionBarContent, "mActionBarView");
+            TextView textView = (TextView) ReflectionUtils.getField(actionBarView, "mTitleTextView");
             textView.setTextColor(color);
         } catch (Throwable e) {
             e.printStackTrace();

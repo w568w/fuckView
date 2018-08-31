@@ -31,7 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
@@ -49,7 +48,7 @@ import static ml.qingsu.fuckview.ui.fragments.MainFragment.getAppTitle;
  * @author w568w
  */
 
-public class SubListFragment extends Fragment implements Searchable{
+public class SubListFragment extends Fragment implements Searchable {
     ListView listView;
     private Activity context;
     ArrayList<BlockModel> models;
@@ -57,6 +56,7 @@ public class SubListFragment extends Fragment implements Searchable{
     PackageManager packageManager;
     private ArrayList<Integer> deleteList = new ArrayList<>();
     String searchText = "";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -146,15 +146,17 @@ public class SubListFragment extends Fragment implements Searchable{
         }
 
     }
+
     private void saveAll() {
         MainActivity.writePreferences("", Constant.LIST_NAME);
-        MainFragment.models.set(getArguments().getInt("index"),models);
+        MainFragment.models.set(getArguments().getInt("index"), models);
         for (ArrayList<BlockModel> model : MainFragment.models) {
             for (BlockModel bm : model) {
                 bm.save();
             }
         }
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -170,6 +172,7 @@ public class SubListFragment extends Fragment implements Searchable{
         menu.add(0, 6, Menu.NONE, model.enable ? R.string.disable_item : R.string.enable_item);
         menu.add(0, 7, Menu.NONE, R.string.start_app);
     }
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -268,6 +271,7 @@ public class SubListFragment extends Fragment implements Searchable{
             ((AppCompatActivity) context).invalidateOptionsMenu();
         }
     }
+
     private class AppAdapter extends BaseAdapter {
         @Override
         public int getCount() {

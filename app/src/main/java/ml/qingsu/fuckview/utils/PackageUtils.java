@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 public class PackageUtils {
     private static List<RunningServiceInfo> serviceInfoList = null;
     private static ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
+
     public static void initLists(Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         serviceInfoList = am.getRunningServices(1000);
@@ -34,6 +35,7 @@ public class PackageUtils {
         }
         return false;
     }
+
     public static void killProcess(String pkg) throws IOException {
         java.lang.Process process = Runtime.getRuntime().exec("su");
         OutputStream out = process.getOutputStream();
@@ -48,6 +50,7 @@ public class PackageUtils {
             e.printStackTrace();
         }
     }
+
     public static void asyncStopProcess(final String pkgName, final Runnable callback, final View runner) {
         singleThreadPool.execute(new Runnable() {
             @Override
@@ -59,7 +62,7 @@ public class PackageUtils {
                 } finally {
                     if (runner != null) {
                         runner.post(callback);
-                    }else{
+                    } else {
                         callback.run();
                     }
                 }

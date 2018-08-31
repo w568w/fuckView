@@ -1,12 +1,10 @@
 package ml.qingsu.fuckview.hook.blocker;
 
-import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import ml.qingsu.fuckview.hook.Hook;
 import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.utils.ViewUtils;

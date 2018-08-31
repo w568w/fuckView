@@ -1,18 +1,13 @@
 package ml.qingsu.fuckview.ui.popups.guide;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.animation.AnimatorCompatHelper;
 import android.support.v4.animation.AnimatorUpdateListenerCompat;
 import android.support.v4.animation.ValueAnimatorCompat;
-import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;

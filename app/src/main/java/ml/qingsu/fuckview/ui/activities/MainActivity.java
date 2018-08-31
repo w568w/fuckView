@@ -14,7 +14,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -24,17 +23,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -56,7 +50,6 @@ import ml.qingsu.fuckview.ui.fragments.OnlineRulesFragment;
 import ml.qingsu.fuckview.ui.fragments.WelcomeFragment;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
 import ml.qingsu.fuckview.utils.FirstRun;
-import ml.qingsu.fuckview.utils.ReflectionUtils;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
 import static ml.qingsu.fuckview.Constant.COOLAPK_MARKET_PKG_NAME;
@@ -79,9 +72,9 @@ public class MainActivity extends BaseAppCompatActivity {
     public Fragment currentFragment;
 
     public static boolean isModuleActive() {
-        Log.d("asklmx","asduiwhledlweeejkdwa");
-        Log.d("asdewrde","asdufewfwefiwhledlweeejkdwa");
-        Log.i("asjsixask","iufwehuiidw");
+        Log.d("asklmx", "asduiwhledlweeejkdwa");
+        Log.d("asdewrde", "asdufewfwefiwhledlweeejkdwa");
+        Log.i("asjsixask", "iufwehuiidw");
         return false;
     }
 

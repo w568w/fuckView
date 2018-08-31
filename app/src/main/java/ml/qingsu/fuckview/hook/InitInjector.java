@@ -2,15 +2,11 @@ package ml.qingsu.fuckview.hook;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.annotation.Keep;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import dalvik.system.PathClassLoader;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -21,8 +17,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ml.qingsu.fuckview.Constant;
 
 import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
-import static ml.qingsu.fuckview.Constant.ENTRY_CLASS;
-import static ml.qingsu.fuckview.Constant.HOOK_CLASS;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
 import static ml.qingsu.fuckview.Constant.VAILD_METHOD;
 

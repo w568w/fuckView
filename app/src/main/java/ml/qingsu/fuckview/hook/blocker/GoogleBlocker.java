@@ -24,9 +24,6 @@ public class GoogleBlocker extends AbstractViewBlocker {
 
     @Override
     public boolean shouldBlock(View view, String id, String className) {
-        if (GOOGLE_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.GOOGLE_AD)) {
-            return true;
-        }
-        return false;
+        return GOOGLE_AD_LAYOUT_TYPE.equals(className) && id.contains(Constant.Ad.GOOGLE_AD);
     }
 }

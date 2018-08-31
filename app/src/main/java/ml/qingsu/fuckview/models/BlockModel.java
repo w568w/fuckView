@@ -55,7 +55,7 @@ public class BlockModel implements Serializable {
 
         ArrayList<String> lines = MainActivity.readPreferenceByLine(Constant.LIST_NAME);
         final int len = lines.size();
-        if(len==0){
+        if (len == 0) {
             return list;
         }
         for (int i = 0; i < len; i++) {
@@ -79,7 +79,7 @@ public class BlockModel implements Serializable {
 
 
     public void save() {
-        MainActivity.appendPreferences("\n" + toString(),Constant.LIST_NAME);
+        MainActivity.appendPreferences("\n" + toString(), Constant.LIST_NAME);
     }
 
     @Override

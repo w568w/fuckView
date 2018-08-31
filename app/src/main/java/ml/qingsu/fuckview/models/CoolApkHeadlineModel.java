@@ -11,6 +11,8 @@ import static ml.qingsu.fuckview.ui.activities.MainActivity.ALL_SPLIT;
  */
 
 public class CoolApkHeadlineModel extends BlockModel {
+    private HeadlineType mType;
+
     public HeadlineType getType() {
         return mType;
     }
@@ -19,7 +21,6 @@ public class CoolApkHeadlineModel extends BlockModel {
         FROM, CONTENT
     }
 
-    private HeadlineType mType;
 
     public CoolApkHeadlineModel(HeadlineType type, String text) {
         super(Constant.COOLAPK_MARKET_PKG_NAME, type.ordinal() + ALL_SPLIT + text, text, Constant.VIRTUAL_COOLAPK_CLASSNAME);
