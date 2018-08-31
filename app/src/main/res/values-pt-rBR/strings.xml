@@ -102,6 +102,25 @@
     <string name="conf_enable_floating_window_des">[Não recomendado] Habilite a análise de layout na janela flutuante.</string>
     <string name="module_active">Fuckview está ativo.</string>
     <string name="module_not_active">Fuckview não está ativo.</string>
-    <string name="force_closing">Forçar fechamento ...</string>
+    <string name="force_closing">Forçar fechamento …</string>
     <string name="start_app">Iniciar app</string>
+    <string name="ask_for_rating">Por que não dar uma estrela para este aplicativo para o desenvolvedor pobre que está usando um computador antigo de 5 polegadas com 32M de memória e CPU Pentium I?</string>
+    <string name="check_item_method_invoked">(Para depuração) Se ganchos poderia ser bem sucedido</string>
+    <string name="checking">Auto-teste em andamento, por favor, dê as permissões necessárias …</string>
+    <string name="conf_icon_des">Alternar ícone do aplicativo</string>
+    <string name="conf_icon_name">Ícone do aplicativo</string>
+    <string name="conf_keep_alive_des">Tente manter o módulo viva quando marcação, a fim de evitar que a janela flutuante de ser morto.</string>
+    <string name="conf_keep_alive_name">Mantenha vivo</string>
+    <string name="dont_show_again">Não mostrar de novo</string>
+    <string name="feel_bad">O desenvolvedor se sente muito mal …</string>
+    <string name="finish_guide">Terminar</string>
+    <string name="fuck">Cale a boca</string>
+    <string name="fuckview_lab">FuckView Lab</string>
+    <string name="loading">Carregando…</string>
+    <string name="no_alipay">Parece que você não instalou o Alipay… Você quer obter o endereço da minha conta Alipay?</string>
+    <string name="no_item">Nada aqui, mantenha a calma.</string>
+    <string name="rules">%1$d regra(s)</string>
+    <string name="save">Guardar</string>
+    <string name="thats_okay">Tudo bem…</string>
+    <string name="welcome_to_xposed">Abrir Xposed Installer</string>
 </resources>

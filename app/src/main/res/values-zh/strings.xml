@@ -67,7 +67,7 @@
     <string name="no">否</string>
     <string name="popup_mark_it">标记该项</string>
     <string name="rule_saved">已保存规则</string>
-    <string name="parsing_view">解析中...</string>
+    <string name="parsing_view">解析中…</string>
     <string name="parse_failed">解析失败!您启用 净眼 的辅助服务了吗?\n启用后请强制停止应用重来！\n启用后请强制停止应用重来！\n启用后请强制停止应用重来！</string>
     <string name="mark_tip">长按显示菜单,短按定位控件</string>
     <string name="cant_open_popup">无法启动悬浮窗，请给予净眼悬浮窗权限！</string>
@@ -102,16 +102,16 @@
     <string name="conf_enable_floating_window_des">[不推荐] 在悬浮窗中启用布局解析。</string>
     <string name="module_active">净眼 已启用</string>
     <string name="module_not_active">净眼 可能未启用</string>
-    <string name="force_closing">强制停止中...</string>
+    <string name="force_closing">强制停止中…</string>
     <string name="finish_guide">结束教程</string>
     <string name="dont_show_again">不再提示</string>
     <string name="start_app">启动该应用</string>
-    <string name="checking">自检进行中,请给予必要权限...</string>
+    <string name="checking">自检进行中,请给予必要权限…</string>
     <string name="check_item_method_invoked">钩子是否能调用,Failed=模块可能无效</string>
     <string name="ask_for_rating">感觉用起来还行? 为什么不给这个用着32M内存，5寸显示屏和一代奔腾CPU的古董电脑的可怜的开发者一个好评呢?</string>
-    <string name="thats_okay">好吧...</string>
+    <string name="thats_okay">好吧…</string>
     <string name="fuck">滚</string>
-    <string name="feel_bad">开发者哭晕在厕所...</string>
+    <string name="feel_bad">开发者哭晕在厕所…</string>
     <string name="conf_keep_alive_name">尽力保活</string>
     <string name="conf_keep_alive_des">尽力保证应用在标记时存活，避免悬浮窗异常消失(需要给予自启权限)</string>
     <string name="welcome_to_xposed">打开Xposed Installer</string>
@@ -121,6 +121,6 @@
     <string name="save">保存</string>
     <string name="conf_icon_des">切换应用图标</string>
     <string name="conf_icon_name">应用图标</string>
-    <string name="loading">加载中...</string>
+    <string name="loading">加载中…</string>
     <string name="no_alipay">看起来您并没有安装支付宝客户端…\n需要将我的支付宝帐号复制到您的剪贴板吗？</string>
 </resources>

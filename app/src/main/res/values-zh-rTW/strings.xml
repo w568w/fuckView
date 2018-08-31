@@ -102,19 +102,25 @@
     <string name="conf_enable_floating_window_des">[不推薦] 在懸浮窗中啟用布局解析。</string>
     <string name="module_active">淨眼 已啟用</string>
     <string name="module_not_active">淨眼 可能未啟用</string>
-    <string name="force_closing">強制停止中...</string>
+    <string name="force_closing">強制停止中…</string>
     <string name="finish_guide">結束教學</string>
     <string name="dont_show_again">不再提示</string>
     <string name="start_app">啟動該程式</string>
-    <string name="checking">自檢進行中,請給予必要權限...</string>
+    <string name="checking">自檢進行中,請給予必要權限…</string>
     <string name="check_item_method_invoked">鉤子是否能調用,Failed=模組可能無效</string>
     <string name="ask_for_rating">感覺用起來還行? 為什麼不給這個用著32M記憶體，5寸螢幕和一代奔騰CPU的古董電腦的可憐的開發者一個好評呢?</string>
-    <string name="thats_okay">好吧...</string>
+    <string name="thats_okay">好吧…</string>
     <string name="fuck">滾</string>
-    <string name="feel_bad">開發者哭暈在廁所...</string>
+    <string name="feel_bad">開發者哭暈在廁所…</string>
     <string name="conf_keep_alive_name">盡力保活</string>
     <string name="conf_keep_alive_des">盡力保證程式在標記時存活，避免懸浮窗異常消失(需要給予自啟權限)</string>
     <string name="welcome_to_xposed">打開Xposed Installer</string>
     <string name="no_item">這裡空空蕩蕩的</string>
     <string name="fuckview_lab">淨眼實驗室</string>
+    <string name="conf_icon_des">切换应用图标</string>
+    <string name="conf_icon_name">切換應用圖標</string>
+    <string name="loading">加載中…</string>
+    <string name="no_alipay">看起來您並沒有安裝支付寶客戶端… 需要將我的支付寶帳號複製到您的剪貼板嗎？</string>
+    <string name="rules">%1$d 個規則</string>
+    <string name="save">保存</string>
 </resources>

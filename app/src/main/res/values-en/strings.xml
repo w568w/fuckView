@@ -66,7 +66,7 @@
     <string name="no">No</string>
     <string name="popup_mark_it">Fuck it!</string>
     <string name="rule_saved">New rule is saved.</string>
-    <string name="parsing_view">Pasring...</string>
+    <string name="parsing_view">Pasring…</string>
     <string name="parse_failed">Parse failed! Have you started the accessibility service?\nThen FORCE STOP the app and start it from fuckview AGAIN!</string>
     <string name="mark_tip">Long click to mark it,short click to show where it is.</string>
     <string name="cant_open_popup">Can\'t show a popup!Have you allowed Fuckview to show SYSTEM_ALERT_WINDOW?</string>
@@ -101,11 +101,11 @@
     <string name="conf_enable_floating_window_des">[Unrecommended] Enable layout parsing in the floating window.</string>
     <string name="module_active">Fuckview is active.</string>
     <string name="module_not_active">Fuckview is not active.</string>
-    <string name="force_closing">Force Closing ...</string>
+    <string name="force_closing">Force Closing …</string>
     <string name="finish_guide">Finish</string>
     <string name="dont_show_again">Don\'t show again</string>
     <string name="start_app">Start app</string>
-    <string name="checking">Self Checking...</string>
+    <string name="checking">Self Checking…</string>
     <string name="check_item_method_invoked">(For debuger)Whether hooks can be successful</string>
     <string name="conf_keep_alive_name">Keep Alive</string>
     <string name="welcome_to_xposed">Open Xposed Installer</string>
@@ -120,5 +120,6 @@
     <string name="conf_keep_alive_des">Try to keep the module alive when marking in order to prevent the floating window from being killed.</string>
     <string name="conf_icon_name">App Icon</string>
     <string name="conf_icon_des">Choose an icon</string>
-    <string name="no_alipay">It seems that you have not installed Alipay…\nDo you want to get my Alipay account's address?</string>
+    <string name="no_alipay">It seems that you have not installed Alipay…\nDo you want to get my Alipay account\'s address?</string>
+    <string name="ask_for_rating">Feeling good?Why not give a star to this app for the poor developer who\'s using a old 5-inch computer with 32M memory and Pentium I CPU?</string>
 </resources>

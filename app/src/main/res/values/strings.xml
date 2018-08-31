@@ -66,7 +66,7 @@
     <string name="no">No</string>
     <string name="popup_mark_it">Fuck it!</string>
     <string name="rule_saved">New rule is saved.</string>
-    <string name="parsing_view">Pasring...</string>
+    <string name="parsing_view">Pasring…</string>
     <string name="parse_failed">Parse failed! Have you started the accessibility service?\nThen FORCE STOP the app and start it from fuckview AGAIN!</string>
     <string name="mark_tip">Long click to mark it,short click to show where it is.</string>
     <string name="cant_open_popup">Can\'t show a popup!Have you allowed Fuckview to show SYSTEM_ALERT_WINDOW?</string>
