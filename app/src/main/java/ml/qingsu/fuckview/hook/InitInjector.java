@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.Keep;
+import android.util.Log;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -14,7 +15,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import ml.qingsu.fuckview.Constant;
 
 import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
@@ -64,7 +64,9 @@ public class InitInjector implements IXposedHookLoadPackage {
                 if (context != null) {
                     loadPackageParam.classLoader = context.getClassLoader();
                     try {
-                        invokeHandleHookMethod(context, Constant.PKG_NAME, Constant.HOOK_CLASS, "handleLoadPackage", loadPackageParam);
+                        new Hook().handleLoadPackage(context, loadPackageParam);
+                        //This way is not supported after Android 8.0.
+                        //invokeHandleHookMethod(context, Constant.PKG_NAME, Constant.HOOK_CLASS, "handleLoadPackage", loadPackageParam);
                     } catch (Throwable error) {
                         error.printStackTrace();
                     }
@@ -81,6 +83,7 @@ public class InitInjector implements IXposedHookLoadPackage {
         }
         //加载指定的hook逻辑处理类，并调用它的handleHook方法
         PathClassLoader pathClassLoader = new PathClassLoader(apkFile.getAbsolutePath(), ClassLoader.getSystemClassLoader());
+
         Class<?> cls = Class.forName(handleHookClass, true, pathClassLoader);
         Object instance = cls.newInstance();
         Method method = cls.getDeclaredMethod(handleHookMethod, XC_LoadPackage.LoadPackageParam.class);

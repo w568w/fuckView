@@ -78,11 +78,6 @@
             android:key="enable_log"
             android:summary="@string/conf_enable_log_des"
             android:title="@string/conf_enable_log_name" />
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="keep_alive"
-            android:summary="@string/conf_keep_alive_des"
-            android:title="@string/conf_keep_alive_name" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/conf_about">

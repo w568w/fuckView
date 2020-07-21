@@ -2,7 +2,13 @@ package ml.qingsu.fuckview.utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -21,6 +27,33 @@ public final class ViewUtils {
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
+    public static Bitmap getBitmapFromView(View view) {
+        if (view == null) return null;
+        Bitmap b;
+        //请求转换
+
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            view.measure(View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
+//                    View.MeasureSpec.makeMeasureSpec(view.getHeight(), View.MeasureSpec.EXACTLY));
+//            view.layout((int) view.getX(), (int) view.getY(),
+//                    (int) view.getX() + view.getMeasuredWidth(), (int) view.getY() + view.getMeasuredWidth());
+//        } else {
+//            view.measure(
+//                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+//                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+//            );
+//            view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+//        }
+        b = Bitmap.createBitmap(view.getDrawingCache(),
+                0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.setDrawingCacheEnabled(false);
+        view.destroyDrawingCache();
+
+        return b;
+    }
+
     public static String getViewId(View view) {
         try {
             return view.getResources().getResourceName(view.getId());
@@ -36,7 +69,7 @@ public final class ViewUtils {
     public static String getViewPath(View v) {
         ViewParent viewParent = v.getParent();
         Object object = v;
-        final StringBuilder path = new StringBuilder();
+        final StringBuilder path = new StringBuilder(64);
         while (viewParent != null) {
             if (viewParent instanceof ViewGroup) {
                 final int len = ((ViewGroup) viewParent).getChildCount();
@@ -50,8 +83,7 @@ public final class ViewUtils {
             object = viewParent;
             viewParent = viewParent.getParent();
         }
-        path.append("#");
-        return path.toString();
+        return path.append("#").toString();
     }
 
     public static String getViewPosition(View view) {

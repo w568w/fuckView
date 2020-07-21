@@ -2,8 +2,10 @@ package ml.qingsu.fuckview.ui.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +41,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.Constant;
+import ml.qingsu.fuckview.MyApplication;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseAppCompatActivity;
 import ml.qingsu.fuckview.implement.Searchable;
@@ -75,7 +78,47 @@ public class MainActivity extends BaseAppCompatActivity {
         Log.d("asklmx", "asduiwhledlweeejkdwa");
         Log.d("asdewrde", "asdufewfwefiwhledlweeejkdwa");
         Log.i("asjsixask", "iufwehuiidw");
-        return false;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && isExpModuleActive(MyApplication.getContext());
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private static boolean isExpModuleActive(Context context) {
+
+        boolean isExp = false;
+        if (context == null) {
+            throw new IllegalArgumentException("context must not be null!!");
+        }
+
+        try {
+            ContentResolver contentResolver = context.getContentResolver();
+            Uri uri = Uri.parse("content://me.weishu.exposed.CP/");
+            Bundle result = null;
+            try {
+
+
+                result = contentResolver.call(uri, "active", null, null);
+
+            } catch (RuntimeException e) {
+                // TaiChi is killed, try invoke
+                try {
+                    Intent intent = new Intent("me.weishu.exp.ACTION_ACTIVE");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                } catch (Throwable e1) {
+                    return false;
+                }
+            }
+            if (result == null) {
+                result = contentResolver.call(uri, "active", null, null);
+            }
+
+            if (result == null) {
+                return false;
+            }
+            isExp = result.getBoolean("active", false);
+        } catch (Throwable ignored) {
+        }
+        return isExp;
     }
 
     public static boolean isDayTheme(Context context) {
@@ -104,13 +147,14 @@ public class MainActivity extends BaseAppCompatActivity {
         }
 
 
-        sSharedPreferences = getSharedPreferences("data", Context.MODE_WORLD_READABLE);
+        sSharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
 
         dealWithIntent();
-        keepAlive();
+        //keepAlive();
         //If it is the first time to run...
         if (FirstRun.isFirstRun(this, "app")) {
-            setFragmentWithoutBack(new WelcomeFragment());
+            // if(true){
+            //setFragmentWithoutBack(new WelcomeFragment());
             //else if there's no rule...
         } else {
             setFragmentWithoutBack(new MainFragment());
@@ -122,19 +166,19 @@ public class MainActivity extends BaseAppCompatActivity {
         }
     }
 
-    private void keepAlive() {
-        if (mSettings.getBoolean("keep_alive", true)) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_SCREEN_ON);
-            filter.addAction(Intent.ACTION_SCREEN_OFF);
-            try {
-                registerReceiver(new BootCompleteReceiver(), filter);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
+//    private void keepAlive() {
+//        if (mSettings.getBoolean("keep_alive", true)) {
+//            IntentFilter filter = new IntentFilter();
+//            filter.addAction(Intent.ACTION_SCREEN_ON);
+//            filter.addAction(Intent.ACTION_SCREEN_OFF);
+//            try {
+//                //registerReceiver(new BootCompleteReceiver(), filter);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//    }
 
     private void startGuide() {
 

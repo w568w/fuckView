@@ -3,6 +3,7 @@ package ml.qingsu.fuckview.base;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -31,7 +32,11 @@ public abstract class BasePopupWindow {
         this.appContext = activity.getApplicationContext();
         mWindowManager = (WindowManager) appContext.getSystemService(Context.WINDOW_SERVICE);
         params = new WindowManager.LayoutParams();
-        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+        }
         params.flags = FLAG_NOT_TOUCH_MODAL;
         params.format = PixelFormat.TRANSLUCENT;
         params.width = WindowManager.LayoutParams.MATCH_PARENT;

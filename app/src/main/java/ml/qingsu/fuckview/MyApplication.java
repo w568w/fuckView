@@ -17,17 +17,22 @@ import ml.qingsu.fuckview.utils.root.AppRulesUtils;
 public class MyApplication extends Application {
     // 暂时关闭，按需修改
     private boolean isOpenSharedFile = false;
+    private static Context sContext;
 
+    public static Context getContext() {
+        return sContext;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        sContext = this;
         //Debug.startMethodTracing("fuckview");
         // 设置文件夹权限，让其他 App 可以读取
-        if (isOpenSharedFile) {
-            AppRulesUtils.setFilePermissions(getApplicationInfo().dataDir, 0757, -1, -1);
-            AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
-        }
+//        if (isOpenSharedFile) {
+//            AppRulesUtils.setFilePermissions(getApplicationInfo().dataDir, 0757, -1, -1);
+//            AppRulesUtils.setFilePermissions(getDir(AppRulesUtils.RULES_DIR, Context.MODE_PRIVATE), 0777, -1, -1);
+//        }
 
         LazyLoadService.start(this);
     }

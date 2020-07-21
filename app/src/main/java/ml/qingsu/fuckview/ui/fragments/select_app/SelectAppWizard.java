@@ -65,7 +65,7 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
         if (Step1.sSelected == null) {
             return;
         }
-        mCon.getSharedPreferences("data", Context.MODE_WORLD_READABLE)
+        mCon.getSharedPreferences("data", Context.MODE_PRIVATE)
                 .edit().putString(Constant.PACKAGE_NAME_NAME, Step1.sSelected.packageName).commit();
         //等待數據寫入完成
         SystemClock.sleep(100);

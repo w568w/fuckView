@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
+import de.psdev.licensesdialog.licenses.MITLicense;
 import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
 import ml.qingsu.checkxposed.util.AlipayDonate;
@@ -168,6 +169,8 @@ public class PreferencesActivity extends PreferenceActivity {
                 notices.addNotice(new Notice("Bugly", "http://jcenter.bintray.com/com/tencent/bugly", "Copyright 1998 - 2016 Tencent.", new ApacheSoftwareLicense20()));
                 notices.addNotice(new Notice("EventBus", "https://github.com/greenrobot/EventBus", "Copyright (C) 2012-2017 Markus Junginger, greenrobot", new ApacheSoftwareLicense20()));
                 notices.addNotice(new Notice("android-shell", "https://github.com/jrummyapps/android-shell", "Copyright (C) 2016 JRummy Apps Inc.\nCopyright (C) 2012-2015 Jorrit \"Chainfire\" Jongma", new ApacheSoftwareLicense20()));
+                notices.addNotice(new Notice("RemotePreferences", "https://github.com/apsun/RemotePreferences", "Copyright (C) 2019 apsun", new MITLicense()));
+
                 notices.addNotice(new Notice("fuckView", "https://github.com/w568w/fuckView", "Copyright (C) 2018 w568w", new GnuAfferoGeneralPublicLicense30()));
                 new LicensesDialog.Builder(PreferencesActivity.this)
                         .setNotices(notices)

@@ -3,7 +3,10 @@ package ml.qingsu.fuckview.ui.popups;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,6 +25,7 @@ import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
 import ml.qingsu.fuckview.base.BaseActionBroadcastReceiver;
 import ml.qingsu.fuckview.base.BasePopupWindow;
+import ml.qingsu.fuckview.binder.BitmapBinder;
 import ml.qingsu.fuckview.hook.ViewReceiver;
 import ml.qingsu.fuckview.models.PageEvent;
 import ml.qingsu.fuckview.models.ViewModel;
@@ -206,6 +210,13 @@ public class FloatingPopupView extends BasePopupWindow {
         @Override
         public void onReceiving(Context context, Intent intent) {
             ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+
+                Bitmap bitmapBinder = (Bitmap) intent.getExtras().get("screenShot");
+                if (bitmapBinder != null) {
+                    mInfo.setBackgroundDrawable(new BitmapDrawable(bitmapBinder));
+                }
+            }
             if (viewModel != null) {
                 mInfo.setTag(viewModel);
                 mInfo.setText(viewModel.className);

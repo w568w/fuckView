@@ -77,8 +77,20 @@
 
         <activity android:name=".ui.activities.ExperimentActivity" />
 
+        <service android:name=".services.LazyLoadService" />
+
         <service
-            android:name=".services.LazyLoadService"/>
+            android:name=".utils.RemoteViewMessager"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="RemoteViewMessager" />
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name=".provider.PreferenceProvider"
+            android:authorities="ml.qingsu.fuckview.ui.activities.MainActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

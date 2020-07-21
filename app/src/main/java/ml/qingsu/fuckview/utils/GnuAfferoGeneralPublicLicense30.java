@@ -22,7 +22,7 @@ public class GnuAfferoGeneralPublicLicense30 extends License {
             " GNU Affero General Public License for more details.\n" +
             "\n" +
             " You should have received a copy of the GNU Affero General Public License\n" +
-            " along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
+            " along with this program.  If not, see http://www.gnu.org/licenses.\n";
 
     @Override
     public String getName() {

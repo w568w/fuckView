@@ -5,16 +5,20 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,15 +29,19 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import com.crossbowffs.remotepreferences.RemotePreferences;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ml.qingsu.fuckview.Constant;
+import ml.qingsu.fuckview.IViewMessager;
 import ml.qingsu.fuckview.R;
+import ml.qingsu.fuckview.binder.BitmapBinder;
 import ml.qingsu.fuckview.hook.blocker.CoolapkBlocker;
 import ml.qingsu.fuckview.hook.blocker.GoogleBlocker;
 import ml.qingsu.fuckview.hook.blocker.ShareThroughBlocker;
@@ -74,13 +82,12 @@ public class Hook {
     private static boolean standardMode;
     private static boolean superMode;
     private static boolean enableLog;
-
-    private static XSharedPreferences xSP = new XSharedPreferences("ml.qingsu.fuckview", "data");
-
     /**
      * @removed Nowhere to use.
      */
     private static int mNotificationId = NOTIFICATION_ID + 1;
+    private RemotePreferences xSP;
+    private IViewMessager viewMessager;
 
     private static String getString(int resId, Context context) throws PackageManager.NameNotFoundException {
         try {
@@ -92,6 +99,46 @@ public class Hook {
     }
 
     // FIXME: 18-4-21 These two methods are the same.
+
+    /**
+     * 给View加上红边~~
+     *
+     * @param view the view to be bounded
+     */
+    private static void addViewShape(final View view) {
+        try {
+            GradientDrawable gd = new GradientDrawable();
+            gd.setStroke(4, Color.RED);
+            final Drawable background = view.getBackground();
+            view.setBackgroundDrawable(gd);
+            //Then recover the background.
+            view.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    view.setBackgroundDrawable(background);
+                }
+            }, 600);
+        } catch (Throwable ignored) {
+
+        }
+    }
+
+    /**
+     * @param length the array's length
+     * @param array  a zero-length array.
+     * @param <E>    type
+     * @return an array.
+     */
+    @SafeVarargs
+    private static <E> E[] newArray(int length, E... array) {
+        return Arrays.copyOf(array, length);
+    }
+
+    public static void log(String text) {
+        if (enableLog) {
+            Log.e("FUCKVIEW", text);
+        }
+    }
 
     private void handleClick(final View view) throws PackageManager.NameNotFoundException {
         final Context context = view.getContext();
@@ -164,7 +211,8 @@ public class Hook {
                 .putExtra("height", view.getHeight())
                 .putExtra("width", view.getWidth())
                 .putExtra("className", ViewUtils.getClassName(view.getClass()))
-                .putExtra("record", ViewBlocker.getInstance().log(view).toString());
+                .putExtra("record", ViewBlocker.getInstance().log(view).toString())
+                .putExtra("screenShot", ViewUtils.getBitmapFromView(view));
         context.sendBroadcast(broadcastIntent);
     }
 
@@ -192,7 +240,6 @@ public class Hook {
         //设置Intent
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //看！奇巧淫技x2！
         log(ViewBlocker.getInstance().log(view).toString());
         intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view).toString());
         intent.putExtra("Dialog", true);
@@ -212,10 +259,6 @@ public class Hook {
             npe.printStackTrace();
 
         } catch (Throwable t) {
-            /*
-            Deal with Class Not Found thrown when creating NotificationCompat in [Exposed](https://github.com/android-hacker/exposed) Environment.
-            But it's not supported in API 10 and below,let's TODO it.
-            */
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     Notification.Builder nb = new Notification.Builder(context);
@@ -243,35 +286,11 @@ public class Hook {
         context.sendBroadcast(broadcastIntent);
     }
 
-
-    /**
-     * 给View加上红边~~
-     *
-     * @param view the view to be bounded
-     */
-    private static void addViewShape(final View view) {
-        try {
-            GradientDrawable gd = new GradientDrawable();
-            gd.setStroke(4, Color.RED);
-            final Drawable background = view.getBackground();
-            view.setBackgroundDrawable(gd);
-            //Then recover the background.
-            view.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    view.setBackgroundDrawable(background);
-                }
-            }, 800);
-        } catch (Throwable ignored) {
-
-        }
-    }
-
     /**
      * @param pkgFilter the specified package name.
      * @return a blocking list.
      */
-    private static ArrayList<BlockModel> readBlockList(String pkgFilter) {
+    private ArrayList<BlockModel> readBlockList(String pkgFilter) {
         ArrayList<BlockModel> list = new ArrayList<>();
         ArrayList<String> lines = readPreferenceByLine(LIST_FILENAME);
         for (String line : lines) {
@@ -294,7 +313,7 @@ public class Hook {
     /**
      * 正常的readfile,不做任何缓存代理
      */
-    private static ArrayList<String> readPreferenceByLine(String filename) {
+    private ArrayList<String> readPreferenceByLine(String filename) {
         String data = xSP.getString(filename, "");
         ArrayList<String> arrayList = new ArrayList<>();
         for (String line : data.split("\n")) {
@@ -306,40 +325,31 @@ public class Hook {
     }
 
     /**
-     * @param length the array's length
-     * @param array  a zero-length array.
-     * @param <E>    type
-     * @return an array.
-     */
-    @SafeVarargs
-    private static <E> E[] newArray(int length, E... array) {
-        return Arrays.copyOf(array, length);
-    }
-
-    public static void log(String text) {
-        if (enableLog) {
-            XposedBridge.log(text);
-        }
-    }
-
-    /**
      * The main hooker.
      *
      * @param loadPackageParam the param of the package loaded.
      * @throws Throwable Some exceptions.
      */
     @Keep
-    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    public void handleLoadPackage(Context applicationContext, final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         if (loadPackageParam == null) {
             return;
         }
         final ArrayList<BlockModel>[] mBlockList;
         mBlockList = newArray(1);
-        xSP.reload();
-        xSP.makeWorldReadable();
-        xSP.getFile().setWritable(true);
+        xSP = new RemotePreferences(applicationContext, Constant.ACTIVITY_NAME, "data");
         String pkg = xSP.getString(PACKAGE_NAME_NAME, "");
+        applicationContext.bindService(new Intent("RemoteViewMessager"), new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                viewMessager = IViewMessager.Stub.asInterface(service);
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        }, Context.BIND_AUTO_CREATE);
         //读取设置
         try {
             superMode = Boolean.valueOf(xSP.getString(SUPER_MODE_NAME, String.valueOf(false)));
@@ -357,7 +367,7 @@ public class Hook {
 
 
         log("净眼:检测模块正常 -->" + pkg);
-        if ((pkg != null && loadPackageParam.packageName.equals(pkg))) {
+        if ((loadPackageParam.packageName.equals(pkg))) {
             if (standardMode) {
                 log("净眼:hook -->setOnClickListener");
 
@@ -439,7 +449,6 @@ public class Hook {
 
         /*
         ------------------------------------标记部分结束，以下为拦截部分------------------------
-        ------------------------------------华丽的分割线----------------------------------------
         读取屏蔽列表
         */
         mBlockList[0] = readBlockList(loadPackageParam.packageName);
@@ -593,7 +602,7 @@ public class Hook {
 
     static abstract class AbstractBlocker {
 
-
+        public static final Pair<Boolean, Integer> NULL_PAIR = new Pair<>(false, -1);
         /**
          * @param o 需要被记录的对象
          * @return 记录Model
@@ -633,13 +642,11 @@ public class Hook {
             return instance;
         }
 
-        @NonNull
-        @Override
-        public BlockModel log(Object o) {
-            View view = (View) o;
-            return new BlockModel(view.getContext().getPackageName(), view.getId() + ALL_SPLIT + getViewPath(view) + ALL_SPLIT + getViewPosition(view), getText(view), ViewUtils.getClassName(view.getClass()));
-        }
-
+        /**
+         * @param str String
+         * @param a   char
+         * @return whether the char appears only once in the string.
+         */
         private static boolean singleStr(String str, char a) {
             final int length = str.length();
             boolean appeared = false;
@@ -655,11 +662,18 @@ public class Hook {
             return appeared;
         }
 
+        @NonNull
+        @Override
+        public BlockModel log(Object o) {
+            View view = (View) o;
+            return new BlockModel(view.getContext().getPackageName(), view.getId() + ALL_SPLIT + getViewPath(view) + ALL_SPLIT + getViewPosition(view), getText(view), ViewUtils.getClassName(view.getClass()));
+        }
+
         /**
-         * Be serious on time.
-         * Be serious on time.
-         * Be serious on time.
-         * Think about it that will be invoked around 6,0000 times on every time of starting.
+         * Be serious about time.
+         * Be serious about time.
+         * Be serious about time.
+         * It will be invoked approximately 6,000 times on every start.
          */
         @Override
         protected Pair<Boolean, Integer> isBlock(ArrayList<BlockModel> mBlockList, Object o) {
@@ -669,18 +683,18 @@ public class Hook {
             final int id = view.getId();
             final String ids = getViewId(view);
 
-            CoolapkBlocker.getInstance().setList(mBlockList);
+            //CoolapkBlocker.getInstance().setList(mBlockList);
             //Block
             GoogleBlocker.getInstance().treatOrBlock(view, ids, className);
-            CoolapkBlocker.getInstance().treatOrBlock(view, ids, className);
+            //CoolapkBlocker.getInstance().treatOrBlock(view, ids, className);
             ShareThroughBlocker.getInstance().treatOrBlock(view, ids, className);
 
-            final String strId = id + "";
+            final String strId = Integer.toString(id);
             final int len = mBlockList.size();
             final String postion = getViewPosition(view);
             final String p = getViewPath(view);
             if (singleStr(p, '/')) {
-                return new Pair<>(false, -1);
+                return NULL_PAIR;
             }
             for (int i = 0; i < len; i++) {
                 final BlockModel model = mBlockList.get(i);
@@ -708,7 +722,7 @@ public class Hook {
                     }
                 }
             }
-            return new Pair<>(false, -1);
+            return NULL_PAIR;
         }
 
         @Override
@@ -776,7 +790,7 @@ public class Hook {
                     return new Pair<>(model.enable, i);
                 }
             }
-            return new Pair<>(false, -1);
+            return NULL_PAIR;
         }
 
     }
