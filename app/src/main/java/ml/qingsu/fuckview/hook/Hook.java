@@ -14,7 +14,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -31,6 +33,8 @@ import android.widget.TextView;
 
 import com.crossbowffs.remotepreferences.RemotePreferences;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -48,6 +52,7 @@ import ml.qingsu.fuckview.hook.blocker.ShareThroughBlocker;
 import ml.qingsu.fuckview.models.BlockModel;
 import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.models.ViewModel;
+import ml.qingsu.fuckview.utils.RemoteViewMessager;
 import ml.qingsu.fuckview.utils.ViewUtils;
 
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
@@ -73,7 +78,6 @@ public class Hook {
     private static final String ENABLE_LOG_NAME = "enable_log";
     private static final String PACKAGE_NAME_NAME = "package_name";
     private static final String LIST_FILENAME = "block_list";
-    private static final String BROADCAST_ACTION = "tooYoungtooSimple";
     private static final String ALL_SPLIT = "~~~";
     private static final String RECEIVER_KEY = "motherfuckerreceiver";
     private static final int NOTIFICATION_ID = 0x123;
@@ -140,7 +144,7 @@ public class Hook {
         }
     }
 
-    private void handleClick(final View view) throws PackageManager.NameNotFoundException {
+    private void handleClick(final View view) throws PackageManager.NameNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException, RemoteException {
         final Context context = view.getContext();
         //增加红框
         addViewShape(view);
@@ -207,13 +211,15 @@ public class Hook {
             }
         }
 
-        Intent broadcastIntent = new Intent(BROADCAST_ACTION)
-                .putExtra("height", view.getHeight())
-                .putExtra("width", view.getWidth())
-                .putExtra("className", ViewUtils.getClassName(view.getClass()))
-                .putExtra("record", ViewBlocker.getInstance().log(view).toString())
-                .putExtra("screenShot", ViewUtils.getBitmapFromView(view));
-        context.sendBroadcast(broadcastIntent);
+        Bundle bundle = new Bundle();
+        bundle.putInt("height", view.getHeight());
+        bundle.putInt("width", view.getWidth());
+        bundle.putString("className", ViewUtils.getClassName(view.getClass()));
+        bundle.putString("record", ViewBlocker.getInstance().log(view).toString());
+        RemoteViewMessager.addBitmapToBundle(bundle, ViewUtils.getBitmapFromView(view));
+        if (viewMessager != null) {
+            viewMessager.shareMemory(bundle);
+        }
     }
 
     /**
@@ -278,12 +284,12 @@ public class Hook {
         }
 
         //BroadcastReceiver
-        Intent broadcastIntent = new Intent(BROADCAST_ACTION)
-                .putExtra("height", view.getHeight())
-                .putExtra("width", view.getWidth())
-                .putExtra("className", ViewUtils.getClassName(view.getClass()))
-                .putExtra("record", ViewBlocker.getInstance().log(view).toString());
-        context.sendBroadcast(broadcastIntent);
+//        Intent broadcastIntent = new Intent(BROADCAST_ACTION)
+//                .putExtra("height", view.getHeight())
+//                .putExtra("width", view.getWidth())
+//                .putExtra("className", ViewUtils.getClassName(view.getClass()))
+//                .putExtra("record", ViewBlocker.getInstance().log(view).toString());
+//        context.sendBroadcast(broadcastIntent);
     }
 
     /**
@@ -383,7 +389,7 @@ public class Hook {
                                 //处理，显示参数
                                 try {
                                     handleClick(view);
-                                } catch (PackageManager.NameNotFoundException e) {
+                                } catch (Throwable e) {
                                     e.printStackTrace();
                                 }
                                 //如果是ListView中的项目，手动CALL一次监听器
@@ -603,6 +609,7 @@ public class Hook {
     static abstract class AbstractBlocker {
 
         public static final Pair<Boolean, Integer> NULL_PAIR = new Pair<>(false, -1);
+
         /**
          * @param o 需要被记录的对象
          * @return 记录Model

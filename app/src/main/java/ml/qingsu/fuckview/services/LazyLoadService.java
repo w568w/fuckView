@@ -34,6 +34,11 @@ public class LazyLoadService extends IntentService {
     }
 
     public static void start(Context c) {
-        c.startService(new Intent(c, LazyLoadService.class));
+        try {
+            c.startService(new Intent(c, LazyLoadService.class));
+        } catch (IllegalStateException e) {
+            //App is in background
+            CrashReport.initCrashReport(c, Constant.BUGLY_KEY, false);
+        }
     }
 }

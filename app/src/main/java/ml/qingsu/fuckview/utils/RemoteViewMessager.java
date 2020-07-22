@@ -13,6 +13,8 @@ import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -24,10 +26,10 @@ import java.util.UUID;
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.IViewMessager;
 import ml.qingsu.fuckview.binder.BitmapBinder;
-
-import static ml.qingsu.fuckview.hook.Hook.BROADCAST_ACTION;
+import ml.qingsu.fuckview.models.ViewCaptureEvent;
 
 public class RemoteViewMessager extends Service {
+    private static final String BROADCAST_ACTION = "tooYoungtooSimple";
 
     private final IViewMessager.Stub stub = new IViewMessager.Stub() {
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -37,8 +39,7 @@ public class RemoteViewMessager extends Service {
             FileDescriptor fd = parcelable.getFileDescriptor();
             FileInputStream fileInputStream = new FileInputStream(fd);
             Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
-            bundle.putBinder("screenShot", new BitmapBinder(bitmap));
-            sendBroadcast(new Intent(BROADCAST_ACTION));
+            EventBus.getDefault().post(new ViewCaptureEvent(bundle, bitmap));
             return null;
         }
     };

@@ -1,5 +1,7 @@
 package ml.qingsu.fuckview.models;
 
+import java.io.Serializable;
+
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 
 /**
@@ -7,7 +9,7 @@ import ml.qingsu.fuckview.ui.activities.MainActivity;
  *
  * @author w568w
  */
-public class ViewModel extends BlockModel {
+public class ViewModel extends BlockModel implements Serializable {
     private String id;
     private String path;
     private String position;

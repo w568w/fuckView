@@ -102,9 +102,9 @@
             android:key="source"
             android:summary="None"
             android:title="Open source" />
-        <Preference
-            android:key="qq"
-            android:summary="@string/conf_qq_group_des"
-            android:title="@string/conf_qq_group_name" />
+        <!--        <Preference-->
+        <!--            android:key="qq"-->
+        <!--            android:summary="@string/conf_qq_group_des"-->
+        <!--            android:title="@string/conf_qq_group_name" />-->
     </PreferenceCategory>
 </PreferenceScreen>

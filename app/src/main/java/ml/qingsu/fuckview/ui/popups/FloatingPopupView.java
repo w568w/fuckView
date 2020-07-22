@@ -3,10 +3,9 @@ package ml.qingsu.fuckview.ui.popups;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,16 +17,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.base.BaseActionBroadcastReceiver;
 import ml.qingsu.fuckview.base.BasePopupWindow;
-import ml.qingsu.fuckview.binder.BitmapBinder;
 import ml.qingsu.fuckview.hook.ViewReceiver;
 import ml.qingsu.fuckview.models.PageEvent;
+import ml.qingsu.fuckview.models.ViewCaptureEvent;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.ui.activities.MainActivity;
 import ml.qingsu.fuckview.ui.popups.guide.GuidePopupToast;
@@ -55,8 +55,7 @@ public class FloatingPopupView extends BasePopupWindow {
     private Button mRefresh;
     private ProgressBar mClosingProgress;
     private TextView mInfo;
-    private HookBrocastReceiver mReceiver;
-    private Button mSave;
+    private Button mDetail;
 
     public FloatingPopupView(Activity activity, String pkg) {
         super(activity);
@@ -68,7 +67,6 @@ public class FloatingPopupView extends BasePopupWindow {
         } else {
             mRefresh.setVisibility(View.GONE);
         }
-        mReceiver = new HookBrocastReceiver();
     }
 
     @Override
@@ -77,7 +75,7 @@ public class FloatingPopupView extends BasePopupWindow {
         mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
         mInfo = (TextView) layout.findViewById(R.id.dump_info);
         mClosingProgress = (ProgressBar) layout.findViewById(R.id.dump_progress);
-        mSave = (Button) layout.findViewById(R.id.dump_save);
+        mDetail = (Button) layout.findViewById(R.id.dump_detail);
         final Button close = (Button) layout.findViewById(R.id.dump_close);
         final Button top = (Button) layout.findViewById(R.id.dump_top);
 
@@ -104,7 +102,6 @@ public class FloatingPopupView extends BasePopupWindow {
                             hide();
                             mClosingProgress.setVisibility(View.GONE);
                             MainActivity.writePreferences("", Constant.PACKAGE_NAME_NAME);
-                            appContext.unregisterReceiver(mReceiver);
                             //Calling startActivity() from outside of an Activity context requires the FLAG_ACTIVITY_NEW_TASK flag.
                             appContext.startActivity(new Intent(appContext, MainActivity.class).addFlags(FLAG_ACTIVITY_NEW_TASK));
 
@@ -123,18 +120,19 @@ public class FloatingPopupView extends BasePopupWindow {
                 updateLayout();
             }
         });
-        mSave.setOnClickListener(new View.OnClickListener() {
+        mDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO :Show a dialog with detail
                 try {
                     ViewModel model = (ViewModel) mInfo.getTag();
                     model.save();
-                    //發送，以使View接收隱藏廣播
                     appContext.sendBroadcast(new Intent(ViewReceiver.ACTION).putExtra("path", model.getPath()));
                     Toast.makeText(appContext, R.string.rule_saved, Toast.LENGTH_SHORT).show();
                     mInfo.setTag(null);
                     mInfo.setText("");
-                    mSave.setVisibility(View.GONE);
+                    mInfo.setBackgroundDrawable(null);
+                    mDetail.setVisibility(View.GONE);
                     EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.MARKED.ordinal()));
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
@@ -148,7 +146,7 @@ public class FloatingPopupView extends BasePopupWindow {
     @Override
     protected void onShow() {
         super.onShow();
-        mReceiver.registerReceiver(appContext);
+        EventBus.getDefault().register(this);
     }
 
 
@@ -199,30 +197,20 @@ public class FloatingPopupView extends BasePopupWindow {
         }
     }
 
-    private class HookBrocastReceiver extends BaseActionBroadcastReceiver {
-        private static final String BROADCAST_ACTION = "tooYoungtooSimple";
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCaptureView(ViewCaptureEvent event) {
+        Bundle intent = event.bundle;
+        ViewModel viewModel = ViewModel.fromString(intent.getString("record"));
 
-        @Override
-        public String getAction() {
-            return BROADCAST_ACTION;
-        }
-
-        @Override
-        public void onReceiving(Context context, Intent intent) {
-            ViewModel viewModel = ViewModel.fromString(intent.getStringExtra("record"));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-
-                Bitmap bitmapBinder = (Bitmap) intent.getExtras().get("screenShot");
-                if (bitmapBinder != null) {
-                    mInfo.setBackgroundDrawable(new BitmapDrawable(bitmapBinder));
-                }
+        if (viewModel != null) {
+            if (event.bitmap != null) {
+                mInfo.setBackgroundDrawable(new BitmapDrawable(event.bitmap));
             }
-            if (viewModel != null) {
-                mInfo.setTag(viewModel);
-                mInfo.setText(viewModel.className);
-                mSave.setVisibility(View.VISIBLE);
-                EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.CLICKED.ordinal()));
-            }
+            mInfo.setTag(viewModel);
+            mInfo.setText(viewModel.className);
+            mDetail.setVisibility(View.VISIBLE);
+            EventBus.getDefault().post(new PageEvent(GuidePopupToast.Page.CLICKED.ordinal()));
         }
     }
+
 }
