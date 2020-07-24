@@ -3,8 +3,6 @@
 
 [![Build Status](https://travis-ci.org/w568w/fuckView.svg?branch=master)](https://travis-ci.org/w568w/fuckView)  
   
-**IMPORTANT!**  The project is **suspended** now because I can't install `Xposed` on my phone for the further test and development.
-
 ---
 An Android xposed moudle which can block anything you want to block in any app,just like an AdBlocker for Android applications.  
 It's experimental and **has so many bugs**,which I am working hard to fix them now.    
@@ -17,8 +15,6 @@ You can also download the stable apk from
 ## License
   ```GNU AFFERO GENERAL PUBLIC LICENSE v3```
 # 净眼
-
-**重要!**  因为我的手机上无法安装`Xposed`，这个项目目前处于 **暂停状态**。 
 
 ---
 这是一个可以让你在任何应用中屏蔽任何你不想看到东西的Xposed模块，就像加强版AdBlocker。  
