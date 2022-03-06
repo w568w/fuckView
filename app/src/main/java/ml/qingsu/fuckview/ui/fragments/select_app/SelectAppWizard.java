@@ -9,7 +9,6 @@ import android.os.SystemClock;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.tencent.bugly.crashreport.CrashReport;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -99,7 +98,6 @@ public class SelectAppWizard extends BaseWizard implements Searchable {
         } catch (Exception e) {
             Toast.makeText(mCon, R.string.cant_start_app, Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-            CrashReport.postCatchedException(e);
         }
     }
 

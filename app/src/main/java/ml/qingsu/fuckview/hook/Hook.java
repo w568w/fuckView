@@ -1,5 +1,12 @@
 package ml.qingsu.fuckview.hook;
 
+import static ml.qingsu.fuckview.Constant.PKG_NAME;
+import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
+import static ml.qingsu.fuckview.utils.ViewUtils.getText;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewId;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewPath;
+import static ml.qingsu.fuckview.utils.ViewUtils.getViewPosition;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
@@ -42,11 +49,10 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ml.qingsu.fuckview.BuildConfig;
 import ml.qingsu.fuckview.Constant;
 import ml.qingsu.fuckview.IViewMessager;
 import ml.qingsu.fuckview.R;
-import ml.qingsu.fuckview.binder.BitmapBinder;
-import ml.qingsu.fuckview.hook.blocker.CoolapkBlocker;
 import ml.qingsu.fuckview.hook.blocker.GoogleBlocker;
 import ml.qingsu.fuckview.hook.blocker.ShareThroughBlocker;
 import ml.qingsu.fuckview.models.BlockModel;
@@ -54,13 +60,6 @@ import ml.qingsu.fuckview.models.CoolApkHeadlineModel;
 import ml.qingsu.fuckview.models.ViewModel;
 import ml.qingsu.fuckview.utils.RemoteViewMessager;
 import ml.qingsu.fuckview.utils.ViewUtils;
-
-import static ml.qingsu.fuckview.Constant.PKG_NAME;
-import static ml.qingsu.fuckview.utils.ViewUtils.getAllText;
-import static ml.qingsu.fuckview.utils.ViewUtils.getText;
-import static ml.qingsu.fuckview.utils.ViewUtils.getViewId;
-import static ml.qingsu.fuckview.utils.ViewUtils.getViewPath;
-import static ml.qingsu.fuckview.utils.ViewUtils.getViewPosition;
 
 /**
  * w568w on 2017-6-30.
@@ -86,10 +85,6 @@ public class Hook {
     private static boolean standardMode;
     private static boolean superMode;
     private static boolean enableLog;
-    /**
-     * @removed Nowhere to use.
-     */
-    private static int mNotificationId = NOTIFICATION_ID + 1;
     private RemotePreferences xSP;
     private IViewMessager viewMessager;
 
@@ -116,12 +111,7 @@ public class Hook {
             final Drawable background = view.getBackground();
             view.setBackgroundDrawable(gd);
             //Then recover the background.
-            view.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    view.setBackgroundDrawable(background);
-                }
-            }, 600);
+            view.postDelayed(() -> view.setBackgroundDrawable(background), 600);
         } catch (Throwable ignored) {
 
         }
@@ -164,7 +154,7 @@ public class Hook {
         //设置Intent
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view).toString());
+        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view));
         intent.putExtra("Dialog", true);
         //Fix: NullPointerE in VAEXposed.
         //VAEXposed throws a exception with chain styles.
@@ -247,7 +237,7 @@ public class Hook {
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(PKG_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         log(ViewBlocker.getInstance().log(view).toString());
-        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view).toString());
+        intent.putExtra("cache", "\n" + ViewBlocker.getInstance().log(view));
         intent.putExtra("Dialog", true);
         //TODO too much trying.
         try {
@@ -345,7 +335,7 @@ public class Hook {
         mBlockList = newArray(1);
         xSP = new RemotePreferences(applicationContext, Constant.ACTIVITY_NAME, "data");
         String pkg = xSP.getString(PACKAGE_NAME_NAME, "");
-        applicationContext.bindService(new Intent("RemoteViewMessager"), new ServiceConnection() {
+        applicationContext.bindService(new Intent("RemoteViewMessager").setPackage(BuildConfig.APPLICATION_ID), new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 viewMessager = IViewMessager.Stub.asInterface(service);
@@ -358,10 +348,10 @@ public class Hook {
         }, Context.BIND_AUTO_CREATE);
         //读取设置
         try {
-            superMode = Boolean.valueOf(xSP.getString(SUPER_MODE_NAME, String.valueOf(false)));
-            onlyOnce = Boolean.valueOf(xSP.getString(ONLY_ONCE_NAME, String.valueOf(false)));
-            standardMode = Boolean.valueOf(xSP.getString(STANDARD_MODE_NAME, String.valueOf(true)));
-            enableLog = Boolean.valueOf(xSP.getString(ENABLE_LOG_NAME, String.valueOf(true)));
+            superMode = Boolean.parseBoolean(xSP.getString(SUPER_MODE_NAME, String.valueOf(false)));
+            onlyOnce = Boolean.parseBoolean(xSP.getString(ONLY_ONCE_NAME, String.valueOf(false)));
+            standardMode = Boolean.parseBoolean(xSP.getString(STANDARD_MODE_NAME, String.valueOf(true)));
+            enableLog = Boolean.parseBoolean(xSP.getString(ENABLE_LOG_NAME, String.valueOf(true)));
         } catch (Exception e) {
             e.printStackTrace();
             superMode = false;
@@ -369,9 +359,9 @@ public class Hook {
             standardMode = true;
             enableLog = true;
         }
-        log("净眼:开始HOOK --> " + loadPackageParam.packageName);
+        log("净眼:开始HOOK -->" + loadPackageParam.packageName);
 
-
+        log("净眼:新的消息！");
         log("净眼:检测模块正常 -->" + pkg);
         if ((loadPackageParam.packageName.equals(pkg))) {
             if (standardMode) {
@@ -381,32 +371,31 @@ public class Hook {
                     @Override
                     protected void beforeHookedMethod(final MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
-
+                        log("净眼:set OnClickListener for " + param.thisObject.getClass());
                         final View.OnClickListener clickListener = (View.OnClickListener) param.args[0];
-                        param.args[0] = new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                //处理，显示参数
+                        log("净眼:start set OnClickListener!");
+                        param.args[0] = (View.OnClickListener) view -> {
+                            log("净眼:onclick!");
+                            //处理，显示参数
+                            try {
+                                handleClick(view);
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                            }
+                            //如果是ListView中的项目，手动CALL一次监听器
+                            ViewArg model = getListView(view);
+                            if (model != null) {
+                                log("in ListView!");
                                 try {
-                                    handleClick(view);
+                                    int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
+                                    long id = (long) XposedHelpers.callMethod(model.adapterView, "getItemIdAtPosition", new Class[]{int.class}, position);
+                                    XposedHelpers.callMethod(model.adapterView, "performItemClick", new Class[]{View.class, int.class, int.class}, model.subView, position, id);
                                 } catch (Throwable e) {
                                     e.printStackTrace();
                                 }
-                                //如果是ListView中的项目，手动CALL一次监听器
-                                ViewArg model = getListView(view);
-                                if (model != null) {
-                                    log("in ListView!");
-                                    try {
-                                        int position = (int) XposedHelpers.callMethod(model.adapterView, "getPositionForView", new Class[]{View.class}, model.subView);
-                                        long id = (long) XposedHelpers.callMethod(model.adapterView, "getItemIdAtPosition", new Class[]{int.class}, position);
-                                        XposedHelpers.callMethod(model.adapterView, "performItemClick", new Class[]{View.class, int.class, int.class}, model.subView, position, id);
-                                    } catch (Throwable e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                if (clickListener != null) {
-                                    clickListener.onClick(view);
-                                }
+                            }
+                            if (clickListener != null) {
+                                clickListener.onClick(view);
                             }
                         };
                     }
@@ -444,6 +433,7 @@ public class Hook {
             XposedHelpers.findAndHookMethod(View.class, "setLongClickable", boolean.class, new BooleanSetterHooker(true));
             log("净眼:hook -->View<init>");
             XposedBridge.hookAllConstructors(View.class, new ConstructorHooker());
+            XposedBridge.hookAllConstructors(XposedHelpers.findClass("android.view.View", loadPackageParam.classLoader), new ConstructorHooker());
             try {
                 XposedHelpers.findAndHookMethod("android.view.WindowManagerGlobal", Dialog.class.getClassLoader(), "removeView", View.class, boolean.class, new WindowHooker());
             } catch (Throwable throwable) {
@@ -803,7 +793,7 @@ public class Hook {
     }
 
 
-    private class WindowHooker extends XC_MethodHook {
+    private static class WindowHooker extends XC_MethodHook {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
             super.beforeHookedMethod(param);
@@ -818,7 +808,7 @@ public class Hook {
         }
     }
 
-    private class BooleanSetterHooker extends XC_MethodHook {
+    private static class BooleanSetterHooker extends XC_MethodHook {
         private boolean mSetValue;
 
         BooleanSetterHooker(boolean s) {
@@ -835,14 +825,14 @@ public class Hook {
 
     private class ConstructorHooker extends XC_MethodHook {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-            super.beforeHookedMethod(param);
+        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            super.afterHookedMethod(param);
             View view = (View) param.thisObject;
 
             // java.lang.RuntimeException:
             // Don't call setOnClickListener for an AdapterView.
             // You probably want setOnItemClickListener() instead.
-
+            log("净眼:initialize for " + view.getClass());
             if (isAdapterView(view) || view == null) {
                 return;
             }
@@ -854,15 +844,15 @@ public class Hook {
                 view.setOnTouchListener(null);
                 view.setOnClickListener(null);
                 view.setOnLongClickListener(null);
-            } catch (Throwable ignored) {
-
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private class ViewArg {
-        private Object adapterView;
-        private View subView;
+    private static class ViewArg {
+        private final Object adapterView;
+        private final View subView;
 
         private ViewArg(Object adapterView, View subView) {
             this.adapterView = adapterView;

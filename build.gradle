@@ -3,17 +3,13 @@
 buildscript {
     repositories {
         maven {
-            url 'http://maven.aliyun.com/nexus/content/groups/public'
+            url 'https://maven.aliyun.com/nexus/content/groups/public'
         }
         maven { url 'https://jitpack.io' }
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        maven { url 'https://maven.aliyun.com/repository/google' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:7.1.2'
     }
 }
 ext{
@@ -24,14 +20,11 @@ ext{
 allprojects {
     repositories {
         maven {
-            url 'http://maven.aliyun.com/nexus/content/groups/public'
+            url 'https://maven.aliyun.com/nexus/content/groups/public'
         }
         maven { url 'https://jitpack.io' }
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+
     }
 }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ml.qingsu.fuckview">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -8,8 +9,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_LOGS" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
     <application
         android:name=".MyApplication"
@@ -18,7 +17,8 @@
         android:largeHeap="true"
         android:icon="@drawable/icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:targetApi="honeycomb">
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
@@ -31,7 +31,8 @@
 
         <activity
             android:name=".ui.activities.MainActivity"
-            android:icon="@drawable/icon">
+            android:icon="@drawable/icon"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +44,8 @@
             android:name=".ui.activities.MainActivityOldIcon"
             android:enabled="false"
             android:icon="@drawable/icon_old"
-            android:targetActivity=".ui.activities.MainActivity">
+            android:targetActivity=".ui.activities.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -81,7 +83,8 @@
 
         <service
             android:name=".utils.RemoteViewMessager"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="RemoteViewMessager" />
             </intent-filter>
@@ -90,7 +93,8 @@
         <provider
             android:name=".provider.PreferenceProvider"
             android:authorities="ml.qingsu.fuckview.ui.activities.MainActivity"
-            android:exported="true" />
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
     </application>
 
 </manifest>

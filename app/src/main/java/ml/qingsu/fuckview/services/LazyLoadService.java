@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.tencent.bugly.crashreport.CrashReport;
 
 import ml.qingsu.fuckview.Constant;
 
@@ -28,7 +27,7 @@ public class LazyLoadService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_LAZY_LOAD_SERVICE.equals(action)) {
-                CrashReport.initCrashReport(getApplicationContext(), Constant.BUGLY_KEY, false);
+//                CrashReport.initCrashReport(getApplicationContext(), Constant.BUGLY_KEY, false);
             }
         }
     }
@@ -38,7 +37,7 @@ public class LazyLoadService extends IntentService {
             c.startService(new Intent(c, LazyLoadService.class));
         } catch (IllegalStateException e) {
             //App is in background
-            CrashReport.initCrashReport(c, Constant.BUGLY_KEY, false);
+//            CrashReport.initCrashReport(c, Constant.BUGLY_KEY, false);
         }
     }
 }

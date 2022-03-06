@@ -4,7 +4,6 @@ android {
     signingConfigs {
     }
     compileSdkVersion rootProject.ext.compileVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "ml.qingsu.fuckview"
         minSdkVersion rootProject.ext.minSdk
@@ -13,41 +12,37 @@ android {
         versionName "0.9.3.1 experimental"
     }
     //Do not check whether the translation has been completed or not when building APK,please?
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
     if (project.hasProperty('devBuild')) {
         aaptOptions.cruncherEnabled = false
     }
 }
 
-repositories {
-    jcenter();
-}
 def AAVersion = '4.4.0'
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    provided 'de.robv.android.xposed:api:53:sources'
-    compile('de.psdev.licensesdialog:licensesdialog:1.8.3') {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    compileOnly 'de.robv.android.xposed:api:53:sources'
+    implementation('de.psdev.licensesdialog:licensesdialog:1.8.3') {
         exclude group: 'com.android.support'
     }
     //android shell runner
-    compile('com.jrummyapps:android-shell:1.0.1@aar') {
+    implementation('com.jrummyapps:android-shell:1.0.1@aar') {
         transitive = true;
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    compile 'com.crossbowffs.remotepreferences:remotepreferences:0.7'
-    compile 'com.android.support:appcompat-v7:23+'
-    compile 'com.android.support:design:23+'
-    compile "com.android.support:cardview-v7:23+"
-    compile 'com.tencent.bugly:crashreport:latest.release'
-    compile 'org.greenrobot:eventbus:3.1.1'
-    provided 'de.robv.android.xposed:api:53'
+    implementation 'com.crossbowffs.remotepreferences:remotepreferences:0.7'
+    implementation 'com.android.support:appcompat-v7:23+'
+    implementation 'com.android.support:design:23+'
+    implementation "com.android.support:cardview-v7:23+"
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    compileOnly 'de.robv.android.xposed:api:53'
 }

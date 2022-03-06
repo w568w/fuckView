@@ -1,8 +1,11 @@
 package ml.qingsu.fuckview.hook;
 
 import android.app.Application;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.Keep;
 import android.util.Log;
 
@@ -15,6 +18,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ml.qingsu.fuckview.MyApplication;
 
 import static ml.qingsu.fuckview.Constant.ACTIVITY_NAME;
 import static ml.qingsu.fuckview.Constant.PKG_NAME;
@@ -73,6 +77,8 @@ public class InitInjector implements IXposedHookLoadPackage {
                 }
             }
         });
+
+
     }
 
     private void invokeHandleHookMethod(Context context, String modulePackageName, String handleHookClass, String handleHookMethod, XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {

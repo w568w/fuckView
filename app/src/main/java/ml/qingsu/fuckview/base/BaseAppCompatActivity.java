@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * Created by w568w on 18-4-2.
@@ -20,7 +19,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         try {
             super.startActivity(intent, options);
         } catch (ActivityNotFoundException e) {
-            CrashReport.postCatchedException(e);
         }
     }
 }

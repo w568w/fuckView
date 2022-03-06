@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,12 +73,12 @@ public class FloatingPopupView extends BasePopupWindow {
     @Override
     protected View onCreateView(final Context context) {
         LinearLayout layout = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.dump_viewer_view, null);
-        mRefresh = (Button) layout.findViewById(R.id.dump_refresh);
-        mInfo = (TextView) layout.findViewById(R.id.dump_info);
-        mClosingProgress = (ProgressBar) layout.findViewById(R.id.dump_progress);
-        mDetail = (Button) layout.findViewById(R.id.dump_detail);
-        final Button close = (Button) layout.findViewById(R.id.dump_close);
-        final Button top = (Button) layout.findViewById(R.id.dump_top);
+        mRefresh = layout.findViewById(R.id.dump_refresh);
+        mInfo = layout.findViewById(R.id.dump_info);
+        mClosingProgress = layout.findViewById(R.id.dump_progress);
+        mDetail = layout.findViewById(R.id.dump_detail);
+        final Button close = layout.findViewById(R.id.dump_close);
+        final Button top = layout.findViewById(R.id.dump_top);
 
         setFocusable(false);
         mRefresh.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +125,7 @@ public class FloatingPopupView extends BasePopupWindow {
             @Override
             public void onClick(View v) {
                 //TODO :Show a dialog with detail
+
                 try {
                     ViewModel model = (ViewModel) mInfo.getTag();
                     model.save();
@@ -141,8 +143,6 @@ public class FloatingPopupView extends BasePopupWindow {
         });
         return layout;
     }
-
-
     @Override
     protected void onShow() {
         super.onShow();
